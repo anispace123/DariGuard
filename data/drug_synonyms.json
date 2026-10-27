@@ -1,0 +1,158 @@
+{
+  "description": "Справочник нормализации: синонимы МНН, торговые наименования и комбинированные препараты для Pharma Sentinel",
+  "version": "1.0",
+  "synonyms": {
+    "парацетамол": {"canonical": "acetaminophen", "type": "inn_translation", "ru": "Парацетамол", "en_inn": "Paracetamol / Acetaminophen"},
+    "paracetamol": {"canonical": "acetaminophen", "type": "inn_alias", "ru": "Парацетамол", "en_inn": "Acetaminophen"},
+    "панадол": {"canonical": "acetaminophen", "type": "brand", "ru": "Панадол", "en_inn": "Acetaminophen"},
+    "тайленол": {"canonical": "acetaminophen", "type": "brand", "ru": "Тайленол", "en_inn": "Acetaminophen"},
+    "эффералган": {"canonical": "acetaminophen", "type": "brand", "ru": "Эффералган", "en_inn": "Acetaminophen"},
+
+    "аспирин": {"canonical": "acetylsalicylic acid", "type": "brand_as_inn", "ru": "Аспирин", "en_inn": "Acetylsalicylic acid"},
+    "aspirin": {"canonical": "acetylsalicylic acid", "type": "brand_as_inn", "ru": "Aspirin", "en_inn": "Acetylsalicylic acid"},
+    "ацетилсалициловая кислота": {"canonical": "acetylsalicylic acid", "type": "inn_translation", "ru": "Ацетилсалициловая кислота", "en_inn": "Acetylsalicylic acid"},
+    "тромбо асс": {"canonical": "acetylsalicylic acid", "type": "brand", "ru": "Тромбо АСС", "en_inn": "Acetylsalicylic acid"},
+    "аспирин кардио": {"canonical": "acetylsalicylic acid", "type": "brand", "ru": "Аспирин Кардио", "en_inn": "Acetylsalicylic acid"},
+
+    "ибупрофен": {"canonical": "ibuprofen", "type": "inn_translation", "ru": "Ибупрофен", "en_inn": "Ibuprofen"},
+    "нурофен": {"canonical": "ibuprofen", "type": "brand", "ru": "Нурофен", "en_inn": "Ibuprofen"},
+    "миг": {"canonical": "ibuprofen", "type": "brand", "ru": "МИГ 400", "en_inn": "Ibuprofen"},
+    "фаспик": {"canonical": "ibuprofen", "type": "brand", "ru": "ФасPick", "en_inn": "Ibuprofen"},
+
+    "диклофенак": {"canonical": "diclofenac", "type": "inn_translation", "ru": "Диклофенак", "en_inn": "Diclofenac"},
+    "вольтарен": {"canonical": "diclofenac", "type": "brand", "ru": "Вольтарен", "en_inn": "Diclofenac"},
+    "ортофен": {"canonical": "diclofenac", "type": "brand", "ru": "Ортофен", "en_inn": "Diclofenac"},
+
+    "кетопрофен": {"canonical": "ketoprofen", "type": "inn_translation", "ru": "Кетопрофен", "en_inn": "Ketoprofen"},
+    "кетонал": {"canonical": "ketoprofen", "type": "brand", "ru": "Кетонал", "en_inn": "Ketoprofen"},
+
+    "варфарин": {"canonical": "warfarin", "type": "inn_translation", "ru": "Варфарин", "en_inn": "Warfarin"},
+    "ривароксабан": {"canonical": "rivaroxaban", "type": "inn_translation", "ru": "Ривароксабан", "en_inn": "Rivaroxaban"},
+    "ксарелто": {"canonical": "rivaroxaban", "type": "brand", "ru": "Ксарелто", "en_inn": "Rivaroxaban"},
+
+    "апиксабан": {"canonical": "apixaban", "type": "inn_translation", "ru": "Апиксабан", "en_inn": "Apixaban"},
+    "эликвис": {"canonical": "apixaban", "type": "brand", "ru": "Эликвис", "en_inn": "Apixaban"},
+
+    "клопидогрел": {"canonical": "clopidogrel", "type": "inn_translation", "ru": "Клопидогрел", "en_inn": "Clopidogrel"},
+    "плавикс": {"canonical": "clopidogrel", "type": "brand", "ru": "Плавикс", "en_inn": "Clopidogrel"},
+    "зилт": {"canonical": "clopidogrel", "type": "brand", "ru": "Зилт", "en_inn": "Clopidogrel"},
+
+    "метформин": {"canonical": "metformin", "type": "inn_translation", "ru": "Метформин", "en_inn": "Metformin"},
+    "глюкофаж": {"canonical": "metformin", "type": "brand", "ru": "Глюкофаж", "en_inn": "Metformin"},
+    "сиофор": {"canonical": "metformin", "type": "brand", "ru": "Сиофор", "en_inn": "Metformin"},
+
+    "омепразол": {"canonical": "omeprazole", "type": "inn_translation", "ru": "Омепразол", "en_inn": "Omeprazole"},
+    "омез": {"canonical": "omeprazole", "type": "brand", "ru": "Омез", "en_inn": "Omeprazole"},
+    "лосек": {"canonical": "omeprazole", "type": "brand", "ru": "Лосек", "en_inn": "Omeprazole"},
+
+    "пантопразол": {"canonical": "pantoprazole", "type": "inn_translation", "ru": "Пантопразол", "en_inn": "Pantoprazole"},
+    "нольпаза": {"canonical": "pantoprazole", "type": "brand", "ru": "Нольпаза", "en_inn": "Pantoprazole"},
+
+    "аторвастатин": {"canonical": "atorvastatin", "type": "inn_translation", "ru": "Аторвастатин", "en_inn": "Atorvastatin"},
+    "липримар": {"canonical": "atorvastatin", "type": "brand", "ru": "Липримар", "en_inn": "Atorvastatin"},
+    "аторис": {"canonical": "atorvastatin", "type": "brand", "ru": "Аторис", "en_inn": "Atorvastatin"},
+
+    "розувастатин": {"canonical": "rosuvastatin", "type": "inn_translation", "ru": "Розувастатин", "en_inn": "Rosuvastatin"},
+    "крестор": {"canonical": "rosuvastatin", "type": "brand", "ru": "Крестор", "en_inn": "Rosuvastatin"},
+    "роксера": {"canonical": "rosuvastatin", "type": "brand", "ru": "Роксера", "en_inn": "Rosuvastatin"},
+
+    "симвастатин": {"canonical": "simvastatin", "type": "inn_translation", "ru": "Симвастатин", "en_inn": "Simvastatin"},
+    "зокор": {"canonical": "simvastatin", "type": "brand", "ru": "Зокор", "en_inn": "Simvastatin"},
+
+    "бисопролол": {"canonical": "bisoprolol", "type": "inn_translation", "ru": "Бисопролол", "en_inn": "Bisoprolol"},
+    "конкор": {"canonical": "bisoprolol", "type": "brand", "ru": "Конкор", "en_inn": "Bisoprolol"},
+    "биол": {"canonical": "bisoprolol", "type": "brand", "ru": "Биол", "en_inn": "Bisoprolol"},
+
+    "метопролол": {"canonical": "metoprolol", "type": "inn_translation", "ru": "Метопролол", "en_inn": "Metoprolol"},
+    "беталок": {"canonical": "metoprolol", "type": "brand", "ru": "Беталок", "en_inn": "Metoprolol"},
+
+    "амлодипин": {"canonical": "amlodipine", "type": "inn_translation", "ru": "Амлодипин", "en_inn": "Amlodipine"},
+    "норваск": {"canonical": "amlodipine", "type": "brand", "ru": "Норваск", "en_inn": "Amlodipine"},
+
+    "лозартан": {"canonical": "losartan", "type": "inn_translation", "ru": "Лозартан", "en_inn": "Losartan"},
+    "лозап": {"canonical": "losartan", "type": "brand", "ru": "Лозап", "en_inn": "Losartan"},
+    "козаар": {"canonical": "losartan", "type": "brand", "ru": "Козаар", "en_inn": "Losartan"},
+
+    "эналаприл": {"canonical": "enalapril", "type": "inn_translation", "ru": "Эналаприл", "en_inn": "Enalapril"},
+    "ренитек": {"canonical": "enalapril", "type": "brand", "ru": "Ренитек", "en_inn": "Enalapril"},
+    "энап": {"canonical": "enalapril", "type": "brand", "ru": "Энап", "en_inn": "Enalapril"},
+
+    "лизиноприл": {"canonical": "lisinopril", "type": "inn_translation", "ru": "Лизиноприл", "en_inn": "Lisinopril"},
+    "диротон": {"canonical": "lisinopril", "type": "brand", "ru": "Диротон", "en_inn": "Lisinopril"},
+
+    "амоксициллин": {"canonical": "amoxicillin", "type": "inn_translation", "ru": "Амоксициллин", "en_inn": "Amoxicillin"},
+    "флемоксин": {"canonical": "amoxicillin", "type": "brand", "ru": "Флемоксин Солютаб", "en_inn": "Amoxicillin"},
+
+    "азитромицин": {"canonical": "azithromycin", "type": "inn_translation", "ru": "Азитромицин", "en_inn": "Azithromycin"},
+    "сумамед": {"canonical": "azithromycin", "type": "brand", "ru": "Сумамед", "en_inn": "Azithromycin"},
+
+    "кларитромицин": {"canonical": "clarithromycin", "type": "inn_translation", "ru": "Кларитромицин", "en_inn": "Clarithromycin"},
+    "клацид": {"canonical": "clarithromycin", "type": "brand", "ru": "Клацид", "en_inn": "Clarithromycin"},
+
+    "ципрофлоксацин": {"canonical": "ciprofloxacin", "type": "inn_translation", "ru": "Ципрофлоксацин", "en_inn": "Ciprofloxacin"},
+    "цифран": {"canonical": "ciprofloxacin", "type": "brand", "ru": "Цифран", "en_inn": "Ciprofloxacin"},
+
+    "флуконазол": {"canonical": "fluconazole", "type": "inn_translation", "ru": "Флуконазол", "en_inn": "Fluconazole"},
+    "дифлюкан": {"canonical": "fluconazole", "type": "brand", "ru": "Дифлюкан", "en_inn": "Fluconazole"},
+    "флюкостат": {"canonical": "fluconazole", "type": "brand", "ru": "Флюкостат", "en_inn": "Fluconazole"},
+
+    "флуоксетин": {"canonical": "fluoxetine", "type": "inn_translation", "ru": "Флуоксетин", "en_inn": "Fluoxetine"},
+    "прозак": {"canonical": "fluoxetine", "type": "brand", "ru": "Прозак", "en_inn": "Fluoxetine"},
+
+    "сертралин": {"canonical": "sertraline", "type": "inn_translation", "ru": "Сертралин", "en_inn": "Sertraline"},
+    "золофт": {"canonical": "sertraline", "type": "brand", "ru": "Золофт", "en_inn": "Sertraline"},
+    "стимулотон": {"canonical": "sertraline", "type": "brand", "ru": "Стимулотон", "en_inn": "Sertraline"},
+
+    "эсциталопрам": {"canonical": "escitalopram", "type": "inn_translation", "ru": "Эсциталопрам", "en_inn": "Escitalopram"},
+    "ципралекс": {"canonical": "escitalopram", "type": "brand", "ru": "Ципралекс", "en_inn": "Escitalopram"},
+
+    "левотироксин": {"canonical": "levothyroxine", "type": "inn_translation", "ru": "Левотироксин", "en_inn": "Levothyroxine"},
+    "l-тироксин": {"canonical": "levothyroxine", "type": "brand", "ru": "L-тироксин", "en_inn": "Levothyroxine"},
+    "эутирокс": {"canonical": "levothyroxine", "type": "brand", "ru": "Эутирокс", "en_inn": "Levothyroxine"}
+  },
+  "combinations": {
+    "цитрамон": {
+      "ru": "Цитрамон",
+      "components": ["acetylsalicylic acid", "acetaminophen", "caffeine"],
+      "description": "Комбинированный анальгетик: ацетилсалициловая кислота + парацетамол + кофеин. Для точной оценки проверяются все активные компоненты."
+    },
+    "аскофен": {
+      "ru": "Аскофен",
+      "components": ["acetylsalicylic acid", "acetaminophen", "caffeine"],
+      "description": "Комбинированный анальгетик: ацетилсалициловая кислота + парацетамол + кофеин."
+    },
+    "кардиомагнил": {
+      "ru": "Кардиомагнил",
+      "components": ["acetylsalicylic acid", "magnesium hydroxide"],
+      "description": "Антиагрегантная комбинация: ацетилсалициловая кислота + магния гидроксид."
+    },
+    "амоксиклав": {
+      "ru": "Амоксиклав",
+      "components": ["amoxicillin", "clavulanate"],
+      "description": "Антибиотик широкого спектра: амоксициллин + клавулановая кислота."
+    },
+    "аугментин": {
+      "ru": "Аугментин",
+      "components": ["amoxicillin", "clavulanate"],
+      "description": "Антибиотик: амоксициллин + клавулановая кислота."
+    },
+    "пенталгин": {
+      "ru": "Пенталгин",
+      "components": ["acetaminophen", "naproxen", "caffeine", "drotaverine", "pheniramine"],
+      "description": "Многокомпонентный анальгетик (парацетамол + напроксен + кофеин + дротаверин + фенирамин). Требует раздельной проверки компонентов."
+    },
+    "терафлю": {
+      "ru": "Терафлю",
+      "components": ["acetaminophen", "phenylephrine", "pheniramine"],
+      "description": "Комбинированный противопростудный препарат: парацетамол + фенилэфрин + фенирамин."
+    }
+  },
+  "recognized_unsupported": {
+    "но-шпа": {"ru": "Но-шпа", "inn": "drotaverine", "reason": "Дротаверин не зарегистрирован FDA и отсутствует в датасете DDInter."},
+    "дротаверин": {"ru": "Дротаверин", "inn": "drotaverine", "reason": "Дротаверин отсутствует в датасете DDInter (препарат преимущественно восточноевропейского применения)."},
+    "анальгин": {"ru": "Анальгин", "inn": "metamizole sodium", "reason": "Метамизол натрия отсутствует в датасете DDInter."},
+    "метамизол": {"ru": "Метамизол", "inn": "metamizole sodium", "reason": "Метамизол натрия отсутствует в датасете DDInter."},
+    "корвалол": {"ru": "Корвалол", "inn": "phenobarbital + ethyl bromoizovalerianate", "reason": "Многокомпонентный растительно-барбитуратный состав; фенобарбитал есть в базе, но полная смесь отсутствует."},
+    "валидол": {"ru": "Валидол", "inn": "menthyl isovalerate", "reason": "Отсутствует в международном датасете DDInter."}
+  }
+}

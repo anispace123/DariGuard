@@ -1,0 +1,152 @@
+{
+  "title": "Доказательная база клинически значимых взаимодействий БАДов и лекарственных средств",
+  "version": "1.0",
+  "evidence_standards": {
+    "Level A": "Высокий уровень доказательности: рандомизированные контролируемые испытания или мета-анализы.",
+    "Level B": "Умеренный уровень: хорошо спланированные клинические исследования или контролируемые когортные испытания.",
+    "Level C": "Фармакокинетические исследования на людях, авторитетные клинические серии случаев или национальные регуляторные предупреждения (FDA, EMA).",
+    "Level D": "Данные in vitro или теоретические биохимические предпосылки (не включены в основную базу)."
+  },
+  "interactions": [
+    {
+      "id": "SUPP-001",
+      "supplement_ru": "Зверобой продырявленный",
+      "supplement_lat": "Hypericum perforatum",
+      "supplement_key": "st_johns_wort",
+      "drug_canonical": "warfarin",
+      "drug_ru": "Варфарин",
+      "severity": "Major",
+      "interaction_type": "Фармакокинетическое (индукция метаболизма)",
+      "mechanism": "Гиперфорин в составе зверобоя является мощным агонистом прегнанового X-рецептора (PXR) и индуцирует изоферменты цитохрома P450 (CYP2C9, CYP3A4) и гликопротеин P (P-gp).",
+      "clinical_consequence": "Ускорение элиминации варфарина, падение МНО, резкое снижение антикоагулянтного эффекта и риск тромбоэмболии.",
+      "clinical_management": "Совместное применение противопоказано. При отмене зверобоя требуется экстренный контроль МНО во избежание кровотечений.",
+      "evidence_level": "Level A",
+      "citations": [
+        "Henderson L. et al. St John's wort (Hypericum perforatum) drug interactions: a review. Br J Clin Pharmacol. 2002;54(4):349-356.",
+        "FDA Public Health Advisory: Risk of Drug Interactions with St. John's Wort and Indinavir or Other Drugs. 2000."
+      ]
+    },
+    {
+      "id": "SUPP-002",
+      "supplement_ru": "Зверобой продырявленный",
+      "supplement_lat": "Hypericum perforatum",
+      "supplement_key": "st_johns_wort",
+      "drug_canonical": "fluoxetine",
+      "drug_ru": "Флуоксетин",
+      "severity": "Major",
+      "interaction_type": "Фармакодинамическое (синергизм)",
+      "mechanism": "Компоненты зверобоя ингибируют обратный захват серотонина, норадреналина и дофамина, суммируясь с действием СИОЗС.",
+      "clinical_consequence": "Риск развития серотонинового синдрома (гипертермия, тремор, спутанность сознания, вегетативная нестабильность).",
+      "clinical_management": "Комбинация противопоказана. Необходим период вымывания не менее 2 недель между курсами.",
+      "evidence_level": "Level B",
+      "citations": [
+        "Dannawi M. Possible serotonin syndrome with St John's wort and sertraline. Eur J Psych. 2002;17(3):145-147.",
+        "Izzo AA. Herb-drug interactions: an overview. Semin Integr Med. 2004;2(1):16-24."
+      ]
+    },
+    {
+      "id": "SUPP-003",
+      "supplement_ru": "Грейпфрутовый сок / Экстракт грейпфрута",
+      "supplement_lat": "Citrus paradisi",
+      "supplement_key": "grapefruit",
+      "drug_canonical": "simvastatin",
+      "drug_ru": "Симвастатин",
+      "severity": "Major",
+      "interaction_type": "Фармакокинетическое (ингибирование пресистемного метаболизма)",
+      "mechanism": "Фуранокумарины (бергамоттин и 6',7'-дигидроксибергамоттин) необратимо инактивируют изофермент CYP3A4 в энтероцитах тонкого кишечника.",
+      "clinical_consequence": "Повышение биодоступности и сывороточной концентрации симвастатина в 3-10 раз. Высокий риск рабдомиолиза, острой почечной недостаточности и миопатии.",
+      "clinical_management": "Исключить употребление грейпфрута и его сока на фоне терапии симвастатином или заменить на розувастатин/правастатин.",
+      "evidence_level": "Level A",
+      "citations": [
+        "Bailey DG. et al. Grapefruit-medication interactions: Forbidden fruit or avoidable consequences? CMAJ. 2013;185(4):309-316. DOI: 10.1503/cmaj.120512",
+        "FDA Consumer Health Information: Grapefruit Juice and Some Drugs Don't Mix. 2021."
+      ]
+    },
+    {
+      "id": "SUPP-004",
+      "supplement_ru": "Грейпфрутовый сок / Экстракт грейпфрута",
+      "supplement_lat": "Citrus paradisi",
+      "supplement_key": "grapefruit",
+      "drug_canonical": "atorvastatin",
+      "drug_ru": "Аторвастатин",
+      "severity": "Moderate",
+      "interaction_type": "Фармакокинетическое (ингибирование CYP3A4)",
+      "mechanism": "Ингибирование кишечного CYP3A4 приводит к умеренному возрастанию AUC аторвастатина (на 80-150%).",
+      "clinical_consequence": "Повышение риска дозозависимых миалгий и трансаминаземии.",
+      "clinical_management": "Ограничить потребление грейпфрутового сока до менее чем 200 мл в сутки или избегать одновременного приёма.",
+      "evidence_level": "Level B",
+      "citations": [
+        "Lilja JJ. et al. Grapefruit juice increases serum concentrations of atorvastatin and has no effect on pravastatin. Clin Pharmacol Ther. 1999;66(2):118-127."
+      ]
+    },
+    {
+      "id": "SUPP-005",
+      "supplement_ru": "Гинкго Билоба",
+      "supplement_lat": "Ginkgo biloba",
+      "supplement_key": "ginkgo",
+      "drug_canonical": "acetylsalicylic acid",
+      "drug_ru": "Ацетилсалициловая кислота (Аспирин)",
+      "severity": "Moderate",
+      "interaction_type": "Фармакодинамическое (синергизм антитромботического действия)",
+      "mechanism": "Гингколид B является селективным антагонистом фактора активации тромбоцитов (PAF), усиливая антиагрегантный эффект аспирина.",
+      "clinical_consequence": "Повышенный риск спонтанных кровотечений, гифемы и микрогематурии.",
+      "clinical_management": "Соблюдать осторожность, контролировать геморрагические симптомы; прекратить приём за 2 недели до плановых хирургических вмешательств.",
+      "evidence_level": "Level B",
+      "citations": [
+        "Rosenblatt M. et al. Spontaneous hyphema associated with ingestion of Ginkgo biloba extract. N Engl J Med. 1997;336(15):1108.",
+        "NCCIH / NIH Clinical Monograph: Ginkgo. 2020."
+      ]
+    },
+    {
+      "id": "SUPP-006",
+      "supplement_ru": "Витамин K (высокие дозы / фитоменадион)",
+      "supplement_lat": "Phytomenadione / Menaquinone",
+      "supplement_key": "vitamin_k",
+      "drug_canonical": "warfarin",
+      "drug_ru": "Варфарин",
+      "severity": "Major",
+      "interaction_type": "Фармакодинамический антагонизм",
+      "mechanism": "Витамин K напрямую преодолевает конкурентное ингибирование эпоксидредуктазы варфарином, восстанавливая синтез факторов II, VII, IX, X.",
+      "clinical_consequence": "Падение МНО ниже терапевтического диапазона, резкий рост риска тромбоза.",
+      "clinical_management": "Поддерживать стабильное постоянное суточное потребление витамина K без резких колебаний и избегать концентрированных БАДов без согласования с врачом.",
+      "evidence_level": "Level A",
+      "citations": [
+        "Holbrook A. et al. Evidence-based management of anticoagulant therapy. Chest. 2012;141(2 Suppl):e152S-e184S. DOI: 10.1378/chest.11-2295"
+      ]
+    },
+    {
+      "id": "SUPP-007",
+      "supplement_ru": "Препараты кальция / магния / железа",
+      "supplement_lat": "Calcium / Iron / Magnesium supplements",
+      "supplement_key": "mineral_cations",
+      "drug_canonical": "ciprofloxacin",
+      "drug_ru": "Ципрофлоксацин",
+      "severity": "Major",
+      "interaction_type": "Фармакокинетическое (хелатообразование в просвете ЖКТ)",
+      "mechanism": "Поливалентные катионы (Ca2+, Fe2+, Mg2+) образуют стабильные нерастворимые хелатные комплексы с 4-хинолоновым ядром фторхинолонов.",
+      "clinical_consequence": "Снижение биодоступности антибиотика на 50-80%, неэффективность антимикробной терапии и развитие резистентности.",
+      "clinical_management": "Соблюдать интервал не менее 2 часов до или 4 часов после приёма минеральных добавок.",
+      "evidence_level": "Level A",
+      "citations": [
+        "Nix DE. et al. Inhibition of absorption of ciprofloxacin by antacids and other divalent and trivalent cations. Clin Pharmacokinet. 1991;21 Suppl 1:1-8."
+      ]
+    },
+    {
+      "id": "SUPP-008",
+      "supplement_ru": "Препараты железа / кальция",
+      "supplement_lat": "Iron and Calcium formulations",
+      "supplement_key": "mineral_cations",
+      "drug_canonical": "levothyroxine",
+      "drug_ru": "Левотироксин",
+      "severity": "Moderate",
+      "interaction_type": "Фармакокинетическое (снижение всасывания)",
+      "mechanism": "Неспецифическая адсорбция и образование нерастворимых солей тироксина в кислой среде желудка.",
+      "clinical_consequence": "Снижение абсорбции левотироксина, рост уровня ТТГ, декомпенсация гипотиреоза.",
+      "clinical_management": "Принимать левотироксин строго натощак за 30-60 минут до еды, а препараты кальция/железа — с интервалом не менее 4 часов.",
+      "evidence_level": "Level A",
+      "citations": [
+        "Campbell NR. et al. Ferrous sulfate reduces thyroxine efficacy in patients with hypothyroidism. Ann Intern Med. 1992;117(12):1010-1013."
+      ]
+    }
+  ]
+}

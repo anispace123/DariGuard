@@ -1,0 +1,22 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Запуск Pharma Sentinel",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/streamlit run app.py",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Запуск автотестов",
+      "type": "shell",
+      "command": "${workspaceFolder}/.venv/bin/python -m unittest discover -s tests -p 'test_*.py'",
+      "problemMatcher": []
+    }
+  ]
+}
