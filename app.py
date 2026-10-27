@@ -1,8 +1,9 @@
-"""PHARMA SENTINEL — Clinical Drug Interaction Intelligence Platform.
+"""PHARMA SENTINEL — Платформа клинической фармакологии и анализа полипрагмазии.
 
-Design system: Production-grade scientific editorial.
-Skills applied: web-design-guidelines (Vercel), animate + review-animations + improve-animations (Emil Kowalski).
-Backend: DDInter 160 235 pairs, 1 939 drugs — preserved entirely.
+Архитектура: Production-grade clinical intelligence platform.
+Локализация: Полноценное переключение RU / EN с сохранением всех синонимов и брендов.
+Арт-дирекшн: Clinical Precision Editorial (Inter + Lora + JetBrains Mono).
+Скиллы: web-design-guidelines, animate, review-animations, improve-animations.
 """
 from difflib import get_close_matches
 import matplotlib
@@ -28,6 +29,14 @@ from normalization import DrugNormalizer
 from supplement_schema import SupplementEvidenceRepository
 
 
+# ─── Инициализация состояния (Session State) ─────────────────────────────────
+if "lang" not in st.session_state:
+    st.session_state.lang = "RU"
+
+if "nav_page" not in st.session_state:
+    st.session_state.nav_page = "workspace"
+
+
 st.set_page_config(
     page_title="Pharma Sentinel",
     page_icon="⚕",
@@ -35,1317 +44,1120 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# ─────────────────────────────────────────────────────────────────────────────
-#  DESIGN SYSTEM
-#  web-design-guidelines: 8pt grid, 7:1 contrast for primary text, 4.5:1 muted,
-#    focus-visible rings, ≥44px touch targets, no random gradients.
-#  animate: GPU-only (transform/opacity), ≤250ms, cubic-bezier(0.16,1,0.3,1),
-#    prefers-reduced-motion wrapper.
-#  review-animations: no ease-in on entry, no scale(0), no layout-thrashing props.
-# ─────────────────────────────────────────────────────────────────────────────
-DESIGN = """
+
+# ─── Централизованный словарь локализации (I18N) ──────────────────────────────
+I18N = {
+    "RU": {
+        "brand_sub": "Клиническая фармакология",
+        "live_db": "DDInter v2024.11 · 160 235 пар",
+        "disclaimer_lead": "Клинический регламент:",
+        "disclaimer_text": "Pharma Sentinel — исследовательская система биоинформатики. Не заменяет клинического суждения врача. Отсутствие записи в DDInter не является подтверждением безопасности комбинации.",
+        # Навигация
+        "nav_workspace": "🔬 Анализ взаимодействий",
+        "nav_supplements": "🌿 БАДы и нутрицевтики",
+        "nav_network": "🕸️ Граф связей",
+        "nav_ml": "📊 ML-валидация",
+        "nav_ai": "🤖 ИИ-аналитик",
+        "nav_overview": "🏛️ О платформе",
+        # Рабочее пространство (Workspace)
+        "ws_eyebrow": "Рабочая станция · Анализ полипрагмазии",
+        "ws_title": "Анализ лекарственных назначений",
+        "ws_subtitle": "Полномасштабный перекрестный аудит всех N×(N−1)/2 пар препаратов, детекция дублирования МНН и сопутствующих фитопрепаратов.",
+        "presets_label": "Клинические когортные сценарии (быстрый ввод):",
+        "preset_cyp": "🔴 Триада CYP2C9 (Варфарин + Кордарон + Дифлюкан)",
+        "preset_whammy": "🟠 Triple Whammy (Эналаприл + Фуросемид + Ибупрофен)",
+        "preset_bleeding": "🩸 Варфарин + Аспирин (Геморрагический конфликт)",
+        "search_label": "Когорта препаратов (поиск по МНН, бренду или торговому названию):",
+        "search_help": "Распознает русские торговые марки (Нурофен, Кардиомагнил, Цитрамон, Омез), латиницу и канонические МНН.",
+        "audit_protocol": "Протокол аудита",
+        "audit_desc": "PS-8924 · DDInter Core<br>Расчёт пар N×(N−1)/2<br>Контроль дублирования МНН",
+        "prompt_empty": "Для запуска анализа выберите как минимум 2 препарата в списке выше.",
+        "risk_overall": "Профиль риска",
+        "risk_sub": "По наивысшей тяжести",
+        "stat_major": "Major",
+        "stat_major_sub": "Критический риск",
+        "stat_mod": "Moderate",
+        "stat_mod_sub": "Требуют коррекции",
+        "stat_minor": "Minor",
+        "stat_minor_sub": "Малый риск",
+        "stat_not_in_db": "Нет в DDInter",
+        "stat_not_in_db_sub": "Не доказано как безопасное",
+        "registry_title": "Реестр обнаруженных взаимодействий",
+        "finding_label": "Клиническая оценка:",
+        "supp_box_title": "Доказанные взаимодействия с сопутствующими БАДами и пищей",
+        "management_label": "Тактика:",
+        "dup_warning": "Дублирование действующего вещества:",
+        # БАДы
+        "supp_eyebrow": "Доказательная фито-токсикология",
+        "supp_title": "База взаимодействий с БАДами и нутрицевтиками",
+        "supp_desc": "Фармакокинетические конфликты экстрактов трав, микронутриентов и пищи с лекарствами со строгой доказательной градацией (Level A/B/C).",
+        "supp_search_label": "Поиск по БАДу (Зверобой, Грейпфрут, Гинкго) или препарату:",
+        "supp_filter_label": "Уровень доказательности:",
+        "supp_all_levels": "Все уровни",
+        "supp_found": "Найдено верифицированных записей:",
+        "supp_type": "Тип:",
+        "supp_mech": "Механизм:",
+        "supp_conseq": "Последствие:",
+        "supp_sources": "Первичные источники:",
+        # Граф
+        "net_eyebrow": "Топологический анализ графа",
+        "net_title": "Интерактивная сеть связей DDInter",
+        "net_desc": "Топологические окрестности препаратов в базе DDInter с ранжированием по степени риска.",
+        "net_center": "Центральный узел (препарат):",
+        "net_levels": "Уровни риска:",
+        "net_max_edges": "Максимум связей:",
+        "net_empty": "Для выбранного препарата и фильтров связей не найдено.",
+        "net_hubs": "Топ-10 фармакологических хабов (по числу связей Major)",
+        # ML
+        "ml_eyebrow": "Научная валидация моделей",
+        "ml_title": "Верификация Link Prediction (Leakage-Free)",
+        "ml_desc": "Оценка моделей восстановления скрытых связей на графе DDInter. Обучающие и тестовые связи физически удалены из графа признаков для исключения утечки.",
+        "ml_sample": "Выборка: {train} обучающих · {test} тестовых (сбалансированные классы).",
+        "ml_conf_matrix": "Матрица ошибок (Случайный лес, порог 0.5)",
+        # AI
+        "ai_eyebrow": "Локальный языковой ассистент",
+        "ai_title": "Контекстный ИИ-аналитик (Ollama)",
+        "ai_desc": "Формирование доказательных текстовых пояснений по конкретным фактам DDInter без передачи данных во внешние облака.",
+        "ai_drug_a": "Препарат A:",
+        "ai_drug_b": "Препарат B:",
+        "ai_question": "Клинический вопрос:",
+        "ai_question_ph": "Например: в чем биологический механизм этого взаимодействия?",
+        "ai_offline_title": "Структурированное пояснение (детерминированное, offline):",
+        "ai_summary": "Суть:",
+        "ai_clinical": "Клинический контекст:",
+        "ai_recommendation": "Рекомендация:",
+        "ai_status_title": "Статус локального сервиса Ollama",
+        "ai_btn_generate": "Сгенерировать пояснение…",
+        "ai_model": "Локальная модель:",
+        "ai_resp": "Ответ модели:",
+        # О платформе (Overview)
+        "ov_eyebrow": "Инициатива 2025 · Вычислительная фармакология",
+        "ov_title": "Картографирование скрытых границ полипрагмазии.",
+        "ov_desc": "Детерминированный биоинформатический комплекс для исследования многокомпонентных межлекарственных взаимодействий, конкуренции за изоферменты CYP450 и полиорганной токсичности.",
+        "ov_stat_pairs": "Индексировано пар",
+        "ov_stat_drugs": "Уникальных веществ",
+        "ov_stat_major": "Связей Major (критических)",
+        "ov_btn_start": "Перейти к анализу назначений →",
+        "ov_provenance_title": "Происхождение данных и методология",
+        "ov_provenance_text": "Каждая межлекарственная связь подтверждена рецензируемой базой DDInter (Nucleic Acids Research, 2022). Данные нормализованы: устранены петли A=A, дубликаты свёрнуты по наивысшей тяжести, обеспечено сопоставление синонимов и торговых названий.",
+        # Футер
+        "footer_text": "Pharma Sentinel · Академический исследовательский проект, 2025.<br>База данных: DDInter v2024.11 (Xiong G. et al., NAR). Не является медицинским изделием.",
+    },
+    "EN": {
+        "brand_sub": "Clinical Pharmacology Intelligence",
+        "live_db": "DDInter v2024.11 · 160,235 pairs",
+        "disclaimer_lead": "Clinical Protocol Notice:",
+        "disclaimer_text": "Pharma Sentinel is a bioinformatics research instrument. It does not replace clinical judgment. Absence of a record in DDInter does not confirm pharmacological safety.",
+        # Navigation
+        "nav_workspace": "🔬 Interaction Analysis",
+        "nav_supplements": "🌿 Dietary Supplements",
+        "nav_network": "🕸️ Network Topology",
+        "nav_ml": "📊 ML Validation",
+        "nav_ai": "🤖 Local AI Analyst",
+        "nav_overview": "🏛️ Overview & Provenance",
+        # Workspace
+        "ws_eyebrow": "Analysis Workspace · Polypharmacy",
+        "ws_title": "Multi-Drug Safety Assessment",
+        "ws_subtitle": "Full pairwise evaluation of all N×(N−1)/2 drug combinations, active ingredient duplication detection, and herbal conflict screening.",
+        "presets_label": "Clinical Cohort Presets (Quick Load):",
+        "preset_cyp": "🔴 CYP2C9 Triad (Warfarin + Amiodarone + Fluconazole)",
+        "preset_whammy": "🟠 Triple Whammy (Enalapril + Furosemide + Ibuprofen)",
+        "preset_bleeding": "🩸 Warfarin + Aspirin (Hemorrhagic Conflict)",
+        "search_label": "Prescription Cohort (Search by INN, brand, or trade name):",
+        "search_help": "Resolves trade brands (Nurofen, Cardiomagnyl, Citramon, Omez), Latin/Cyrillic synonyms, and canonical DDInter INNs.",
+        "audit_protocol": "Audit Protocol",
+        "audit_desc": "PS-8924 · DDInter Core<br>Pairwise N×(N-1)/2 matrix<br>Active INN duplication guard",
+        "prompt_empty": "Select at least 2 medications in the input box above to calculate interaction matrix.",
+        "risk_overall": "Risk Profile",
+        "risk_sub": "By highest severity",
+        "stat_major": "Major",
+        "stat_major_sub": "Critical risk",
+        "stat_mod": "Moderate",
+        "stat_mod_sub": "Requires monitoring",
+        "stat_minor": "Minor",
+        "stat_minor_sub": "Limited risk",
+        "stat_not_in_db": "Not in DDInter",
+        "stat_not_in_db_sub": "Not proven safe",
+        "registry_title": "Pairwise Interaction Findings",
+        "finding_label": "Clinical finding:",
+        "supp_box_title": "Verified Dietary and Herbal Interactions for Current Cohort",
+        "management_label": "Management:",
+        "dup_warning": "Therapeutic duplication detected:",
+        # Supplements
+        "supp_eyebrow": "Evidence-Based Phytopharmacology",
+        "supp_title": "Supplement & Herb Interaction Registry",
+        "supp_desc": "Pharmacokinetic conflicts between herbal extracts, nutrients, and conventional drugs graded by clinical evidence (Level A/B/C).",
+        "supp_search_label": "Search by supplement (St. John's wort, Grapefruit, Ginkgo) or drug:",
+        "supp_filter_label": "Evidence level:",
+        "supp_all_levels": "All levels",
+        "supp_found": "Verified records found:",
+        "supp_type": "Type:",
+        "supp_mech": "Mechanism:",
+        "supp_conseq": "Consequence:",
+        "supp_sources": "Primary sources:",
+        # Network
+        "net_eyebrow": "Graph Topology Analysis",
+        "net_title": "DDInter Network Interaction Map",
+        "net_desc": "Topological neighborhoods of drugs in DDInter with risk-ranked edge visualization.",
+        "net_center": "Central drug node:",
+        "net_levels": "Risk levels:",
+        "net_max_edges": "Max edges:",
+        "net_empty": "No connections found for selected drug and filters.",
+        "net_hubs": "Top 10 Pharmacological Hubs (by Major degree)",
+        # ML
+        "ml_eyebrow": "Scientific Model Validation",
+        "ml_title": "Link Prediction Benchmark (Leakage-Free)",
+        "ml_desc": "Evaluation of graph topological models for predicting unrecorded drug interactions with train/test edges strictly isolated from feature calculation.",
+        "ml_sample": "Sample: {train} training · {test} test examples (balanced classes).",
+        "ml_conf_matrix": "Random Forest Confusion Matrix (threshold 0.5)",
+        # AI
+        "ai_eyebrow": "Contextual Language Assistant",
+        "ai_title": "Local AI Clinical Pharmacology Analyst",
+        "ai_desc": "Evidence-grounded explanations of DDInter records generated locally using Ollama without sending patient data to cloud APIs.",
+        "ai_drug_a": "Drug A:",
+        "ai_drug_b": "Drug B:",
+        "ai_question": "Clinical question:",
+        "ai_question_ph": "E.g., What is the biochemical mechanism of this interaction?",
+        "ai_offline_title": "Structured explanation (deterministic, offline):",
+        "ai_summary": "Summary:",
+        "ai_clinical": "Clinical context:",
+        "ai_recommendation": "Recommendation:",
+        "ai_status_title": "Local Ollama service status",
+        "ai_btn_generate": "Generate explanation…",
+        "ai_model": "Local model:",
+        "ai_resp": "Model response:",
+        # Overview
+        "ov_eyebrow": "Initiative 2025 · Computational Pharmacology",
+        "ov_title": "Mapping the unseen boundaries of polypharmacy.",
+        "ov_desc": "A deterministic framework for identifying multi-agent pharmacokinetic clashes across hepatic CYP450 clearance pathways and renal transport systems.",
+        "ov_stat_pairs": "Pairs indexed",
+        "ov_stat_drugs": "Substances",
+        "ov_stat_major": "Major interactions",
+        "ov_btn_start": "Launch Interaction Analysis →",
+        "ov_provenance_title": "Data Provenance & Scientific Integrity",
+        "ov_provenance_text": "Every drug interaction is anchored in DDInter (Nucleic Acids Research, 2022). Records are canonically normalized: self-loops eliminated, duplicates collapsed by severity, and synonyms linked to verified INNs.",
+        # Footer
+        "footer_text": "Pharma Sentinel · Academic Research Project, 2025.<br>Database: DDInter v2024.11 (Xiong G. et al., NAR). Not a certified medical device.",
+    }
+}
+
+
+def t(key: str, **kwargs) -> str:
+    """Возвращает перевод по ключу для текущего выбранного языка."""
+    lang = st.session_state.get("lang", "RU")
+    text = I18N.get(lang, I18N["RU"]).get(key, I18N["RU"].get(key, key))
+    if kwargs:
+        text = text.format(**kwargs)
+    return text
+
+
+# ─── Дизайн-система Clinical Precision Editorial ─────────────────────────────
+st.markdown("""
 <style>
-/* ── Google Fonts ─────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* ── Token layer ──────────────────────────────────────────────────────────── */
 :root {
-  /* Colour */
-  --bg:          #F9F8F6;     /* warm off-white */
-  --bg-raised:   #FFFFFF;
-  --bg-subtle:   #F2F1EF;
-  --border:      #E4E2DE;
-  --border-med:  #D1CEC9;
+  --bg:          #FAF9F6;
+  --bg-card:     #FFFFFF;
+  --bg-subtle:   #F3F2EE;
+  --border:      #E4E1DB;
+  --border-focus:#1A56A0;
 
-  --ink:         #0E1117;     /* ≥7:1 on --bg */
-  --ink-2:       #3D3A35;     /* body text */
-  --ink-3:       #6B6860;     /* muted, ≥4.5:1 */
+  --ink-primary: #111418;
+  --ink-body:    #374151;
+  --ink-muted:   #64748B;
 
-  --accent:      #1A56A0;     /* cobalt */
-  --accent-bg:   #EBF1FA;
-  --accent-dark: #13407D;
+  --accent:      #1A56A0;
+  --accent-light:#EBF3FB;
+  --accent-hover:#13407D;
 
   --sev-major:   #B91C1C;
   --sev-major-bg:#FEF2F2;
-  --sev-mod:     #B45309;
+  --sev-mod:     #D97706;
   --sev-mod-bg:  #FFFBEB;
-  --sev-minor:   #065F46;
-  --sev-minor-bg:#ECFDF5;
-  --sev-none:    #6B6860;
-  --sev-none-bg: #F2F1EF;
+  --sev-minor:   #0D7A75;
+  --sev-minor-bg:#F0FDF4;
+  --sev-none:    #64748B;
+  --sev-none-bg: #F1F5F9;
 
-  /* Type scale (8pt grid) */
-  --text-xs:   0.6875rem;  /* 11px */
-  --text-sm:   0.8125rem;  /* 13px */
-  --text-base: 0.9375rem;  /* 15px */
-  --text-md:   1.0625rem;  /* 17px */
-  --text-lg:   1.25rem;    /* 20px */
-  --text-xl:   1.5rem;     /* 24px */
-  --text-2xl:  2rem;       /* 32px */
-  --text-3xl:  clamp(1.75rem, 3.5vw, 2.75rem);
+  --font-ui:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif:  'Lora', Georgia, serif;
+  --font-mono:   'JetBrains Mono', monospace;
 
-  /* Spacing (8pt) */
-  --sp-1: 0.25rem;  /* 4 */
-  --sp-2: 0.5rem;   /* 8 */
-  --sp-3: 0.75rem;  /* 12 */
-  --sp-4: 1rem;     /* 16 */
-  --sp-5: 1.25rem;  /* 20 */
-  --sp-6: 1.5rem;   /* 24 */
-  --sp-8: 2rem;     /* 32 */
-  --sp-10: 2.5rem;  /* 40 */
-  --sp-12: 3rem;    /* 48 */
-
-  /* Shape */
-  --r-sm: 2px;
-  --r-md: 4px;
-
-  /* Fonts */
-  --font-ui:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-serif: 'Lora', Georgia, serif;
-  --font-mono:  'JetBrains Mono', 'Courier New', monospace;
-
-  /* Motion tokens — animate skill */
-  --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-std:  cubic-bezier(0, 0, 0.2, 1);
-  --dur-fast:  150ms;
-  --dur-base:  220ms;
+  --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ── Base reset ───────────────────────────────────────────────────────────── */
 html, body, [class*="css"] {
   font-family: var(--font-ui);
-  color: var(--ink-2);
-  background: var(--bg);
+  color: var(--ink-body);
+  background-color: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Hide Streamlit chrome we replace */
 #MainMenu, footer, [data-testid="stHeader"] { display: none !important; }
 
-/* Streamlit block container */
 .block-container {
-  max-width: 1200px !important;
-  padding: var(--sp-4) var(--sp-6) var(--sp-12) !important;
+  max-width: 1240px !important;
+  padding: 0.75rem 1.5rem 3rem !important;
 }
 
-/* Fix Streamlit column overflow — web-design-guidelines */
 [data-testid="column"] { min-width: 0 !important; }
-[data-testid="stMarkdownContainer"] * {
-  max-width: 100%;
-  overflow-wrap: break-word;
-}
 
-/* ── Typography ───────────────────────────────────────────────────────────── */
+/* ── Заголовки с засечками ── */
 [data-testid="stMarkdownContainer"] h1 {
   font-family: var(--font-serif) !important;
-  font-size: var(--text-3xl) !important;
-  font-weight: 400 !important;
-  line-height: 1.2 !important;
-  letter-spacing: -0.025em !important;
-  color: var(--ink) !important;
-  margin: 0 0 var(--sp-4) !important;
+  font-size: clamp(1.65rem, 3.2vw, 2.4rem) !important;
+  font-weight: 500 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--ink-primary) !important;
+  margin: 0.15rem 0 0.5rem !important;
 }
+
 [data-testid="stMarkdownContainer"] h2 {
   font-family: var(--font-serif) !important;
-  font-size: var(--text-xl) !important;
+  font-size: clamp(1.25rem, 2.2vw, 1.7rem) !important;
   font-weight: 500 !important;
   line-height: 1.3 !important;
-  color: var(--ink) !important;
-  margin: var(--sp-8) 0 var(--sp-4) !important;
+  color: var(--ink-primary) !important;
+  margin: 1.25rem 0 0.4rem !important;
 }
+
 [data-testid="stMarkdownContainer"] h3 {
   font-family: var(--font-ui) !important;
-  font-size: var(--text-md) !important;
+  font-size: 1.05rem !important;
   font-weight: 600 !important;
-  color: var(--ink) !important;
-  margin: var(--sp-6) 0 var(--sp-3) !important;
-}
-[data-testid="stMarkdownContainer"] p,
-[data-testid="stMarkdownContainer"] li {
-  font-size: var(--text-base) !important;
-  line-height: 1.65 !important;
-  color: var(--ink-2) !important;
+  color: var(--ink-primary) !important;
+  margin: 1rem 0 0.35rem !important;
 }
 
-/* ── Application shell ────────────────────────────────────────────────────── */
-
-/* Header */
-.ps-header {
+/* ── Верхний Header и Language Switch ── */
+.ps-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--sp-4);
-  padding: var(--sp-3) 0 var(--sp-3);
   border-bottom: 1px solid var(--border);
-  margin-bottom: var(--sp-6);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
   flex-wrap: wrap;
+  gap: 0.75rem;
 }
-.ps-wordmark {
+
+.ps-brand-wrap {
   display: flex;
   align-items: baseline;
-  gap: var(--sp-2);
+  gap: 0.6rem;
 }
-.ps-wordmark-name {
-  font-family: var(--font-ui);
-  font-size: var(--text-base);
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ink);
-}
-.ps-wordmark-tag {
-  font-size: var(--text-xs);
-  color: var(--ink-3);
-  font-weight: 500;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-}
-.ps-nav {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-6);
-}
-.ps-nav-link {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--ink-3);
-  text-decoration: none;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  /* animate: opacity/color only — GPU-safe */
-  transition: color var(--dur-fast) var(--ease-std),
-              opacity var(--dur-fast) var(--ease-std);
-  padding: var(--sp-1) 0;
-  border-bottom: 1.5px solid transparent;
-}
-.ps-nav-link:hover { color: var(--ink); }
-.ps-nav-link.active {
-  color: var(--ink);
-  border-bottom-color: var(--accent);
-}
-.ps-nav-action {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  padding: var(--sp-2) var(--sp-4);
-  background: var(--accent);
-  color: #fff;
-  border-radius: var(--r-md);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  cursor: pointer;
-  /* animate skill: transform + opacity, ease-out, sub-220ms */
-  transition: background var(--dur-fast) var(--ease-std),
-              transform var(--dur-fast) var(--ease-out),
-              opacity var(--dur-fast) var(--ease-std);
-}
-.ps-nav-action:hover {
-  background: var(--accent-dark);
-  transform: translateY(-1px);
-}
-.ps-nav-action:active { transform: translateY(0); }
 
-/* ── Severity chips ───────────────────────────────────────────────────────── */
-.ps-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-1);
-  padding: 2px var(--sp-2);
-  border-radius: var(--r-sm);
+.ps-brand-title {
   font-family: var(--font-ui);
-  font-size: var(--text-xs);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1.05rem;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  white-space: nowrap;
-  border: 1px solid;
-}
-.ps-chip-major  { color: var(--sev-major); background: var(--sev-major-bg); border-color: #FECACA; }
-.ps-chip-mod    { color: var(--sev-mod);   background: var(--sev-mod-bg);   border-color: #FDE68A; }
-.ps-chip-minor  { color: var(--sev-minor); background: var(--sev-minor-bg); border-color: #A7F3D0; }
-.ps-chip-none   { color: var(--sev-none);  background: var(--sev-none-bg);  border-color: var(--border); }
-
-/* ── Stat row ─────────────────────────────────────────────────────────────── */
-.ps-stat {
-  padding: var(--sp-4) 0;
-  border-top: 1px solid var(--border);
-}
-.ps-stat-number {
-  font-family: var(--font-serif);
-  font-size: var(--text-2xl);
-  font-weight: 400;
-  color: var(--ink);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  display: block;
-  margin-bottom: var(--sp-1);
-}
-.ps-stat-label {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--ink-3);
-  display: block;
-}
-.ps-stat-caption {
-  font-size: var(--text-sm);
-  color: var(--ink-3);
-  margin-top: var(--sp-1);
-  display: block;
+  color: var(--ink-primary);
 }
 
-/* ── Section label ────────────────────────────────────────────────────────── */
-.ps-eyebrow {
-  font-size: var(--text-xs);
-  font-weight: 600;
+.ps-brand-sub {
+  font-size: 0.72rem;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.09em;
-  color: var(--accent);
-  display: block;
-  margin-bottom: var(--sp-2);
-}
-.ps-eyebrow-muted {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
-  color: var(--ink-3);
-  display: block;
-  margin-bottom: var(--sp-2);
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
 }
 
-/* ── Result card ──────────────────────────────────────────────────────────── */
-.ps-result {
-  background: var(--bg-raised);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  padding: var(--sp-4) var(--sp-5);
-  margin-bottom: var(--sp-3);
-  /* animate: opacity + translateY entry, ease-out, 200ms */
-  animation: ps-fadein 200ms var(--ease-out) both;
-}
-.ps-result:hover {
-  border-color: var(--border-med);
-  /* GPU-only: no layout props */
-  transition: border-color var(--dur-fast) var(--ease-std);
-}
-.ps-result-header {
+.ps-topbar-right {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--sp-4);
-  flex-wrap: wrap;
-  margin-bottom: var(--sp-3);
-}
-.ps-result-drugs {
-  font-family: var(--font-ui);
-  font-size: var(--text-md);
-  font-weight: 600;
-  color: var(--ink);
-  min-width: 0;
-  flex: 1;
-  overflow-wrap: break-word;
-}
-.ps-result-sep { color: var(--ink-3); margin: 0 var(--sp-2); font-weight: 400; }
-.ps-result-body {
-  font-size: var(--text-sm);
-  line-height: 1.65;
-  color: var(--ink-2);
-}
-.ps-result-body b { color: var(--ink); font-weight: 600; }
-
-/* animate: fade-in entry — GPU only (opacity + transform) */
-@keyframes ps-fadein {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  align-items: center;
+  gap: 0.85rem;
 }
 
-/* ── Supplement card ──────────────────────────────────────────────────────── */
-.ps-supp {
-  border-left: 2px solid var(--sev-major);
+.ps-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: var(--bg-subtle);
-  padding: var(--sp-3) var(--sp-4);
-  margin-bottom: var(--sp-3);
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
-}
-.ps-supp-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: var(--sp-3);
-  flex-wrap: wrap;
-  margin-bottom: var(--sp-2);
-}
-.ps-supp-title {
-  font-weight: 600;
-  font-size: var(--text-sm);
-  color: var(--ink);
-  min-width: 0;
-  flex: 1;
-  overflow-wrap: break-word;
-}
-.ps-supp-text {
-  font-size: var(--text-sm);
-  color: var(--ink-3);
-  line-height: 1.6;
-}
-
-/* ── Info panel ───────────────────────────────────────────────────────────── */
-.ps-panel {
-  background: var(--bg-raised);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  padding: var(--sp-4) var(--sp-5);
-}
-.ps-panel-title {
-  font-size: var(--text-xs);
+  padding: 0.25rem 0.65rem;
+  border-radius: 3px;
+  font-size: 0.72rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--ink-3);
-  margin-bottom: var(--sp-3);
-  display: block;
+  color: #065F46;
 }
 
-/* ── Disclaimer ───────────────────────────────────────────────────────────── */
+.ps-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  animation: ps-pulse 2s infinite ease-in-out;
+}
+
+@keyframes ps-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* ── Навигационная полоса вкладок ── */
+div[data-testid="stRadio"] > div[role="radiogroup"] {
+  display: flex;
+  flex-direction: row;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  background: var(--bg-subtle);
+  padding: 3px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+
+div[data-testid="stRadio"] > div[role="radiogroup"] > label {
+  margin: 0 !important;
+  padding: 0.4rem 0.85rem !important;
+  border-radius: 4px;
+  font-size: 0.83rem !important;
+  font-weight: 500 !important;
+  color: var(--ink-body) !important;
+  background: transparent;
+  cursor: pointer;
+  transition: all 140ms var(--ease-snappy);
+}
+
+div[data-testid="stRadio"] > div[role="radiogroup"] > label[data-checked="true"],
+div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
+  background: #FFFFFF !important;
+  color: var(--accent) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* ── Дисклеймер ── */
 .ps-disclaimer {
   display: flex;
   align-items: flex-start;
-  gap: var(--sp-3);
-  background: var(--accent-bg);
+  gap: 0.65rem;
+  background: var(--accent-light);
   border: 1px solid #BFDBFE;
-  border-radius: var(--r-md);
-  padding: var(--sp-3) var(--sp-4);
-  margin-bottom: var(--sp-5);
-  font-size: var(--text-sm);
-  color: var(--ink-2);
-  line-height: 1.55;
-}
-.ps-disclaimer-icon { color: var(--accent); font-size: var(--text-md); flex-shrink: 0; }
-.ps-disclaimer b { color: var(--ink); font-weight: 600; }
-
-/* ── Live dot ─────────────────────────────────────────────────────────────── */
-.ps-live {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--sp-2);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--ink-3);
-}
-.ps-live-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: #16A34A;
-  /* animate: opacity pulse — GPU */
-  animation: ps-pulse 2.2s ease-in-out infinite;
-}
-@keyframes ps-pulse {
-  0%, 100% { opacity: 0.4; }
-  50%       { opacity: 1;   }
+  border-left: 3px solid var(--accent);
+  padding: 0.65rem 0.95rem;
+  border-radius: 3px;
+  margin-bottom: 1.25rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ink-body);
 }
 
-/* ── Telemetry grid ───────────────────────────────────────────────────────── */
-.ps-telem {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--sp-2);
-  margin-top: var(--sp-3);
-}
-.ps-telem-cell {
-  background: var(--bg-subtle);
+.ps-disclaimer b { color: var(--ink-primary); }
+
+/* ── Карточки и статистика ── */
+.ps-stat-box {
+  background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--r-sm);
-  padding: var(--sp-2) var(--sp-3);
+  padding: 0.85rem 1rem;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
-.ps-telem-label {
-  font-size: var(--text-xs);
+
+.ps-stat-label {
+  font-size: 0.68rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--ink-3);
-  display: block;
+  color: var(--ink-muted);
 }
-.ps-telem-val {
-  font-family: var(--font-mono);
-  font-size: var(--text-sm);
-  color: var(--ink);
+
+.ps-stat-number {
+  font-family: var(--font-serif);
+  font-size: 1.55rem;
+  line-height: 1.2;
   font-weight: 500;
-  display: block;
-  margin-top: 2px;
+  color: var(--ink-primary);
+  margin: 0.2rem 0;
 }
 
-/* ── Capability row ───────────────────────────────────────────────────────── */
-.ps-cap-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--sp-4);
-  margin-top: var(--sp-6);
-}
-@media (max-width: 720px) {
-  .ps-cap-grid { grid-template-columns: 1fr; }
-}
-.ps-cap {
-  border-top: 2px solid var(--accent);
-  padding-top: var(--sp-4);
-}
-.ps-cap-title {
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: var(--sp-2);
-  display: block;
-}
-.ps-cap-body {
-  font-size: var(--text-sm);
-  color: var(--ink-3);
-  line-height: 1.65;
+.ps-stat-sub {
+  font-size: 0.72rem;
+  color: var(--ink-muted);
 }
 
-/* ── Divider ──────────────────────────────────────────────────────────────── */
-.ps-divider {
-  border: 0;
-  border-top: 1px solid var(--border);
-  margin: var(--sp-8) 0;
+/* ── Результаты анализа ── */
+.ps-card-finding {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 1rem 1.15rem;
+  margin-bottom: 0.65rem;
+  transition: border-color 140ms ease;
+  animation: ps-slideup 180ms var(--ease-snappy) both;
 }
 
-/* ── Footer ───────────────────────────────────────────────────────────────── */
-.ps-footer {
-  border-top: 1px solid var(--border);
-  padding-top: var(--sp-5);
-  margin-top: var(--sp-10);
+.ps-card-finding:hover {
+  border-color: #CBD5E1;
+}
+
+@keyframes ps-slideup {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ps-finding-head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 0.75rem;
   flex-wrap: wrap;
-  gap: var(--sp-3);
-}
-.ps-footer-left {
-  font-size: var(--text-xs);
-  color: var(--ink-3);
-  line-height: 1.5;
-}
-.ps-footer-right {
-  font-size: var(--text-xs);
-  color: var(--ink-3);
+  margin-bottom: 0.5rem;
 }
 
-/* ── Buttons ──────────────────────────────────────────────────────────────── */
-/* web-design-guidelines: ≥44px touch target, visible focus-visible ring */
-.stButton > button {
-  font-family: var(--font-ui) !important;
-  font-size: var(--text-sm) !important;
-  font-weight: 600 !important;
-  letter-spacing: 0.02em !important;
-  padding: var(--sp-2) var(--sp-4) !important;
-  min-height: 44px !important;
-  border-radius: var(--r-md) !important;
-  border: 1px solid var(--border-med) !important;
-  background: var(--bg-raised) !important;
-  color: var(--ink) !important;
-  /* animate: transform + opacity, no layout props */
-  transition: transform var(--dur-fast) var(--ease-out),
-              background var(--dur-fast) var(--ease-std),
-              border-color var(--dur-fast) var(--ease-std) !important;
+.ps-finding-drugs {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
 }
+
+.ps-finding-body {
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--ink-body);
+}
+
+/* ── Плашки тяжести ── */
+.ps-badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid;
+  white-space: nowrap;
+}
+
+.ps-badge-major { color: var(--sev-major); background: var(--sev-major-bg); border-color: #FECACA; }
+.ps-badge-mod   { color: var(--sev-mod);   background: var(--sev-mod-bg);   border-color: #FDE68A; }
+.ps-badge-minor { color: var(--sev-minor); background: var(--sev-minor-bg); border-color: #A7F3D0; }
+.ps-badge-none  { color: var(--sev-none);  background: var(--sev-none-bg);  border-color: var(--border); }
+
+/* ── БАД-карточка ── */
+.ps-supp-row {
+  border-left: 3px solid var(--sev-major);
+  background: var(--bg-subtle);
+  padding: 0.75rem 0.95rem;
+  border-radius: 0 3px 3px 0;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Пресеты и кнопки ── */
+.stButton > button {
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  border-radius: 3px !important;
+  min-height: 40px !important;
+  transition: all 120ms var(--ease-snappy) !important;
+}
+
 .stButton > button:hover {
-  background: var(--bg-subtle) !important;
-  border-color: var(--border-med) !important;
   transform: translateY(-1px) !important;
 }
-.stButton > button:active { transform: translateY(0) !important; }
-.stButton > button:focus-visible {
-  outline: 2px solid var(--accent) !important;
-  outline-offset: 2px !important;
+
+.stButton > button:active {
+  transform: translateY(0) !important;
 }
 
-/* Primary button variant */
-.stButton > button[kind="primary"],
-div[data-testid="stForm"] .stButton > button {
-  background: var(--accent) !important;
-  color: #fff !important;
-  border-color: var(--accent) !important;
-}
-.stButton > button[kind="primary"]:hover {
-  background: var(--accent-dark) !important;
-  border-color: var(--accent-dark) !important;
+/* ── Доступность ── */
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--border-focus) !important;
+  outline-offset: 1px !important;
 }
 
-/* ── Forms ────────────────────────────────────────────────────────────────── */
-/* web-design-guidelines: font-size ≥16px on mobile to prevent iOS zoom */
-input, select, textarea {
-  font-family: var(--font-ui) !important;
-  font-size: 1rem !important;
-}
-[data-testid="stMultiSelect"] [data-baseweb="select"] *,
-[data-testid="stSelectbox"] [data-baseweb="select"] * {
-  font-family: var(--font-ui) !important;
-}
-[data-testid="stTextInput"] input,
-[data-testid="stTextArea"] textarea {
-  border-radius: var(--r-md) !important;
-}
-
-/* ── Tables ───────────────────────────────────────────────────────────────── */
-[data-testid="stDataFrame"] {
-  border: 1px solid var(--border) !important;
-  border-radius: var(--r-md);
-  background: var(--bg-raised);
-}
-
-/* ── Sidebar (used only for nav fallback) ─────────────────────────────────── */
-section[data-testid="stSidebar"] {
-  background: var(--bg-subtle) !important;
-  border-right: 1px solid var(--border) !important;
-}
-
-/* ── Reduced-motion (animate + review-animations accessibility rules) ──────── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 </style>
-"""
-
-st.markdown(DESIGN, unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
 
-# ─── Data caches ──────────────────────────────────────────────────────────────
+# ─── Кэшируемые данные ───────────────────────────────────────────────────────
 @st.cache_data(show_spinner=False)
 def cached_data():
     return load_ddinter()
 
+
 @st.cache_resource(show_spinner=False)
 def cached_normalizer(drugs_tuple):
     return DrugNormalizer(drugs_tuple)
+
 
 @st.cache_data(show_spinner=False)
 def cached_evaluation(pairs: pd.DataFrame, drugs: pd.DataFrame):
     return train_and_evaluate(pairs, drugs)
 
 
-# ─── Shared components ────────────────────────────────────────────────────────
-def chip(level: str) -> str:
-    """Severity chip — no emoji, only semantic colour."""
-    mapping = {
-        "Major":    ("ps-chip-major",  "Major"),
-        "Moderate": ("ps-chip-mod",    "Moderate"),
-        "Minor":    ("ps-chip-minor",  "Minor"),
-        "Unknown":  ("ps-chip-none",   "Unknown"),
+# ─── Семантические бейджи ────────────────────────────────────────────────────
+def severity_badge(level: str) -> str:
+    lang = st.session_state.get("lang", "RU")
+    if level == "Major":
+        label = "Major · Высокий" if lang == "RU" else "Major Risk"
+        return f'<span class="ps-badge ps-badge-major">● {label}</span>'
+    elif level == "Moderate":
+        label = "Moderate · Умеренный" if lang == "RU" else "Moderate"
+        return f'<span class="ps-badge ps-badge-mod">◐ {label}</span>'
+    elif level == "Minor":
+        label = "Minor · Малый" if lang == "RU" else "Minor"
+        return f'<span class="ps-badge ps-badge-minor">○ {label}</span>'
+    elif level == "Unknown":
+        label = "Unknown" if lang == "EN" else "Не классифицирован"
+        return f'<span class="ps-badge ps-badge-none">{label}</span>'
+    else:
+        label = "Not in DDInter" if lang == "EN" else "Нет в DDInter"
+        return f'<span class="ps-badge ps-badge-none">{label}</span>'
+
+
+# ─── Верхняя панель (Header + Навигация + RU/EN переключатель) ───────────────
+def render_top_bar():
+    c_brand, c_meta, c_lang = st.columns([2.5, 2.5, 1.2])
+
+    with c_brand:
+        st.markdown(
+            f'<div class="ps-brand-wrap">'
+            f'<span class="ps-brand-title">Pharma Sentinel</span>'
+            f'<span class="ps-brand-sub">{t("brand_sub")}</span>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+    with c_meta:
+        st.markdown(
+            f'<div style="text-align:right;">'
+            f'<span class="ps-live-badge"><span class="ps-live-dot"></span>{t("live_db")}</span>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+    with c_lang:
+        # Компактный переключатель языков RU | EN
+        cur_lang = st.session_state.get("lang", "RU")
+        new_lang = st.radio(
+            "Lang",
+            options=["RU", "EN"],
+            index=0 if cur_lang == "RU" else 1,
+            horizontal=True,
+            label_visibility="collapsed",
+            key="lang_toggle"
+        )
+        if new_lang != cur_lang:
+            st.session_state.lang = new_lang
+            st.rerun()
+
+    # Полноценная горизонтальная навигационная панель
+    nav_options = [
+        t("nav_workspace"),
+        t("nav_supplements"),
+        t("nav_network"),
+        t("nav_ml"),
+        t("nav_ai"),
+        t("nav_overview"),
+    ]
+
+    # Маппинг между ключами и метками
+    key_to_idx = {
+        "workspace": 0,
+        "supplements": 1,
+        "network": 2,
+        "ml": 3,
+        "ai": 4,
+        "overview": 5
     }
-    cls, label = mapping.get(level, ("ps-chip-none", "Not in DB"))
-    return f'<span class="ps-chip {cls}">{label}</span>'
+    idx_to_key = ["workspace", "supplements", "network", "ml", "ai", "overview"]
 
+    cur_idx = key_to_idx.get(st.session_state.get("nav_page", "workspace"), 0)
 
-def eyebrow(text: str, muted: bool = False) -> str:
-    cls = "ps-eyebrow-muted" if muted else "ps-eyebrow"
-    return f'<span class="{cls}">{text}</span>'
-
-
-def disclaimer():
-    st.markdown(
-        '<div class="ps-disclaimer">'
-        '<span class="ps-disclaimer-icon">ⓘ</span>'
-        '<span><b>Clinical notice:</b> Pharma Sentinel is a research and education tool. '
-        'It does not replace clinical judgement. '
-        '<b>Absence of a record in DDInter does not confirm safety.</b></span>'
-        '</div>',
-        unsafe_allow_html=True,
+    selected_nav = st.radio(
+        "Navigation",
+        options=nav_options,
+        index=cur_idx,
+        horizontal=True,
+        label_visibility="collapsed",
+        key="main_nav_radio"
     )
 
+    chosen_key = idx_to_key[nav_options.index(selected_nav)]
+    if chosen_key != st.session_state.get("nav_page"):
+        st.session_state.nav_page = chosen_key
+        st.rerun()
 
-def render_header(active: str):
-    """Compact application header with real navigation."""
-    pages = {
-        "overview":   "Overview",
-        "workspace":  "Interaction Analysis",
-        "methodology":"Methodology",
-    }
-    nav_html = "".join(
-        f'<span class="ps-nav-link {"active" if k == active else ""}" '
-        f'data-page="{k}">{v}</span>'
-        for k, v in pages.items()
-    )
-    # Navigation is handled by st.radio in sidebar for Streamlit routing
+    # Клинический дисклеймер
     st.markdown(
-        '<div class="ps-header">'
-        '  <div class="ps-wordmark">'
-        '    <span class="ps-wordmark-name">Pharma Sentinel</span>'
-        '    <span class="ps-wordmark-tag">Clinical Intelligence</span>'
-        '  </div>'
-        '  <div class="ps-live">'
-        '    <span class="ps-live-dot"></span>'
-        '    DDInter v2024.11 · 160,235 pairs'
-        '  </div>'
-        '</div>',
-        unsafe_allow_html=True,
+        f'<div class="ps-disclaimer">'
+        f'<span>⚕</span>'
+        f'<div><b>{t("disclaimer_lead")}</b> {t("disclaimer_text")}</div>'
+        f'</div>',
+        unsafe_allow_html=True
     )
 
 
 def render_footer():
     st.markdown(
-        '<div class="ps-footer">'
-        '  <div class="ps-footer-left">'
-        '    <strong>Pharma Sentinel</strong> · Academic research project, 2025<br>'
-        '    Data: DDInter v2024.11 (<em>Nucleic Acids Research</em>, 2022 — Xiong G. et al.)'
-        '  </div>'
-        '  <div class="ps-footer-right">Not a medical device. For research use only.</div>'
-        '</div>',
-        unsafe_allow_html=True,
+        f'<div style="border-top:1px solid var(--border); padding-top:1.25rem; margin-top:2.5rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem; font-size:0.75rem; color:var(--ink-muted);">'
+        f'<div>{t("footer_text")}</div>'
+        f'<div style="text-align:right;">Pharmacoinformatics Lab · 2025</div>'
+        f'</div>',
+        unsafe_allow_html=True
     )
 
 
-# ─── Pages ────────────────────────────────────────────────────────────────────
-def page_overview(pairs: pd.DataFrame, drugs: pd.DataFrame):
-    render_header("overview")
-    disclaimer()
-
-    # ── Hero ──────────────────────────────────────────────────────────────────
-    hero_l, hero_r = st.columns([1.45, 1], gap="large")
-
-    with hero_l:
-        st.markdown(eyebrow("Initiative 2025 · Clinical Pharmacology"), unsafe_allow_html=True)
-        st.markdown(
-            '<h1>Mapping the boundaries of polypharmacy.</h1>'
-            '<p style="font-size:var(--text-md);line-height:1.65;color:var(--ink-2);'
-            'max-width:52ch;margin-bottom:var(--sp-5);">'
-            'A deterministic, evidence-grounded framework for identifying '
-            'multi-drug pharmacokinetic conflicts across CYP450, renal, and receptor pathways—'
-            'built on the full DDInter dataset.'
-            '</p>',
-            unsafe_allow_html=True,
-        )
-
-        # Metric row — ps-stat is border-top only, no height:100%
-        m1, m2, m3 = st.columns(3)
-        with m1:
-            st.markdown(
-                '<div class="ps-stat">'
-                '<span class="ps-stat-label">Drug pairs indexed</span>'
-                f'<span class="ps-stat-number">{len(pairs):,}</span>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-        with m2:
-            st.markdown(
-                '<div class="ps-stat">'
-                '<span class="ps-stat-label">Unique substances</span>'
-                f'<span class="ps-stat-number">{len(drugs):,}</span>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-        with m3:
-            major_count = int((pairs["Level"] == "Major").sum())
-            st.markdown(
-                '<div class="ps-stat">'
-                '<span class="ps-stat-label">Major interactions</span>'
-                f'<span class="ps-stat-number" style="color:var(--sev-major)">{major_count:,}</span>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-
-    with hero_r:
-        # 3D molecule — graceful fallback if CDN unavailable
-        try:
-            mol = render_molecule_3d_html(height=240)
-            components.html(mol, height=250, scrolling=False)
-        except Exception:
-            pass  # silent — no broken placeholder
-
-        st.markdown(
-            '<div class="ps-telem">'
-            '  <div class="ps-telem-cell">'
-            '    <span class="ps-telem-label">Buffer pH</span>'
-            '    <span class="ps-telem-val">7.42 ± 0.02</span>'
-            '  </div>'
-            '  <div class="ps-telem-cell">'
-            '    <span class="ps-telem-label">Incubation</span>'
-            '    <span class="ps-telem-val">37.0 °C</span>'
-            '  </div>'
-            '  <div class="ps-telem-cell">'
-            '    <span class="ps-telem-label">HLM protein</span>'
-            '    <span class="ps-telem-val">0.5 mg/mL</span>'
-            '  </div>'
-            '  <div class="ps-telem-cell">'
-            '    <span class="ps-telem-label">NADPH</span>'
-            '    <span class="ps-telem-val" style="color:var(--sev-minor)">99.8% sat.</span>'
-            '  </div>'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-    st.markdown('<hr class="ps-divider">', unsafe_allow_html=True)
-
-    # ── Capabilities ──────────────────────────────────────────────────────────
-    st.markdown(eyebrow("What the platform does", muted=True), unsafe_allow_html=True)
+# ─── Страница: Анализ назначений (Workspace — главная рабочая зона) ───────────
+def view_workspace(pairs: pd.DataFrame, drugs: pd.DataFrame, normalizer: DrugNormalizer, supp_repo: SupplementEvidenceRepository):
     st.markdown(
-        '<div class="ps-cap-grid">'
-
-        '<div class="ps-cap">'
-        '<span class="ps-cap-title">Multi-drug interaction matrix</span>'
-        '<span class="ps-cap-body">'
-        'Checks all N×(N−1)/2 pairs in a prescription list. '
-        'Detects duplicate active ingredients across brand names. '
-        'Severity-sorted output with DDInter provenance.'
-        '</span>'
-        '</div>'
-
-        '<div class="ps-cap">'
-        '<span class="ps-cap-title">Evidence-graded supplement database</span>'
-        '<span class="ps-cap-body">'
-        'Herb, food, and micronutrient interactions indexed by evidence level (A/B/C). '
-        'Each entry links to primary PubMed sources and FDA/EMA advisories.'
-        '</span>'
-        '</div>'
-
-        '<div class="ps-cap">'
-        '<span class="ps-cap-title">Graph topology and link prediction</span>'
-        '<span class="ps-cap-body">'
-        'Interactive DDInter network visualisation and a leakage-free Random Forest '
-        'link predictor (ROC-AUC 0.91) for discovering candidate unknown interactions.'
-        '</span>'
-        '</div>'
-
-        '</div>',
-        unsafe_allow_html=True,
+        f'<div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--accent);">'
+        f'{t("ws_eyebrow")}</div>'
+        f'<h1>{t("ws_title")}</h1>'
+        f'<p style="font-size:0.92rem; color:var(--ink-muted); line-height:1.5; margin-bottom:1rem;">'
+        f'{t("ws_subtitle")}</p>',
+        unsafe_allow_html=True
     )
-
-    st.markdown('<hr class="ps-divider">', unsafe_allow_html=True)
-
-    # ── Data provenance ───────────────────────────────────────────────────────
-    st.markdown(eyebrow("Data provenance", muted=True), unsafe_allow_html=True)
-    prov_l, prov_r = st.columns([1.5, 1], gap="large")
-    with prov_l:
-        st.markdown(
-            '<p style="font-size:var(--text-base);line-height:1.7;color:var(--ink-2);">'
-            'Every drug–drug interaction in this platform is sourced from '
-            '<strong>DDInter</strong> (<em>Nucleic Acids Research</em>, 2022). '
-            'No interaction is synthesised or inferred without an explicit DDInter record. '
-            'Supplement interactions are independently catalogued with mandatory citations '
-            'and evidence-level assignments.'
-            '</p>'
-            '<p style="font-size:var(--text-sm);color:var(--ink-3);line-height:1.6;">'
-            'Canonical normalisation: duplicate pairs collapsed to highest severity; '
-            'self-loops removed; alphabetical pair ordering enforced.'
-            '</p>',
-            unsafe_allow_html=True,
-        )
-    with prov_r:
-        sev_counts = pairs["Level"].value_counts()
-        for lv, col in [("Major","var(--sev-major)"), ("Moderate","var(--sev-mod)"),
-                         ("Minor","var(--sev-minor)"), ("Unknown","var(--ink-3)")]:
-            n = sev_counts.get(lv, 0)
-            st.markdown(
-                f'<div style="display:flex;justify-content:space-between;'
-                f'align-items:center;padding:var(--sp-2) 0;border-bottom:1px solid var(--border);">'
-                f'  <span style="font-size:var(--text-sm);color:var(--ink-2);">{lv}</span>'
-                f'  <span style="font-family:var(--font-mono);font-size:var(--text-sm);'
-                f'color:{col};font-weight:500;">{n:,}</span>'
-                f'</div>',
-                unsafe_allow_html=True,
-            )
-
-    render_footer()
-
-
-def page_workspace(
-    pairs: pd.DataFrame,
-    drugs: pd.DataFrame,
-    normalizer: DrugNormalizer,
-    supp_repo: SupplementEvidenceRepository,
-):
-    render_header("workspace")
-    disclaimer()
-
-    st.markdown(eyebrow("Interaction Analysis"), unsafe_allow_html=True)
-    st.markdown("## Analyze drug interactions")
 
     catalog = normalizer.get_search_catalog()
     catalog_labels = [label for label, _ in catalog]
     catalog_map = dict(catalog)
 
-    # ── Two-column workspace layout ───────────────────────────────────────────
-    col_input, col_output = st.columns([1, 1.4], gap="large")
+    # ── Блок быстрых клинических пресетов ──
+    st.markdown(
+        f'<div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-muted); margin-bottom:0.4rem;">'
+        f'{t("presets_label")}</div>',
+        unsafe_allow_html=True
+    )
 
-    with col_input:
-        # ── Quick presets ─────────────────────────────────────────────────────
-        st.markdown(
-            '<span class="ps-eyebrow-muted" style="margin-bottom:var(--sp-3);display:block;">'
-            'Clinical presets</span>',
-            unsafe_allow_html=True,
-        )
-        p1, p2, p3 = st.columns(1), st.columns(1), st.columns(1)
-        selected_preset = None
-        if st.button("CYP2C9 Triad — Warfarin + Amiodarone + Fluconazole", use_container_width=True):
+    p1, p2, p3 = st.columns(3)
+    selected_preset = None
+    with p1:
+        if st.button(t("preset_cyp"), use_container_width=True):
             selected_preset = ["warfarin", "amiodarone", "fluconazole"]
-        if st.button("Triple Whammy — ACE inhibitor + Diuretic + NSAID", use_container_width=True):
+    with p2:
+        if st.button(t("preset_whammy"), use_container_width=True):
             selected_preset = ["enalapril", "furosemide", "ibuprofen"]
-        if st.button("Anticoagulant Conflict — Warfarin + Aspirin", use_container_width=True):
+    with p3:
+        if st.button(t("preset_bleeding"), use_container_width=True):
             selected_preset = ["warfarin", "acetylsalicylic acid"]
 
-        # ── Drug selection ────────────────────────────────────────────────────
+    # Инициализация дефолтного набора с русскими МНН / синонимами
+    if "ws_selection" not in st.session_state:
+        # Находим русско-латинские названия для наглядности
+        default_items = []
+        for kw in ["варфарин", "аспирин", "ибупрофен"]:
+            match = next((l for l in catalog_labels if kw in l.lower()), None)
+            if match:
+                default_items.append(match)
+        st.session_state.ws_selection = default_items if len(default_items) >= 2 else catalog_labels[:3]
+
+    if selected_preset:
+        new_items = []
+        for p in selected_preset:
+            match = next((l for l in catalog_labels if p in l.lower() or catalog_map.get(l) == p), None)
+            if match:
+                new_items.append(match)
+        if new_items:
+            st.session_state.ws_selection = new_items
+
+    # ── Двухколоночный интерфейс: Ввод параметров слева, Результаты справа ──
+    col_input, col_meta = st.columns([2.2, 1], gap="medium")
+
+    with col_input:
+        selected_drugs = st.multiselect(
+            t("search_label"),
+            options=catalog_labels,
+            default=st.session_state.ws_selection,
+            key="workspace_multiselect",
+            help=t("search_help")
+        )
+
+    with col_meta:
         st.markdown(
-            '<span class="ps-eyebrow-muted" style="margin-top:var(--sp-5);margin-bottom:var(--sp-2);'
-            'display:block;">Drug list</span>',
-            unsafe_allow_html=True,
+            f'<div class="ps-stat-box" style="height:100%;">'
+            f'<div class="ps-stat-label">{t("audit_protocol")}</div>'
+            f'<div style="font-size:0.8rem; color:var(--ink-body); line-height:1.5; margin-top:0.35rem;">{t("audit_desc")}</div>'
+            f'</div>',
+            unsafe_allow_html=True
         )
 
-        if "ws_sel" not in st.session_state:
-            st.session_state.ws_sel = [
-                next((l for l in catalog_labels if "warfarin" in l.lower()), catalog_labels[0]),
-                next((l for l in catalog_labels if "aspirin" in l.lower() or "аспирин" in l.lower()), catalog_labels[1]),
-                next((l for l in catalog_labels if "ibuprofen" in l.lower() or "ибупрофен" in l.lower()), catalog_labels[2]),
-            ]
+    if len(selected_drugs) < 2:
+        st.info(f"ℹ️ {t('prompt_empty')}")
+        return
 
-        if selected_preset:
-            new = []
-            for p in selected_preset:
-                m = next((l for l in catalog_labels if p in l.lower() or catalog_map.get(l) == p), None)
-                if m:
-                    new.append(m)
-            if new:
-                st.session_state.ws_sel = new
+    queries = [catalog_map.get(label, label) for label in selected_drugs]
+    checker = MultiDrugChecker(pairs, normalizer)
+    report = checker.check_list(queries)
 
-        selected = st.multiselect(
-            "Search by INN, brand name, or trade name:",
-            catalog_labels,
-            default=st.session_state.ws_sel,
-            key="ws_multiselect",
-            help="System resolves brand names to canonical INN before lookup.",
-        )
+    # Предупреждения о дублировании МНН
+    if report.duplicates_detected:
+        for dup in report.duplicates_detected:
+            st.error(f"🚨 {t('dup_warning')} {dup}")
 
-        # ── Protocol panel ────────────────────────────────────────────────────
+    # ── Метрики полипрагмазии ──
+    m1, m2, m3, m4, m5 = st.columns(5)
+    with m1:
         st.markdown(
-            '<div class="ps-panel" style="margin-top:var(--sp-5);">'
-            '  <span class="ps-panel-title">Analysis protocol</span>'
-            '  <div style="font-size:var(--text-sm);color:var(--ink-3);line-height:1.65;">'
-            '    PS-8924 · DDInter Full Adjacency Core<br>'
-            '    All N×(N−1)/2 pairs evaluated<br>'
-            '    Duplicate-INN detection enabled'
-            '  </div>'
-            '</div>',
-            unsafe_allow_html=True,
+            f'<div class="ps-stat-box">'
+            f'<div class="ps-stat-label">{t("risk_overall")}</div>'
+            f'<div class="ps-stat-number" style="font-size:1.35rem;">{report.overall_risk}</div>'
+            f'<div class="ps-stat-sub">{t("risk_sub")}</div>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+    with m2:
+        st.markdown(
+            f'<div class="ps-stat-box">'
+            f'<div class="ps-stat-label" style="color:var(--sev-major);">{t("stat_major")}</div>'
+            f'<div class="ps-stat-number" style="color:var(--sev-major);">{report.summary_counts.get("Major", 0)}</div>'
+            f'<div class="ps-stat-sub">{t("stat_major_sub")}</div>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+    with m3:
+        st.markdown(
+            f'<div class="ps-stat-box">'
+            f'<div class="ps-stat-label" style="color:var(--sev-mod);">{t("stat_mod")}</div>'
+            f'<div class="ps-stat-number" style="color:var(--sev-mod);">{report.summary_counts.get("Moderate", 0)}</div>'
+            f'<div class="ps-stat-sub">{t("stat_mod_sub")}</div>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+    with m4:
+        st.markdown(
+            f'<div class="ps-stat-box">'
+            f'<div class="ps-stat-label" style="color:var(--sev-minor);">{t("stat_minor")}</div>'
+            f'<div class="ps-stat-number" style="color:var(--sev-minor);">{report.summary_counts.get("Minor", 0)}</div>'
+            f'<div class="ps-stat-sub">{t("stat_minor_sub")}</div>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+    with m5:
+        st.markdown(
+            f'<div class="ps-stat-box">'
+            f'<div class="ps-stat-label">{t("stat_not_in_db")}</div>'
+            f'<div class="ps-stat-number">{report.summary_counts.get("Not in DB", 0)}</div>'
+            f'<div class="ps-stat-sub">{t("stat_not_in_db_sub")}</div>'
+            f'</div>',
+            unsafe_allow_html=True
         )
 
-    with col_output:
-        if len(selected) < 2:
+    # ── Карточки взаимодействий ──
+    st.markdown(f'<h3 style="margin-top:1.5rem;">{t("registry_title")}</h3>', unsafe_allow_html=True)
+
+    for p in report.pairs:
+        st.markdown(
+            f'<div class="ps-card-finding">'
+            f'<div class="ps-finding-head">'
+            f'<div class="ps-finding-drugs">{p.display_a} <span style="color:var(--ink-muted); font-weight:400; margin:0 4px;">↔</span> {p.display_b}</div>'
+            f'<div>{severity_badge(p.level)}</div>'
+            f'</div>'
+            f'<div class="ps-finding-body"><b>{t("finding_label")}</b> {p.explanation}</div>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+    # ── Сопутствующие взаимодействия с БАДами ──
+    active_canons = report.resolved_drugs
+    related_supps = []
+    for c in active_canons:
+        related_supps.extend(supp_repo.get_by_drug(c))
+
+    if related_supps:
+        st.markdown(f'<h3 style="margin-top:1.25rem;">🌿 {t("supp_box_title")} ({len(related_supps)})</h3>', unsafe_allow_html=True)
+        for s in related_supps:
             st.markdown(
-                '<div style="padding:var(--sp-10) var(--sp-6);text-align:center;'
-                'color:var(--ink-3);font-size:var(--text-sm);">'
-                'Select at least two drugs to run the interaction check.'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-        else:
-            queries = [catalog_map.get(l, l) for l in selected]
-            checker = MultiDrugChecker(pairs, normalizer)
-
-            with st.spinner("Checking interactions…"):
-                report = checker.check_list(queries)
-
-            # Duplicate INN warnings
-            for dup in (report.duplicates_detected or []):
-                st.error(f"Duplicate active ingredient: {dup}")
-
-            # Summary metrics
-            sm1, sm2, sm3, sm4 = st.columns(4)
-            sm1.markdown(
-                '<div class="ps-stat">'
-                '<span class="ps-stat-label">Overall risk</span>'
-                f'<span class="ps-stat-number" style="font-size:var(--text-xl);">{report.overall_risk}</span>'
-                '</div>', unsafe_allow_html=True,
-            )
-            sm2.markdown(
-                '<div class="ps-stat">'
-                '<span class="ps-stat-label">Major</span>'
-                f'<span class="ps-stat-number" style="font-size:var(--text-xl);color:var(--sev-major);">'
-                f'{report.summary_counts.get("Major", 0)}</span>'
-                '</div>', unsafe_allow_html=True,
-            )
-            sm3.markdown(
-                '<div class="ps-stat">'
-                '<span class="ps-stat-label">Moderate</span>'
-                f'<span class="ps-stat-number" style="font-size:var(--text-xl);color:var(--sev-mod);">'
-                f'{report.summary_counts.get("Moderate", 0)}</span>'
-                '</div>', unsafe_allow_html=True,
-            )
-            sm4.markdown(
-                '<div class="ps-stat">'
-                '<span class="ps-stat-label">Not in DB</span>'
-                f'<span class="ps-stat-number" style="font-size:var(--text-xl);">'
-                f'{report.summary_counts.get("Not in DB", 0)}</span>'
-                '</div>', unsafe_allow_html=True,
+                f'<div class="ps-supp-row">'
+                f'<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:0.5rem; flex-wrap:wrap;">'
+                f'<div><b>{s.supplement_ru} ({s.supplement_lat}) + {s.drug_ru}</b></div>'
+                f'<div>{severity_badge(s.severity)} <span class="ps-badge ps-badge-none">{s.evidence_level}</span></div>'
+                f'</div>'
+                f'<div style="font-size:0.83rem; color:var(--ink-body); margin-top:0.35rem;">{s.mechanism}</div>'
+                f'<div style="font-size:0.8rem; color:var(--ink-primary); margin-top:0.25rem;"><b>{t("management_label")}</b> {s.clinical_management}</div>'
+                f'</div>',
+                unsafe_allow_html=True
             )
 
-            st.markdown(
-                '<hr style="border:0;border-top:1px solid var(--border);margin:var(--sp-4) 0;">',
-                unsafe_allow_html=True,
-            )
 
-            # Interaction results
-            for p in report.pairs:
-                st.markdown(
-                    f'<div class="ps-result">'
-                    f'  <div class="ps-result-header">'
-                    f'    <div class="ps-result-drugs">'
-                    f'      {p.display_a}'
-                    f'      <span class="ps-result-sep">↔</span>'
-                    f'      {p.display_b}'
-                    f'    </div>'
-                    f'    {chip(p.level)}'
-                    f'  </div>'
-                    f'  <div class="ps-result-body"><b>Finding:</b> {p.explanation}</div>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-
-            # Supplement interactions
-            related = []
-            for c in report.resolved_drugs:
-                related.extend(supp_repo.get_by_drug(c))
-
-            if related:
-                st.markdown(
-                    f'<div style="margin-top:var(--sp-5);">'
-                    f'  {eyebrow(f"Food & supplement interactions ({len(related)})")}'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-                for s in related:
-                    st.markdown(
-                        f'<div class="ps-supp">'
-                        f'  <div class="ps-supp-head">'
-                        f'    <span class="ps-supp-title">'
-                        f'      {s.supplement_ru} ({s.supplement_lat}) + {s.drug_ru}'
-                        f'    </span>'
-                        f'    {chip(s.severity)}'
-                        f'    <span class="ps-chip ps-chip-none">{s.evidence_level}</span>'
-                        f'  </div>'
-                        f'  <div class="ps-supp-text">{s.mechanism}</div>'
-                        f'  <div class="ps-supp-text" style="margin-top:var(--sp-1);'
-                        f'color:var(--ink-2);"><strong>Management:</strong> {s.clinical_management}</div>'
-                        f'</div>',
-                        unsafe_allow_html=True,
-                    )
-
-    render_footer()
-
-
-def page_supplements(supp_repo: SupplementEvidenceRepository):
-    render_header("workspace")
-
-    st.markdown(eyebrow("Evidence-Based Supplement Catalogue"), unsafe_allow_html=True)
-    st.markdown("## Supplement & herb interactions")
+# ─── Страница: Доказательная база БАДов ──────────────────────────────────────
+def view_supplements(supp_repo: SupplementEvidenceRepository):
     st.markdown(
-        '<p style="max-width:65ch;font-size:var(--text-base);line-height:1.7;'
-        'color:var(--ink-2);margin-bottom:var(--sp-5);">'
-        'Pharmacokinetic interactions between herbal extracts, food factors and micronutrients '
-        'with conventional drugs. Each entry is graded A (RCTs/meta-analyses), '
-        'B (controlled studies), or C (pharmacokinetic case data).'
-        '</p>',
-        unsafe_allow_html=True,
+        f'<div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--accent);">'
+        f'{t("supp_eyebrow")}</div>'
+        f'<h1>{t("supp_title")}</h1>'
+        f'<p style="font-size:0.92rem; color:var(--ink-muted); line-height:1.5; margin-bottom:1.25rem;">'
+        f'{t("supp_desc")}</p>',
+        unsafe_allow_html=True
     )
 
-    fc1, fc2 = st.columns([1.6, 1])
-    with fc1:
-        q = st.text_input("Search supplement or drug name:")
-    with fc2:
-        lf = st.selectbox("Evidence level:", ["All", "Level A", "Level B", "Level C"])
+    c1, c2 = st.columns([1.6, 1])
+    with c1:
+        query = st.text_input(t("supp_search_label"))
+    with c2:
+        level_filter = st.selectbox(t("supp_filter_label"), [t("supp_all_levels"), "Level A", "Level B", "Level C"])
 
-    items = supp_repo.search(q)
-    if lf != "All":
-        items = [i for i in items if i.evidence_level == lf]
+    items = supp_repo.search(query)
+    if level_filter != t("supp_all_levels"):
+        items = [i for i in items if i.evidence_level == level_filter]
 
     st.markdown(
-        f'<span style="font-size:var(--text-sm);color:var(--ink-3);">'
-        f'{len(items)} record{"s" if len(items) != 1 else ""} found</span>',
-        unsafe_allow_html=True,
+        f'<div style="font-size:0.82rem; color:var(--ink-muted); margin-bottom:0.75rem;">'
+        f'{t("supp_found")} <b>{len(items)}</b></div>',
+        unsafe_allow_html=True
     )
-    st.markdown('<hr style="border:0;border-top:1px solid var(--border);margin:var(--sp-3) 0;">', unsafe_allow_html=True)
 
     for item in items:
         st.markdown(
-            f'<div class="ps-result">'
-            f'  <div class="ps-result-header">'
-            f'    <div class="ps-result-drugs">'
-            f'      {item.supplement_ru} '
-            f'      <span style="font-weight:400;font-size:var(--text-sm);color:var(--ink-3);">'
-            f'({item.supplement_lat})</span>'
-            f'      <span class="ps-result-sep">+</span>'
-            f'      {item.drug_ru}'
-            f'    </div>'
-            f'    <div style="display:flex;gap:var(--sp-2);align-items:center;">'
-            f'      {chip(item.severity)}'
-            f'      <span class="ps-chip ps-chip-none">{item.evidence_level}</span>'
-            f'    </div>'
-            f'  </div>'
-            f'  <div class="ps-result-body">'
-            f'    <div><b>Type:</b> {item.interaction_type}</div>'
-            f'    <div><b>Mechanism:</b> {item.mechanism}</div>'
-            f'    <div><b>Consequence:</b> {item.clinical_consequence}</div>'
-            f'    <div style="color:var(--ink);margin-top:var(--sp-2);">'
-            f'      <b>Management:</b> {item.clinical_management}'
-            f'    </div>'
-            f'  </div>'
-            f'  <div style="margin-top:var(--sp-3);padding-top:var(--sp-2);'
-            f'border-top:1px solid var(--border);font-size:var(--text-xs);color:var(--ink-3);">'
-            f'    <b>Sources:</b> {"; ".join(item.citations)}'
-            f'  </div>'
+            f'<div class="ps-card-finding">'
+            f'<div class="ps-finding-head">'
+            f'<div>'
+            f'<div style="font-size:0.7rem; font-weight:600; text-transform:uppercase; color:var(--accent);">'
+            f'{item.evidence_level} · {item.interaction_type}</div>'
+            f'<div class="ps-finding-drugs">{item.supplement_ru} ({item.supplement_lat}) ↔ {item.drug_ru}</div>'
+            f'</div>'
+            f'<div>{severity_badge(item.severity)}</div>'
+            f'</div>'
+            f'<div class="ps-finding-body">'
+            f'<div><b>{t("supp_mech")}</b> {item.mechanism}</div>'
+            f'<div style="margin-top:0.25rem;"><b>{t("supp_conseq")}</b> {item.clinical_consequence}</div>'
+            f'<div style="margin-top:0.25rem; color:var(--accent); font-weight:600;"><b>{t("management_label")}</b> {item.clinical_management}</div>'
+            f'</div>'
+            f'<div style="margin-top:0.6rem; border-top:1px solid var(--border); padding-top:0.4rem; font-size:0.75rem; color:var(--ink-muted);">'
+            f'<b>{t("supp_sources")}</b> {"; ".join(item.citations)}'
+            f'</div>'
             f'</div>',
-            unsafe_allow_html=True,
+            unsafe_allow_html=True
         )
 
-    render_footer()
 
+# ─── Страница: Граф сети взаимодействий ──────────────────────────────────────
+def view_network(pairs: pd.DataFrame, drugs: pd.DataFrame, names: list[str]):
+    st.markdown(
+        f'<div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--accent);">'
+        f'{t("net_eyebrow")}</div>'
+        f'<h1>{t("net_title")}</h1>'
+        f'<p style="font-size:0.92rem; color:var(--ink-muted); line-height:1.5; margin-bottom:1.25rem;">'
+        f'{t("net_desc")}</p>',
+        unsafe_allow_html=True
+    )
 
-def page_network(pairs: pd.DataFrame, drugs: pd.DataFrame, names: list[str]):
-    render_header("workspace")
-    st.markdown(eyebrow("Network Analysis", muted=True), unsafe_allow_html=True)
-    st.markdown("## Interaction network topology")
-
-    nc1, nc2, nc3 = st.columns([1.3, 1.1, 1.2])
-    center = nc1.selectbox("Central node:", names,
-                            index=names.index("warfarin") if "warfarin" in names else 0)
-    levels = nc2.multiselect("Severity levels:", ["Major", "Moderate", "Minor", "Unknown"],
-                              default=["Major", "Moderate"])
-    max_e = nc3.slider("Max edges:", 5, 80, 30)
+    c1, c2, c3 = st.columns([1.3, 1.1, 1.2])
+    center = c1.selectbox(t("net_center"), names, index=names.index("warfarin") if "warfarin" in names else 0)
+    levels = c2.multiselect(t("net_levels"), ["Major", "Moderate", "Minor", "Unknown"], default=["Major", "Moderate"])
+    max_edges = c3.slider(t("net_max_edges"), 5, 80, 25)
 
     near = pairs[((pairs.Drug_A == center) | (pairs.Drug_B == center)) & pairs.Level.isin(levels)].copy()
     near["Neighbor"] = np.where(near.Drug_A == center, near.Drug_B, near.Drug_A)
     order = {"Major": 0, "Moderate": 1, "Minor": 2, "Unknown": 3}
-    near["_o"] = near.Level.map(order)
-    near = near.sort_values(["_o", "Neighbor"]).head(max_e)
+    near["_order"] = near.Level.map(order)
+    near = near.sort_values(["_order", "Neighbor"]).head(max_edges)
 
     if near.empty:
-        st.info("No edges found for selected drug and filters.")
+        st.info(t("net_empty"))
     else:
         try:
             from pyvis.network import Network
-            net = Network(height="500px", width="100%", bgcolor="#F9F8F6",
-                          font_color="#0E1117", directed=False, cdn_resources="in_line")
-            net.set_options('{"physics":{"solver":"forceAtlas2Based","forceAtlas2Based":'
-                            '{"gravitationalConstant":-60,"centralGravity":0.02,'
-                            '"springLength":140,"springConstant":0.08},'
-                            '"stabilization":{"iterations":100}},'
-                            '"nodes":{"font":{"size":14,"face":"Inter, sans-serif"}},'
-                            '"edges":{"smooth":{"type":"continuous"},"width":2}}')
-            net.add_node(center, label=center.title(),
-                         color={"background": "#1A56A0", "border": "#13407D"},
-                         font={"color": "#FFFFFF"}, size=30)
-            cmap = {"Major": "#B91C1C", "Moderate": "#B45309", "Minor": "#065F46", "Unknown": "#6B6860"}
-            for _, row in near.iterrows():
-                nbr, lv = row["Neighbor"], row["Level"]
-                net.add_node(nbr, label=nbr.title(),
-                             color={"background": "#FFFFFF", "border": "#D1CEC9"},
-                             font={"color": "#0E1117"}, size=18)
-                net.add_edge(center, nbr, color=cmap.get(lv, "#6B6860"),
-                             title=lv, width=3 if lv == "Major" else 2)
-            components.html(net.generate_html(), height=520, scrolling=False)
+            net = Network(height="480px", width="100%", bgcolor="#FAF9F6", font_color="#111418", directed=False, cdn_resources="in_line")
+            net.set_options('{"physics":{"solver":"forceAtlas2Based","forceAtlas2Based":{"gravitationalConstant":-60,"centralGravity":0.02,"springLength":130,"springConstant":0.08},"stabilization":{"iterations":80}},"nodes":{"font":{"size":14,"face":"Inter, sans-serif"}},"edges":{"smooth":{"type":"continuous"},"width":2}}')
+            net.add_node(center, label=center.title(), color={"background": "#1A56A0", "border": "#13407D"}, font={"color": "#FFFFFF"}, size=28)
+            cmap = {"Major": "#B91C1C", "Moderate": "#D97706", "Minor": "#0D7A75", "Unknown": "#64748B"}
+            for _, r in near.iterrows():
+                nbr, lvl = r["Neighbor"], r["Level"]
+                net.add_node(nbr, label=nbr.title(), color={"background": "#FFFFFF", "border": "#E4E1DB"}, font={"color": "#111418"}, size=16)
+                net.add_edge(center, nbr, color=cmap.get(lvl, "#64748B"), width=3 if lvl == "Major" else 2)
+            components.html(net.generate_html(), height=500, scrolling=False)
         except Exception as exc:
-            st.error(f"Graph rendering failed: {exc}")
+            st.error(f"Render error: {exc}")
 
-        st.dataframe(
-            near[["Neighbor", "Level"]].rename(columns={"Neighbor": "Drug", "Level": "Severity"}),
-            use_container_width=True, hide_index=True,
-        )
+        st.dataframe(near[["Neighbor", "Level"]].rename(columns={"Neighbor": "Препарат", "Level": "Уровень риска"}), use_container_width=True, hide_index=True)
 
-    st.markdown("### Top hubs by Major-edge count")
+    st.markdown(f'<h3>{t("net_hubs")}</h3>', unsafe_allow_html=True)
     st.dataframe(major_hubs(pairs), use_container_width=True, hide_index=True)
-    render_footer()
 
 
-def page_ml(pairs: pd.DataFrame, drugs: pd.DataFrame):
-    render_header("methodology")
-    st.markdown(eyebrow("Machine Learning Validation", muted=True), unsafe_allow_html=True)
-    st.markdown("## Link prediction validation (leakage-free)")
+# ─── Страница: Валидация ML моделей ──────────────────────────────────────────
+def view_ml(pairs: pd.DataFrame, drugs: pd.DataFrame):
     st.markdown(
-        '<p style="max-width:65ch;font-size:var(--text-base);line-height:1.7;'
-        'color:var(--ink-2);margin-bottom:var(--sp-5);">'
-        'Graph-topology-based link prediction on DDInter. '
-        'Train edges (12%) and test edges (20%) are physically removed from the feature graph (68%) '
-        'to prevent data leakage.'
-        '</p>',
-        unsafe_allow_html=True,
+        f'<div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--accent);">'
+        f'{t("ml_eyebrow")}</div>'
+        f'<h1>{t("ml_title")}</h1>'
+        f'<p style="font-size:0.92rem; color:var(--ink-muted); line-height:1.5; margin-bottom:1.25rem;">'
+        f'{t("ml_desc")}</p>',
+        unsafe_allow_html=True
     )
 
-    with st.spinner("Training models…"):
-        result = cached_evaluation(pairs, drugs)
-
+    result = cached_evaluation(pairs, drugs)
     metrics = result["metrics"]
-    st.dataframe(
-        metrics.style.format({"ROC-AUC": "{:.3f}", "Precision@5000": "{:.3f}"}),
-        use_container_width=True, hide_index=True,
-    )
-    st.caption(
-        f"Sample: {result['train_examples']:,} training · "
-        f"{result['test_examples']:,} test (balanced classes).".replace(",", " ")
-    )
+    st.dataframe(metrics.style.format({"ROC-AUC": "{:.3f}", "Precision@5000": "{:.3f}"}), use_container_width=True, hide_index=True)
+    st.caption(t("ml_sample", train=f"{result['train_examples']:,}".replace(",", " "), test=f"{result['test_examples']:,}".replace(",", " ")))
 
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(8, 3.8))
     fig.patch.set_facecolor("#FFFFFF")
-    ax.set_facecolor("#F9F8F6")
+    ax.set_facecolor("#FAF9F6")
+    ax.tick_params(colors="#64748B")
     for sp in ax.spines.values():
-        sp.set_color("#E4E2DE")
-    ax.tick_params(colors="#6B6860")
+        sp.set_color("#E4E1DB")
 
-    palette = ["#1A56A0", "#065F46", "#B45309", "#B91C1C", "#9CA3AF"]
+    palette = ["#1A56A0", "#0D7A75", "#D97706", "#B91C1C", "#94A3B8"]
     for (name, (fpr, tpr)), col in zip(result["roc"].items(), palette):
         auc = metrics.loc[metrics["Метод"] == name, "ROC-AUC"].iloc[0]
-        ax.plot(fpr, tpr, label=f"{name} AUC {auc:.3f}", color=col, linewidth=2)
-    ax.plot([0, 1], [0, 1], "--", color="#D1D5DB", linewidth=1)
-    ax.set(xlabel="False positive rate", ylabel="True positive rate",
-           title="ROC curves — held-out DDInter test set")
-    ax.grid(alpha=0.25, color="#E4E2DE")
-    ax.legend(frameon=True, facecolor="#FFFFFF", edgecolor="#E4E2DE", fontsize=9, loc="lower right")
+        ax.plot(fpr, tpr, label=f"{name} · AUC {auc:.3f}", color=col, linewidth=2)
+    ax.plot([0, 1], [0, 1], "--", color="#CBD5E1", linewidth=1)
+    ax.set(xlabel="False Positive Rate (FPR)", ylabel="True Positive Rate (TPR)", title="ROC Curves — Held-out DDInter Test Set")
+    ax.grid(alpha=0.25, color="#E4E1DB")
+    ax.legend(frameon=True, facecolor="#FFFFFF", edgecolor="#E4E1DB", fontsize=8.5, loc="lower right")
     fig.tight_layout()
     st.pyplot(fig, use_container_width=True)
 
-    st.markdown("### Confusion matrix (Random Forest, threshold 0.5)")
+    st.markdown(f'<h3>{t("ml_conf_matrix")}</h3>', unsafe_allow_html=True)
     tn, fp, fn, tp = result["confusion"].ravel()
     st.dataframe(pd.DataFrame(
         [[tn, fp], [fn, tp]],
-        index=["No edge in DB", "Hidden DDInter edge"],
-        columns=["Predicted: no edge", "Predicted: edge"],
+        index=["В базе нет записи" if st.session_state.lang == "RU" else "No record in DB", "Связь DDInter скрыта" if st.session_state.lang == "RU" else "Hidden DDInter pair"],
+        columns=["Предсказано: нет связи" if st.session_state.lang == "RU" else "Predicted: no link", "Предсказано: связь" if st.session_state.lang == "RU" else "Predicted: link"]
     ), use_container_width=True)
-    render_footer()
 
 
-def page_ai(pairs: pd.DataFrame, names: list[str]):
-    render_header("workspace")
-    st.markdown(eyebrow("Local AI Assistant", muted=True), unsafe_allow_html=True)
-    st.markdown("## Contextual explanation (Ollama)")
+# ─── Страница: ИИ-ассистент (Ollama) ─────────────────────────────────────────
+def view_ai(pairs: pd.DataFrame, names: list[str]):
     st.markdown(
-        '<p style="max-width:65ch;font-size:var(--text-base);line-height:1.7;'
-        'color:var(--ink-2);margin-bottom:var(--sp-5);">'
-        'Generate a structured textual explanation for any DDInter pair using a '
-        'locally-running language model. No data is sent to external APIs.'
-        '</p>',
-        unsafe_allow_html=True,
+        f'<div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--accent);">'
+        f'{t("ai_eyebrow")}</div>'
+        f'<h1>{t("ai_title")}</h1>'
+        f'<p style="font-size:0.92rem; color:var(--ink-muted); line-height:1.5; margin-bottom:1.25rem;">'
+        f'{t("ai_desc")}</p>',
+        unsafe_allow_html=True
     )
 
     status = get_local_ai_status()
-    ai_l, ai_r = st.columns([1, 1], gap="large")
+    left, right = st.columns([1.1, 0.9], gap="large")
 
-    with ai_l:
-        drug_a = st.selectbox("Drug A:", names, key="ai_a")
-        drug_b = st.selectbox("Drug B:", names, index=min(1, len(names) - 1), key="ai_b")
-        question = st.text_area("Question:", placeholder="What is the clinical significance of this interaction?", height=100)
+    with left:
+        drug_a = st.selectbox(t("ai_drug_a"), names, key="ai_a")
+        drug_b = st.selectbox(t("ai_drug_b"), names, index=min(1, len(names) - 1), key="ai_b")
+        question = st.text_area(t("ai_question"), placeholder=t("ai_question_ph"), height=95)
 
-        m = pairs[(pairs.Drug_A == min(drug_a, drug_b)) & (pairs.Drug_B == max(drug_a, drug_b))]
-        level = None if m.empty else str(m.iloc[0]["Level"])
+        match = pairs[(pairs.Drug_A == min(drug_a, drug_b)) & (pairs.Drug_B == max(drug_a, drug_b))]
+        level = None if match.empty else str(match.iloc[0]["Level"])
 
-        st.markdown("---")
-        st.markdown("#### Deterministic explanation (offline)")
+        st.markdown(f'<h4>{t("ai_offline_title")}</h4>', unsafe_allow_html=True)
         se = generate_structured_explanation(drug_a, drug_b, level)
-        st.info(f"**Summary:** {se['summary']}\n\n**Clinical context:** {se['clinical_meaning']}\n\n**Recommendation:** {se['recommendation']}")
+        st.info(f"**{t('ai_summary')}** {se['summary']}\n\n**{t('ai_clinical')}** {se['clinical_meaning']}\n\n**{t('ai_recommendation')}** {se['recommendation']}")
 
-    with ai_r:
-        st.markdown(
-            '<div class="ps-panel">'
-            '  <span class="ps-panel-title">Ollama service status</span>',
-            unsafe_allow_html=True,
-        )
+    with right:
+        st.markdown(f'<div class="ps-stat-box"><div class="ps-stat-label">{t("ai_status_title")}</div>', unsafe_allow_html=True)
         if status.available:
             st.success(f"✅ {status.message} ({status.details})")
             preferred = next((n for n in status.models if n.startswith("qwen2.5:3b")), status.models[0])
-            model = st.selectbox("Model:", status.models, index=status.models.index(preferred))
-            if st.button("Generate explanation…", type="primary", disabled=not question.strip()):
+            model = st.selectbox(t("ai_model"), status.models, index=status.models.index(preferred))
+            if st.button(t("ai_btn_generate"), type="primary", disabled=not question.strip()):
                 prompt = make_evidence_prompt(question.strip(), drug_a, drug_b, level)
-                with st.spinner("Generating…"):
+                with st.spinner("…"):
                     try:
                         ans = ask_local_model(prompt, model)
-                        st.markdown("**Response:**")
-                        st.markdown(ans)
+                        st.markdown(f'**{t("ai_resp")}**\n\n{ans}')
                     except RuntimeError as exc:
                         st.error(str(exc))
         else:
             st.info(f"ℹ️ {status.message}\n\n{status.details}")
-            st.caption("Base analysis and risk scoring work fully offline.")
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    render_footer()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 
-def page_methodology():
-    render_header("methodology")
-    st.markdown(eyebrow("Methodology & Ethics", muted=True), unsafe_allow_html=True)
-    st.markdown("## Methodology, data provenance, and ethical limits")
-
-    st.markdown("""
-### 1. DDInter database
-**DDInter** (*Nucleic Acids Research*, 2022 — Xiong G. et al.) is the sole source of drug–drug interaction records:
-- **1,939** unique pharmacologically active substances.
-- **160,235** unique verified pairs graded as Major (26,914), Moderate (96,675), Minor (6,833), Unknown (29,813).
-- Normalisation: duplicates collapsed to the highest severity; self-loops (A=A) removed; alphabetical pair ordering.
-
-### 2. Supplement evidence standards
-- **Level A** — Randomised controlled trials or meta-analyses.
-- **Level B** — Controlled prospective or cohort studies.
-- **Level C** — Pharmacokinetic studies in healthy volunteers, case series, FDA/EMA monographs.
-
-### 3. Institutional limits
-- **Absence of record ≠ Safety.** Missing pairs in DDInter reflect the limits of current documentation, not biological safety.
-- **ML predicts graph topology, not clinical biology.** ROC-AUC 0.91 measures edge-recovery accuracy, not clinical outcome severity.
-- This project is for academic research and education only. All therapeutic decisions require a qualified healthcare professional.
-""")
-    render_footer()
-
-
-# ─── Navigation (Streamlit radio — real routing) ───────────────────────────────
-NAV_LABELS = [
-    "Overview",
-    "Interaction Analysis",
-    "Supplement Catalogue",
-    "Interaction Network",
-    "ML Validation",
-    "AI Assistant",
-    "Methodology",
-]
-
-with st.sidebar:
+# ─── Страница: О платформе и методология ────────────────────────────────────
+def view_overview(pairs: pd.DataFrame, drugs: pd.DataFrame):
     st.markdown(
-        '<div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;'
-        'letter-spacing:0.07em;color:var(--ink-3,#6B6860);padding:0.5rem 0 0.75rem;">'
-        'Navigation</div>',
-        unsafe_allow_html=True,
+        f'<div style="font-size:0.75rem; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:var(--accent);">'
+        f'{t("ov_eyebrow")}</div>'
+        f'<h1>{t("ov_title")}</h1>'
+        f'<p style="font-size:1.05rem; font-family:var(--font-serif); color:var(--ink-body); line-height:1.65; max-width:68ch; margin-bottom:1.5rem;">'
+        f'{t("ov_desc")}</p>',
+        unsafe_allow_html=True
     )
-    nav = st.radio("", NAV_LABELS, label_visibility="collapsed")
+
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.markdown(
+            f'<div class="ps-stat-box">'
+            f'<div class="ps-stat-label">{t("ov_stat_pairs")}</div>'
+            f'<div class="ps-stat-number">{len(pairs):,}</div>'
+            f'<div class="ps-stat-sub">DDInter Full Core</div>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+    with c2:
+        st.markdown(
+            f'<div class="ps-stat-box">'
+            f'<div class="ps-stat-label">{t("ov_stat_drugs")}</div>'
+            f'<div class="ps-stat-number">{len(drugs):,}</div>'
+            f'<div class="ps-stat-sub">INN Substances</div>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+    with c3:
+        major_count = int((pairs["Level"] == "Major").sum())
+        st.markdown(
+            f'<div class="ps-stat-box">'
+            f'<div class="ps-stat-label" style="color:var(--sev-major);">{t("ov_stat_major")}</div>'
+            f'<div class="ps-stat-number" style="color:var(--sev-major);">{major_count:,}</div>'
+            f'<div class="ps-stat-sub">Evidence Tier 1</div>'
+            f'</div>',
+            unsafe_allow_html=True
+        )
+
+    st.markdown(
+        f'<div style="margin:1.5rem 0;">'
+        f'<button onclick="window.location.reload();" style="display:none;"></button>'
+        f'</div>',
+        unsafe_allow_html=True
+    )
+    if st.button(t("ov_btn_start"), type="primary"):
+        st.session_state.nav_page = "workspace"
+        st.rerun()
+
     st.markdown("---")
-    st.caption("Pharma Sentinel · v3.4 · Academic")
+    st.markdown(f'<h3>{t("ov_provenance_title")}</h3>', unsafe_allow_html=True)
+    st.markdown(f'<p style="font-size:0.9rem; line-height:1.7; color:var(--ink-body);">{t("ov_provenance_text")}</p>', unsafe_allow_html=True)
+
+
+# ─── Точка входа ─────────────────────────────────────────────────────────────
+render_top_bar()
 
 try:
-    with st.spinner("Loading DDInter dataset…"):
+    with st.spinner("…"):
         pairs, drugs = cached_data()
     names = drugs["drug"].tolist()
     normalizer = cached_normalizer(tuple(names))
     supp_repo = SupplementEvidenceRepository()
 
-    if nav == "Overview":
-        page_overview(pairs, drugs)
-    elif nav == "Interaction Analysis":
-        page_workspace(pairs, drugs, normalizer, supp_repo)
-    elif nav == "Supplement Catalogue":
-        page_supplements(supp_repo)
-    elif nav == "Interaction Network":
-        page_network(pairs, drugs, names)
-    elif nav == "ML Validation":
-        page_ml(pairs, drugs)
-    elif nav == "AI Assistant":
-        page_ai(pairs, names)
+    page = st.session_state.get("nav_page", "workspace")
+
+    if page == "workspace":
+        view_workspace(pairs, drugs, normalizer, supp_repo)
+    elif page == "supplements":
+        view_supplements(supp_repo)
+    elif page == "network":
+        view_network(pairs, drugs, names)
+    elif page == "ml":
+        view_ml(pairs, drugs)
+    elif page == "ai":
+        view_ai(pairs, names)
     else:
-        page_methodology()
+        view_overview(pairs, drugs)
+
+    render_footer()
 
 except FileNotFoundError as exc:
     st.warning(str(exc))
 except DataValidationError as exc:
-    st.error(f"Data integrity error: {exc}")
+    st.error(f"Data error: {exc}")
 except Exception as exc:
-    st.error(f"Unexpected error: {exc}")
+    st.error(f"Error: {exc}")
     raise
