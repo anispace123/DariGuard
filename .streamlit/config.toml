@@ -1,8 +1,7 @@
-[browser]
-gatherUsageStats = false
-
-[server]
-headless = true
-port = 8501
-enableCORS = false
-enableXsrfProtection = false
+[theme]
+base = "dark"
+primaryColor = "#527DFF"
+backgroundColor = "#0A1020"
+secondaryBackgroundColor = "#101B30"
+textColor = "#DCE7F7"
+font = "sans serif"

@@ -250,41 +250,48 @@ def t(key: str, **kwargs) -> str:
     return text
 
 
-# ─── Дизайн-система + Анимации переходов страниц ─────────────────────────────
+# ─── Дизайн-система (Dark Scientific Palette) + Анимации переходов ───────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  --bg:          #FAF9F6;
-  --bg-card:     rgba(255, 255, 255, 0.88);
-  --bg-subtle:   rgba(243, 242, 238, 0.88);
-  --border:      #E4E1DB;
-  --border-focus:#1A56A0;
+  --bg:           #0A1020;
+  --bg-sec:       #0D1628;
+  --bg-card:      rgba(16, 27, 48, 0.90);
+  --bg-elevated:  rgba(21, 35, 58, 0.94);
+  --bg-subtle:    rgba(13, 22, 40, 0.88);
+  --border:       rgba(147, 164, 191, 0.16);
+  --border-hover: rgba(82, 125, 255, 0.38);
+  --border-focus: #527DFF;
 
-  --ink-primary: #111418;
-  --ink-body:    #374151;
-  --ink-muted:   #64748B;
+  --ink-primary:  #DCE7F7;
+  --ink-body:     #DCE7F7;
+  --ink-muted:    #93A4BF;
 
-  --accent:      #1A56A0;
-  --accent-light:rgba(235, 243, 251, 0.88);
-  --accent-hover:#13407D;
+  --accent:       #527DFF;
+  --cyan:         #55D6E8;
+  --accent-light: rgba(16, 27, 48, 0.92);
+  --accent-hover: #6B90FF;
 
-  --sev-major:   #B91C1C;
-  --sev-major-bg:#FEF2F2;
-  --sev-mod:     #D97706;
-  --sev-mod-bg:  #FFFBEB;
-  --sev-minor:   #0D7A75;
-  --sev-minor-bg:#F0FDF4;
-  --sev-none:    #64748B;
-  --sev-none-bg: #F1F5F9;
+  --sev-major:    #F87171;
+  --sev-major-bg: rgba(185, 28, 28, 0.18);
+  --sev-major-bd: rgba(248, 113, 113, 0.36);
+  --sev-mod:      #FBBF24;
+  --sev-mod-bg:   rgba(217, 119, 6, 0.18);
+  --sev-mod-bd:   rgba(251, 191, 36, 0.36);
+  --sev-minor:    #55D6E8;
+  --sev-minor-bg: rgba(85, 214, 232, 0.14);
+  --sev-minor-bd: rgba(85, 214, 232, 0.34);
+  --sev-none:     #93A4BF;
+  --sev-none-bg:  rgba(21, 35, 58, 0.85);
 
-  --font-ui:     'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-serif:  'Lora', Georgia, serif;
-  --font-mono:   'JetBrains Mono', monospace;
+  --font-ui:      'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif:   'Lora', Georgia, serif;
+  --font-mono:    'JetBrains Mono', monospace;
 
-  --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-power3: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --ease-snappy:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-power3:  cubic-bezier(0.215, 0.61, 0.355, 1);
 }
 
 html, body, [class*="css"] {
@@ -294,26 +301,27 @@ html, body, [class*="css"] {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Прозрачность для видимости WebGL2 <Galaxy /> фона */
-.stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+/* Прозрачность оболочки Streamlit для видимости постоянных слоёв <Galaxy /> и <SplashCursor /> */
+.stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"], .main {
   background: transparent !important;
+  color: var(--ink-body) !important;
 }
 
 #MainMenu, footer, [data-testid="stHeader"] { display: none !important; }
 
-.block-container {
+.block-container, [data-testid="stMainBlockContainer"] {
   max-width: 1240px !important;
   padding: 0.5rem 1.5rem 3rem !important;
-  position: relative;
-  z-index: 2;
+  position: relative !important;
+  z-index: 2 !important;
 }
 
 [data-testid="column"] { min-width: 0 !important; }
 
-/* ── Заголовки с засечками ── */
+/* ── Заголовки и типографика ── */
 [data-testid="stMarkdownContainer"] h1 {
   font-family: var(--font-serif) !important;
-  font-size: clamp(1.65rem, 3.2vw, 2.4rem) !important;
+  font-size: clamp(1.65rem, 3.2vw, 2.35rem) !important;
   font-weight: 500 !important;
   line-height: 1.25 !important;
   letter-spacing: -0.02em !important;
@@ -330,12 +338,22 @@ html, body, [class*="css"] {
   margin: 1.25rem 0 0.4rem !important;
 }
 
-[data-testid="stMarkdownContainer"] h3 {
+[data-testid="stMarkdownContainer"] h3,
+[data-testid="stMarkdownContainer"] h4 {
   font-family: var(--font-ui) !important;
   font-size: 1.05rem !important;
   font-weight: 600 !important;
   color: var(--ink-primary) !important;
   margin: 1rem 0 0.35rem !important;
+}
+
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stCaptionContainer"] {
+  color: var(--ink-muted);
+}
+
+hr {
+  border-color: var(--border) !important;
 }
 
 /* ── Плашка статуса базы данных ── */
@@ -344,26 +362,26 @@ html, body, [class*="css"] {
   align-items: center;
   gap: 7px;
   background: var(--bg-card);
-  backdrop-filter: blur(8px);
   border: 1px solid var(--border);
-  padding: 0.35rem 0.75rem;
+  padding: 0.36rem 0.78rem;
   border-radius: 3px;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 500;
-  color: #065F46;
+  color: var(--cyan);
 }
 
 .ps-live-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #10B981;
-  animation: ps-pulse 2s infinite ease-in-out;
+  background: var(--cyan);
+  box-shadow: 0 0 8px rgba(85, 214, 232, 0.65);
+  animation: ps-pulse 2.2s infinite ease-in-out;
 }
 
 @keyframes ps-pulse {
-  0%, 100% { opacity: 0.4; }
+  0%, 100% { opacity: 0.45; }
   50% { opacity: 1; }
 }
 
@@ -374,7 +392,6 @@ div[data-testid="stRadio"] > div[role="radiogroup"] {
   gap: 0.35rem;
   flex-wrap: wrap;
   background: var(--bg-subtle);
-  backdrop-filter: blur(8px);
   padding: 4px;
   border-radius: 4px;
   border: 1px solid var(--border);
@@ -388,30 +405,112 @@ div[data-testid="stRadio"] > div[role="radiogroup"] > label {
   font-size: 0.82rem !important;
   font-weight: 500 !important;
   letter-spacing: 0.01em !important;
-  color: var(--ink-body) !important;
+  color: var(--ink-muted) !important;
   background: transparent;
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: transform 150ms var(--ease-snappy), background 150ms ease, color 150ms ease;
+  transition: transform 150ms var(--ease-snappy), background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+
+div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
+  color: inherit !important;
+  font-size: 0.82rem !important;
+  font-weight: inherit !important;
 }
 
 div[data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
   color: var(--ink-primary) !important;
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(21, 35, 58, 0.65);
 }
 
 div[data-testid="stRadio"] > div[role="radiogroup"] > label[data-checked="true"],
 div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
-  background: #FFFFFF !important;
-  color: var(--accent) !important;
+  background: var(--bg-elevated) !important;
+  color: var(--ink-primary) !important;
+  border-color: rgba(82, 125, 255, 0.38) !important;
   font-weight: 600 !important;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+}
+
+/* ── Формы ввода, селекты и теги препаратов на тёмных поверхностях #101B30 / #15233A ── */
+label[data-testid="stWidgetLabel"] p {
+  color: var(--ink-primary) !important;
+  font-weight: 500 !important;
+  font-size: 0.84rem !important;
+}
+
+div[data-baseweb="select"] > div,
+div[data-baseweb="input"] > div,
+div[data-baseweb="textarea"] {
+  background-color: #101B30 !important;
+  border-color: rgba(147, 164, 191, 0.24) !important;
+  color: #DCE7F7 !important;
+  border-radius: 3px !important;
+}
+
+div[data-baseweb="select"] > div:focus-within,
+div[data-baseweb="input"] > div:focus-within,
+div[data-baseweb="textarea"]:focus-within {
+  border-color: #527DFF !important;
+  box-shadow: 0 0 0 1px #527DFF !important;
+}
+
+div[data-baseweb="select"] input,
+div[data-baseweb="input"] input,
+div[data-baseweb="textarea"] textarea {
+  color: #DCE7F7 !important;
+}
+
+span[data-baseweb="tag"] {
+  background-color: #15233A !important;
+  border: 1px solid rgba(82, 125, 255, 0.38) !important;
+  color: #DCE7F7 !important;
+  border-radius: 3px !important;
+}
+
+span[data-baseweb="tag"] span {
+  color: #DCE7F7 !important;
+}
+
+ul[data-testid="stSelectboxVirtualDropdown"],
+div[data-baseweb="popover"] ul {
+  background-color: #101B30 !important;
+  border: 1px solid rgba(147, 164, 191, 0.22) !important;
+}
+
+div[data-baseweb="popover"] li {
+  color: #DCE7F7 !important;
+}
+
+div[data-baseweb="popover"] li:hover,
+div[data-baseweb="popover"] li[aria-selected="true"] {
+  background-color: #15233A !important;
+}
+
+/* ── Таблицы и алерты ── */
+[data-testid="stDataFrame"] {
+  background: #101B30 !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 3px !important;
+  padding: 2px;
+}
+
+[data-testid="stAlert"] {
+  background-color: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--ink-primary) !important;
+  border-radius: 3px !important;
+}
+
+[data-testid="stAlert"] p {
+  color: var(--ink-primary) !important;
 }
 
 /* ── Анимация смены страниц и появления контента (<AnimatedContent />) ── */
 @keyframes ps-page-enter {
   0% {
     opacity: 0;
-    transform: translate3d(0, 32px, 0) scale(0.99);
+    transform: translate3d(0, 26px, 0) scale(0.992);
   }
   100% {
     opacity: 1;
@@ -420,33 +519,32 @@ div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
 }
 
 .ps-animated-page-root {
-  animation: ps-page-enter 620ms var(--ease-power3) both;
+  animation: ps-page-enter 540ms var(--ease-power3) both;
 }
 
 .ps-anim-item {
-  animation: ps-page-enter 680ms var(--ease-power3) both;
+  animation: ps-page-enter 580ms var(--ease-power3) both;
 }
 
-.ps-stagger-1 { animation-delay: 50ms; }
-.ps-stagger-2 { animation-delay: 110ms; }
-.ps-stagger-3 { animation-delay: 170ms; }
-.ps-stagger-4 { animation-delay: 230ms; }
+.ps-stagger-1 { animation-delay: 40ms; }
+.ps-stagger-2 { animation-delay: 90ms; }
+.ps-stagger-3 { animation-delay: 140ms; }
+.ps-stagger-4 { animation-delay: 190ms; }
 
 /* ── Дисклеймер ── */
 .ps-disclaimer {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  background: var(--accent-light);
-  backdrop-filter: blur(8px);
-  border: 1px solid #BFDBFE;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   padding: 0.65rem 1rem;
   border-radius: 3px;
   margin-bottom: 1.25rem;
   font-size: 0.82rem;
   line-height: 1.5;
-  color: var(--ink-body);
+  color: var(--ink-muted);
 }
 
 .ps-disclaimer-tag {
@@ -455,8 +553,9 @@ div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--accent);
-  background: rgba(26, 86, 160, 0.1);
+  color: var(--cyan);
+  background: rgba(85, 214, 232, 0.12);
+  border: 1px solid rgba(85, 214, 232, 0.25);
   padding: 2px 6px;
   border-radius: 2px;
   white-space: nowrap;
@@ -465,22 +564,22 @@ div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
 
 .ps-disclaimer b { color: var(--ink-primary); }
 
-/* ── Карточки и статистика ── */
+/* ── Карточки и статистика (#101B30 и приподнятые #15233A) ── */
 .ps-stat-box {
   background: var(--bg-card);
-  backdrop-filter: blur(8px);
   border: 1px solid var(--border);
   padding: 0.85rem 1rem;
   border-radius: 3px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 180ms var(--ease-snappy), border-color 180ms ease;
+  transition: transform 180ms var(--ease-snappy), border-color 180ms ease, background 180ms ease;
 }
 
 .ps-stat-box:hover {
   transform: translateY(-2px);
-  border-color: #CBD5E1;
+  background: var(--bg-elevated);
+  border-color: var(--border-hover);
 }
 
 .ps-stat-label {
@@ -508,17 +607,17 @@ div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
 /* ── Результаты анализа ── */
 .ps-card-finding {
   background: var(--bg-card);
-  backdrop-filter: blur(8px);
   border: 1px solid var(--border);
   border-radius: 3px;
   padding: 1rem 1.15rem;
   margin-bottom: 0.65rem;
-  transition: border-color 150ms ease, transform 180ms var(--ease-snappy);
-  animation: ps-page-enter 560ms var(--ease-power3) both;
+  transition: border-color 150ms ease, transform 180ms var(--ease-snappy), background 150ms ease;
+  animation: ps-page-enter 520ms var(--ease-power3) both;
 }
 
 .ps-card-finding:hover {
-  border-color: #CBD5E1;
+  background: var(--bg-elevated);
+  border-color: var(--border-hover);
   transform: translateY(-1px);
 }
 
@@ -533,7 +632,7 @@ div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
 
 .ps-finding-drugs {
   font-size: 0.98rem;
-  font-weight: 700;
+  font-weight: 600;
   color: var(--ink-primary);
   flex: 1;
   min-width: 0;
@@ -543,7 +642,11 @@ div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
 .ps-finding-body {
   font-size: 0.85rem;
   line-height: 1.6;
-  color: var(--ink-body);
+  color: var(--ink-muted);
+}
+
+.ps-finding-body b {
+  color: var(--ink-primary);
 }
 
 /* ── Плашки тяжести ── */
@@ -559,20 +662,20 @@ div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
   white-space: nowrap;
 }
 
-.ps-badge-major { color: var(--sev-major); background: var(--sev-major-bg); border-color: #FECACA; }
-.ps-badge-mod   { color: var(--sev-mod);   background: var(--sev-mod-bg);   border-color: #FDE68A; }
-.ps-badge-minor { color: var(--sev-minor); background: var(--sev-minor-bg); border-color: #A7F3D0; }
+.ps-badge-major { color: var(--sev-major); background: var(--sev-major-bg); border-color: var(--sev-major-bd); }
+.ps-badge-mod   { color: var(--sev-mod);   background: var(--sev-mod-bg);   border-color: var(--sev-mod-bd); }
+.ps-badge-minor { color: var(--sev-minor); background: var(--sev-minor-bg); border-color: var(--sev-minor-bd); }
 .ps-badge-none  { color: var(--sev-none);  background: var(--sev-none-bg);  border-color: var(--border); }
 
 /* ── БАД-карточка ── */
 .ps-supp-row {
+  border: 1px solid var(--border);
   border-left: 3px solid var(--sev-major);
-  background: var(--bg-subtle);
-  backdrop-filter: blur(8px);
+  background: var(--bg-elevated);
   padding: 0.75rem 0.95rem;
   border-radius: 0 3px 3px 0;
   margin-bottom: 0.5rem;
-  animation: ps-page-enter 600ms var(--ease-power3) both;
+  animation: ps-page-enter 560ms var(--ease-power3) both;
 }
 
 /* ── Пресеты и кнопки ── */
@@ -581,14 +684,27 @@ div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
   font-weight: 500 !important;
   border-radius: 3px !important;
   min-height: 40px !important;
+  color: var(--ink-primary) !important;
   background: var(--bg-card) !important;
-  backdrop-filter: blur(6px);
+  border: 1px solid var(--border) !important;
   transition: transform 140ms var(--ease-snappy), border-color 140ms ease, background 140ms ease !important;
 }
 
 .stButton > button:hover {
   transform: translateY(-1px) !important;
+  background: var(--bg-elevated) !important;
   border-color: var(--accent) !important;
+  color: #FFFFFF !important;
+}
+
+.stButton > button[kind="primary"] {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #FFFFFF !important;
+}
+
+.stButton > button[kind="primary"]:hover {
+  background: var(--accent-hover) !important;
 }
 
 .stButton > button:active {
@@ -647,18 +763,18 @@ def severity_badge(level: str) -> str:
         return f'<span class="ps-badge ps-badge-none">{label}</span>'
 
 
-# ─── Верхняя панель (<TechText /> + <Galaxy /> + Навигация + RU/EN) ──────────
+# ─── Верхняя панель (<TechText /> + <Galaxy /> + <SplashCursor /> + RU/EN) ───
 def render_top_bar():
     c_brand, c_meta, c_lang = st.columns([3.2, 2.0, 1.0])
 
     current_page = st.session_state.get("nav_page", "workspace")
 
     with c_brand:
-        # Интерактивный заголовок <TechText /> из React Bits + монтирование <Galaxy /> и <AnimatedContent />
+        # Интерактивный заголовок <TechText /> из React Bits + постоянные слои <Galaxy /> и <SplashCursor /> в window.parent
+        # Важно: не передаём page_key, чтобы HTML-строка оставалась неизменной и Streamlit не пересоздавал iframe при смене вкладок!
         tech_html = render_tech_text_and_effects_html(
             text="PHARMA SENTINEL",
-            subtitle=f"{t('brand_sub')} · RELEASE v3.4",
-            page_key=current_page,
+            subtitle=f"{t('brand_sub')} · RELEASE v3.5",
             height=72,
         )
         components.html(tech_html, height=74, scrolling=False)
@@ -1007,14 +1123,14 @@ def view_network(pairs: pd.DataFrame, drugs: pd.DataFrame, names: list[str]):
     else:
         try:
             from pyvis.network import Network
-            net = Network(height="480px", width="100%", bgcolor="#FAF9F6", font_color="#111418", directed=False, cdn_resources="in_line")
-            net.set_options('{"physics":{"solver":"forceAtlas2Based","forceAtlas2Based":{"gravitationalConstant":-60,"centralGravity":0.02,"springLength":130,"springConstant":0.08},"stabilization":{"iterations":80}},"nodes":{"font":{"size":14,"face":"Inter, sans-serif"}},"edges":{"smooth":{"type":"continuous"},"width":2}}')
-            net.add_node(center, label=center.title(), color={"background": "#1A56A0", "border": "#13407D"}, font={"color": "#FFFFFF"}, size=28)
-            cmap = {"Major": "#B91C1C", "Moderate": "#D97706", "Minor": "#0D7A75", "Unknown": "#64748B"}
+            net = Network(height="480px", width="100%", bgcolor="#0D1628", font_color="#DCE7F7", directed=False, cdn_resources="in_line")
+            net.set_options('{"physics":{"solver":"forceAtlas2Based","forceAtlas2Based":{"gravitationalConstant":-60,"centralGravity":0.02,"springLength":130,"springConstant":0.08},"stabilization":{"iterations":80}},"nodes":{"font":{"size":14,"face":"Inter, sans-serif","color":"#DCE7F7"}},"edges":{"smooth":{"type":"continuous"},"width":2}}')
+            net.add_node(center, label=center.title(), color={"background": "#527DFF", "border": "#55D6E8"}, font={"color": "#FFFFFF"}, size=28)
+            cmap = {"Major": "#F87171", "Moderate": "#FBBF24", "Minor": "#55D6E8", "Unknown": "#93A4BF"}
             for _, r in near.iterrows():
                 nbr, lvl = r["Neighbor"], r["Level"]
-                net.add_node(nbr, label=nbr.title(), color={"background": "#FFFFFF", "border": "#E4E1DB"}, font={"color": "#111418"}, size=16)
-                net.add_edge(center, nbr, color=cmap.get(lvl, "#64748B"), width=3 if lvl == "Major" else 2)
+                net.add_node(nbr, label=nbr.title(), color={"background": "#15233A", "border": "#527DFF"}, font={"color": "#DCE7F7"}, size=16)
+                net.add_edge(center, nbr, color=cmap.get(lvl, "#93A4BF"), width=3 if lvl == "Major" else 2)
             components.html(net.generate_html(), height=500, scrolling=False)
         except Exception as exc:
             st.error(f"Render error: {exc}")
@@ -1046,20 +1162,25 @@ def view_ml(pairs: pd.DataFrame, drugs: pd.DataFrame):
     st.caption(t("ml_sample", train=f"{result['train_examples']:,}".replace(",", " "), test=f"{result['test_examples']:,}".replace(",", " ")))
 
     fig, ax = plt.subplots(figsize=(8, 3.8))
-    fig.patch.set_facecolor("#FFFFFF")
-    ax.set_facecolor("#FAF9F6")
-    ax.tick_params(colors="#64748B")
+    fig.patch.set_facecolor("#101B30")
+    ax.set_facecolor("#0D1628")
+    ax.tick_params(colors="#93A4BF")
+    ax.xaxis.label.set_color("#DCE7F7")
+    ax.yaxis.label.set_color("#DCE7F7")
+    ax.title.set_color("#DCE7F7")
     for sp in ax.spines.values():
-        sp.set_color("#E4E1DB")
+        sp.set_color("#1E2F4D")
 
-    palette = ["#1A56A0", "#0D7A75", "#D97706", "#B91C1C", "#94A3B8"]
+    palette = ["#527DFF", "#55D6E8", "#FBBF24", "#F87171", "#A8C7FF"]
     for (name, (fpr, tpr)), col in zip(result["roc"].items(), palette):
         auc = metrics.loc[metrics["Метод"] == name, "ROC-AUC"].iloc[0]
         ax.plot(fpr, tpr, label=f"{name} · AUC {auc:.3f}", color=col, linewidth=2)
-    ax.plot([0, 1], [0, 1], "--", color="#CBD5E1", linewidth=1)
+    ax.plot([0, 1], [0, 1], "--", color="#475569", linewidth=1)
     ax.set(xlabel="False Positive Rate (FPR)", ylabel="True Positive Rate (TPR)", title="ROC Curves — Held-out DDInter Test Set")
-    ax.grid(alpha=0.25, color="#E4E1DB")
-    ax.legend(frameon=True, facecolor="#FFFFFF", edgecolor="#E4E1DB", fontsize=8.5, loc="lower right")
+    ax.grid(alpha=0.22, color="#1E2F4D")
+    leg = ax.legend(frameon=True, facecolor="#15233A", edgecolor="#2A3F66", fontsize=8.5, loc="lower right")
+    for text_obj in leg.get_texts():
+        text_obj.set_color("#DCE7F7")
     fig.tight_layout()
     st.pyplot(fig, use_container_width=True)
 

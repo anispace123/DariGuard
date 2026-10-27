@@ -1,22 +1,21 @@
-"""Интеграция компонентов React Bits (Galaxy, TechText, AnimatedContent) для Pharma Sentinel.
+"""Модуль интеграции эффектов React Bits (<Galaxy />, <SplashCursor />, <TechText />, <AnimatedContent />).
 
-Реализует три компонента из библиотеки React Bits:
-1. <Galaxy /> — полноэкранный WebGL2 шейдерный фон (#version 300 es) с параметрами:
-   density=1, glowIntensity=0.42, flareIntensity=1, starSpeed=0.5, mouseRepulsion=true, clickWarp=true.
-2. <TechText /> — интерактивный 2D Canvas заголовок с посимвольной векторной обводкой (reveal="letter"),
-   dashLength=4, dashGap=2, specks=15, clickKick=true, guides=false.
-3. <AnimatedContent /> — каскадная анимация появления контента и переходов между страницами
-   (distance=60, direction="vertical", duration=0.75, ease="power3.out", stagger=0.08, threshold=0.1).
+Архитектурное решение проблемы жизненного цикла в Streamlit:
+- Вместо запуска WebGL2-циклов внутри дочернего `<iframe>` (который уничтожается или перезагружается при
+  смене параметров и rerun Streamlit), движок `<Galaxy />`, `<SplashCursor />` и наблюдатель `<AnimatedContent />`
+  инжектируются как постоянный `<script id="ps-persistent-engine">` непосредственно в `window.parent.document.head`.
+- Благодаря этому оба WebGL2-контекста, их `requestAnimationFrame` циклы и DOM-слои живут в глобальном
+  окне браузера (`window.parent.__PS_PERSISTENT_ENGINE__`) и работают непрерывно при любых переходах между
+  страницами, изменениях `st.session_state` и перезапусках скрипта Streamlit.
 """
 
 
 def render_tech_text_and_effects_html(
     text: str = "PHARMA SENTINEL",
     subtitle: str = "КЛИНИЧЕСКАЯ ФАРМАКОЛОГИЯ · DDINTER v2024.11",
-    page_key: str = "workspace",
     height: int = 74,
 ) -> str:
-    """Рендерит <TechText /> в шапке и монтирует <Galaxy /> + <AnimatedContent /> в родительский документ."""
+    """Рендерит интерактивный заголовок <TechText /> и однократно инициализирует в родительском окне постоянные слои <Galaxy /> и <SplashCursor />."""
     return f"""<!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -46,7 +45,7 @@ def render_tech_text_and_effects_html(
   .tech-text {{
     position: relative;
     width: 100%;
-    height: 52px;
+    height: 50px;
     touch-action: pan-y;
     user-select: none;
   }}
@@ -63,9 +62,9 @@ def render_tech_text_and_effects_html(
     font-weight: 500;
     letter-spacing: 0.09em;
     text-transform: uppercase;
-    color: #526071;
+    color: #93A4BF;
     padding-left: 2px;
-    margin-top: -2px;
+    margin-top: -1px;
     pointer-events: none;
   }}
 </style>
@@ -75,12 +74,12 @@ def render_tech_text_and_effects_html(
     <div id="tech-text-root" class="tech-text" role="img" aria-label="{text}">
       <canvas id="tech-text-canvas" class="tech-text-canvas"></canvas>
     </div>
-    <div class="header-sub">{subtitle}</div>
+    <div id="tech-text-sub" class="header-sub">{subtitle}</div>
   </div>
 
 <script>
 /* ==========================================================================
-   1. <TechText /> — React Bits Interactive Wordmark
+   1. <TechText /> — React Bits Interactive Wordmark (Dark Scientific Theme)
    ========================================================================== */
 (function initTechText() {{
   const container = document.getElementById('tech-text-root');
@@ -100,10 +99,10 @@ def render_tech_text_and_effects_html(
     text: {text!r},
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
     fontWeight: 600,
-    fontSize: 34,
-    letterSpacing: -0.04,
-    color: '#0F172A',
-    accentColor: '#1A56A0',
+    fontSize: 33,
+    letterSpacing: -0.035,
+    color: '#DCE7F7',
+    accentColor: '#55D6E8',
     align: 'left',
     reach: 200,
     softness: 0.7,
@@ -112,13 +111,13 @@ def render_tech_text_and_effects_html(
     strokeWidth: 1.5,
     lineStyle: 'dashed',
     reveal: 'letter',
-    specks: 15,
+    specks: 12,
     selection: true,
     labels: true,
     draggable: true,
-    bounce: 0.4,
+    bounce: 0.38,
     sweep: true,
-    speed: 1.0,
+    speed: 0.85,
     clickKick: true,
     intro: 'none',
     introDuration: 2.0,
@@ -166,7 +165,7 @@ def render_tech_text_and_effects_html(
   const family = s => s.fontFamily || getComputedStyle(container).fontFamily || 'sans-serif';
   const fontFor = (s, size) => `${{s.fontWeight}} ${{size}}px ${{family(s)}}`;
   const palette = s => {{
-    const current = getComputedStyle(container).color || '#0F172A';
+    const current = getComputedStyle(container).color || '#DCE7F7';
     const pick = value => (!value || INHERIT.test(String(value).trim()) ? current : value);
     return {{ ink: pick(s.color), accent: pick(s.accentColor) }};
   }};
@@ -229,11 +228,10 @@ def render_tech_text_and_effects_html(
     const size = s.fontSize * fit;
     setFont(probe, s, size);
     m = probe.measureText(s.text);
-    const inkWidth = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
     const inkHeight = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
     const start = 2;
     const x = start + m.actualBoundingBoxLeft;
-    const baseline = (height - inkHeight) / 2 + m.actualBoundingBoxAscent + 4;
+    const baseline = (height - inkHeight) / 2 + m.actualBoundingBoxAscent + 3;
     const top = baseline - m.actualBoundingBoxAscent;
     const bottom = baseline + m.actualBoundingBoxDescent;
     const next = {{
@@ -334,22 +332,14 @@ def render_tech_text_and_effects_html(
       if (life > 0.7) continue;
       const [px, py, nx, ny] = perimeterPoint(noise(seed, k, cycle) * perimeter, w, h);
       const pick = noise(seed, k, cycle, 2);
-      const size = pick < 0.46 ? 2 : pick < 0.7 ? 3 : pick < 0.84 ? 4 : 6;
-      const large = size >= 6;
-      const out = (large ? 6 : 3) + Math.floor(noise(seed, k, cycle, 1) * 3) * grid;
+      const size = pick < 0.46 ? 2 : pick < 0.75 ? 3 : 4;
+      const out = 3 + Math.floor(noise(seed, k, cycle, 1) * 3) * grid;
       const x = frame.x1 + Math.round((px + nx * out - frame.x1) / grid) * grid;
       const y = frame.y1 + Math.round((py + ny * out - frame.y1) / grid) * grid;
       const tone = noise(seed, k, cycle, 3);
       const blink = life < 0.06 || (life > 0.32 && life < 0.36) ? 0.35 : 1;
-      const alpha = a * (large ? 0.3 + 0.4 * tone : 0.3 + 0.6 * tone) * blink;
-      const left = Math.round(x - size / 2);
-      const top = Math.round(y - size / 2);
-      ctx.globalAlpha = alpha;
-      if (tone < 0.26 || (large && tone < 0.78)) {{
-        ctx.strokeRect(left + 0.5, top + 0.5, size, size);
-      }} else {{
-        ctx.fillRect(left, top, size, size);
-      }}
+      ctx.globalAlpha = a * (0.3 + 0.55 * tone) * blink;
+      ctx.fillRect(Math.round(x - size / 2), Math.round(y - size / 2), size, size);
     }}
     ctx.globalAlpha = 1;
   }};
@@ -382,14 +372,14 @@ def render_tech_text_and_effects_html(
 
     ctx.beginPath();
     ctx.rect(x1, y1, x2 - x1, y2 - y1);
-    ctx.globalAlpha = 0.5 * a;
+    ctx.globalAlpha = 0.45 * a;
     ctx.stroke();
 
     ctx.beginPath();
     for (const [cx, cy] of [[x1, y1], [x2, y1], [x2, y2], [x1, y2]]) {{
       ctx.rect(Math.round(cx) - 2, Math.round(cy) - 2, 4, 4);
     }}
-    ctx.globalAlpha = 0.95 * a;
+    ctx.globalAlpha = 0.9 * a;
     ctx.fill();
     ctx.globalAlpha = 1;
 
@@ -400,7 +390,7 @@ def render_tech_text_and_effects_html(
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
     ctx.fillStyle = accent;
-    ctx.globalAlpha = 0.78 * a;
+    ctx.globalAlpha = 0.8 * a;
     const label = moved > 1
       ? `${{signed(Math.round(glyph.offset.x))}}, ${{signed(Math.round(-glyph.offset.y))}}`
       : `${{glyph.char}} ${{Math.round(glyph.box.x2 - glyph.box.x1)}}×${{Math.round(glyph.box.y2 - glyph.box.y1)}}`;
@@ -409,7 +399,7 @@ def render_tech_text_and_effects_html(
   }};
 
   const kick = index => {{
-    const strength = (word ? word.size : 40) * 9.5;
+    const strength = (word ? word.size : 40) * 9.0;
     kicks.push({{ index, at: pulse, velocity: strength }});
     for (let d = 1; d < glyphs.length; d++) {{
       const velocity = strength * Math.pow(KICK_DECAY, d);
@@ -609,66 +599,102 @@ def render_tech_text_and_effects_html(
 
 
 /* ==========================================================================
-   2. <Galaxy /> + <AnimatedContent /> — Монтирование в родительское окно
+   2. Постоянная инъекция <Galaxy />, <SplashCursor /> и <AnimatedContent />
+      непосредственно в window.parent (жизненный цикл независим от iframe!)
    ========================================================================== */
-(function mountParentEffects() {{
-  let parentWin, parentDoc;
-  try {{
-    parentWin = window.parent;
-    parentDoc = window.parent.document;
-    if (!parentDoc || !parentDoc.body) return;
-  }} catch (e) {{
-    return;
-  }}
+function initPharmaSentinelPersistentEngine() {{
+  if (window.__PS_PERSISTENT_ENGINE_ACTIVE__) return;
+  window.__PS_PERSISTENT_ENGINE_ACTIVE__ = true;
 
-  /* --- Прозрачность контейнеров Streamlit поверх <Galaxy /> --- */
-  if (!parentDoc.getElementById('ps-galaxy-parent-styles')) {{
-    const styleEl = parentDoc.createElement('style');
-    styleEl.id = 'ps-galaxy-parent-styles';
-    styleEl.textContent = `
+  const doc = document;
+  const win = window;
+  const reducedMotion = win.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false;
+
+  /* ------------------------------------------------------------------------
+     Слой стилей для базового фона #0A1020 и прозрачности оболочки Streamlit
+     ------------------------------------------------------------------------ */
+  let styleTag = doc.getElementById('ps-persistent-layer-styles');
+  if (!styleTag) {{
+    styleTag = doc.createElement('style');
+    styleTag.id = 'ps-persistent-layer-styles';
+    styleTag.textContent = `
+      html, body {{
+        background-color: #0A1020 !important;
+        color: #DCE7F7 !important;
+      }}
       .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"], .main {{
         background: transparent !important;
       }}
       [data-testid="stMainBlockContainer"], .block-container {{
-        position: relative;
-        z-index: 2;
+        position: relative !important;
+        z-index: 2 !important;
+      }}
+      #ps-galaxy-layer {{
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 0 !important;
+        pointer-events: none !important;
+        overflow: hidden !important;
+        background: radial-gradient(ellipse at 50% 25%, #0D1628 0%, #0A1020 75%) !important;
+      }}
+      #ps-galaxy-canvas {{
+        position: absolute !important;
+        inset: 0 !important;
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        pointer-events: none !important;
+      }}
+      #ps-splash-layer {{
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        z-index: 1 !important;
+        pointer-events: none !important;
+        overflow: hidden !important;
+      }}
+      #ps-splash-canvas {{
+        display: block !important;
+        width: 100% !important;
+        height: 100% !important;
+        pointer-events: none !important;
       }}
     `;
-    parentDoc.head.appendChild(styleEl);
+    doc.head.appendChild(styleTag);
   }}
 
-  /* --- A. <Galaxy /> WebGL2 Shader Background --- */
-  if (!parentDoc.getElementById('ps-galaxy-bg-container')) {{
-    const bgWrap = parentDoc.createElement('div');
-    bgWrap.id = 'ps-galaxy-bg-container';
-    bgWrap.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;overflow:hidden;';
-    const canvas = parentDoc.createElement('canvas');
-    canvas.id = 'ps-galaxy-bg-canvas';
-    canvas.setAttribute('aria-hidden', 'true');
-    canvas.style.cssText = 'position:absolute;inset:0;display:block;width:100%;height:100%;';
-    bgWrap.appendChild(canvas);
-    parentDoc.body.prepend(bgWrap);
+  /* ========================================================================
+     СЛОЙ 1: <Galaxy /> — Постоянный фоновый слой WebGL2 (z-index: 0)
+     Палитра: ['#527DFF', '#55D6E8', '#A8C7FF', '#E1E9FF']
+     Параметры: прозрачный режим, умеренная плотность, мягкое свечение, без warp
+     ======================================================================== */
+  (function startPersistentGalaxy() {{
+    let galaxyWrap = doc.getElementById('ps-galaxy-layer');
+    if (!galaxyWrap) {{
+      galaxyWrap = doc.createElement('div');
+      galaxyWrap.id = 'ps-galaxy-layer';
+      galaxyWrap.setAttribute('aria-hidden', 'true');
+      const gCanvas = doc.createElement('canvas');
+      gCanvas.id = 'ps-galaxy-canvas';
+      galaxyWrap.appendChild(gCanvas);
+      doc.body.prepend(galaxyWrap);
+    }}
+    const canvas = doc.getElementById('ps-galaxy-canvas');
+    if (!canvas) return;
 
-    const gl = canvas.getContext('webgl2', {{
-      alpha: true,
-      premultipliedAlpha: true,
-      antialias: false,
-      depth: false,
-      stencil: false
-    }});
+    const MAX_LAYERS = 8;
+    const MAX_COLORS = 4;
 
-    if (gl) {{
-      const MAX_LAYERS = 8;
-      const MAX_COLORS = 4;
-      const INTRO_SECONDS = 2.2;
-
-      const VERTEX = `#version 300 es
+    const VERTEX = `#version 300 es
 in vec2 aPosition;
 void main() {{
   gl_Position = vec4(aPosition, 0.0, 1.0);
 }}`;
 
-      const FRAGMENT = `#version 300 es
+    const FRAGMENT = `#version 300 es
 precision highp float;
 precision highp int;
 uniform float uTime;
@@ -692,7 +718,7 @@ uniform float uRepulsionStrength;
 uniform float uMouseActiveFactor;
 uniform float uAutoCenterRepulsion;
 uniform int uLayers;
-uniform vec3 uColors[${{MAX_COLORS}}];
+uniform vec3 uColors[4];
 uniform int uColorCount;
 uniform float uWarp;
 uniform float uReveal;
@@ -725,29 +751,15 @@ float trisn(float x) {{
   return 2.0 * (1.0 - smoothstep(0.0, 1.0, abs(2.0 * t - 1.0))) - 1.0;
 }}
 
-vec3 hsv2rgb(vec3 c) {{
-  vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-  vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-  return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-}}
-
 float Star(vec2 uv, float flare, vec2 radial, float invReach) {{
-#ifdef WARP
-  float along = dot(uv, radial);
-  float d = sqrt(max(dot(uv, uv) - uSquash * along * along, 0.0));
-#else
   float d = length(uv);
-#endif
-  float m = uStarGlow / d;
+  float m = uStarGlow / max(d, 0.0005);
   float rays = smoothstep(0.0, 1.0, 1.0 - abs(uv.x * uv.y * 1000.0));
   m += rays * flare * uFlareGain;
   uv *= MAT45;
   rays = smoothstep(0.0, 1.0, 1.0 - abs(uv.x * uv.y * 1000.0));
   m += rays * 0.3 * flare * uFlareGain;
   m *= smoothstep(1.0, 0.2, d * invReach);
-#ifdef WARP
-  m *= mix(1.0, smoothstep(1.0, 0.55, length(uv) * invReach), min(uWarp * 4.0, 1.0));
-#endif
   return m;
 }}
 
@@ -764,20 +776,8 @@ vec3 StarLayer(vec2 uv, vec2 radial, vec2 repelAt, float pushCells, float spread
       float glossLocal = tri(uGloss / (PERIOD * seed + 1.0));
       float flareSize = smoothstep(0.9, 1.0, size) * glossLocal;
 
-#ifdef PALETTE
       float pick = Hash21(si + 7.0) * float(uColorCount);
       vec3 base = uColors[int(min(floor(pick), float(uColorCount - 1)))];
-#else
-      float red = smoothstep(STAR_COLOR_CUTOFF, 1.0, Hash21(si + 1.0)) + STAR_COLOR_CUTOFF;
-      float blu = smoothstep(STAR_COLOR_CUTOFF, 1.0, Hash21(si + 3.0)) + STAR_COLOR_CUTOFF;
-      float grn = min(red, blu) * seed;
-      vec3 base = vec3(red, grn, blu);
-      float hue = atan(base.g - base.r, base.b - base.r) / (2.0 * 3.14159) + 0.5;
-      hue = fract(hue + uHueShift / 360.0);
-      float sat = length(base - vec3(dot(base, vec3(0.299, 0.587, 0.114)))) * uSaturation;
-      float val = max(max(base.r, base.g), base.b);
-      base = hsv2rgb(vec3(hue, sat, val));
-#endif
 
       vec2 pad = vec2(tris(seed * 34.0 + uTime * uSpeed / 10.0), tris(seed * 38.0 + uTime * uSpeed / 30.0)) - 0.5;
       vec2 shift = vec2(0.0);
@@ -808,10 +808,7 @@ void main() {{
   vec2 repelAt = vec2(0.0);
   float strength = 0.0;
   float push = 0.0;
-  if (uAutoCenterRepulsion > 0.0) {{
-    strength = uAutoCenterRepulsion;
-    push = strength * 0.05;
-  }} else if (uMouseRepulsion > 0.5) {{
+  if (uMouseRepulsion > 0.5) {{
     repelAt = (uMouse * uResolution - focalPx) / uResolution.y;
     strength = max(uRepulsionStrength, 0.0);
     push = strength * 0.05 * uMouseActiveFactor;
@@ -831,7 +828,7 @@ void main() {{
 
   vec3 col = vec3(0.0);
   float layers = float(uLayers);
-  for (int k = 0; k < ${{MAX_LAYERS}}; k++) {{
+  for (int k = 0; k < 8; k++) {{
     if (k >= uLayers) break;
     float i = float(k) / layers;
     float depth = fract(i + uDepth);
@@ -842,330 +839,1023 @@ void main() {{
   }}
   col *= uReveal;
 
-  if (uMode > 1.5) {{
-    vec3 lit = col * smoothstep(0.0, 0.3, length(col));
-    float energy = max(max(lit.r, lit.g), lit.b);
-    vec3 tint = lit / max(energy, 0.0001);
-    vec3 ink = tint * (0.16 / max(dot(tint, vec3(0.2126, 0.7152, 0.0722)), 0.16));
-    float coverage = pow(min(energy * 1.3, 1.0), 1.3) * 0.92 * uOpacity;
-    outColor = uMode > 2.5 ? vec4(ink * coverage, coverage) : vec4(mix(uBackground, ink, coverage), 1.0);
-  }} else if (uMode > 0.5) {{
-    float alpha = min(smoothstep(0.0, 0.3, length(col)), 1.0) * uOpacity;
-    outColor = vec4(col * alpha, alpha);
-  }} else {{
-    outColor = vec4(mix(uBackground, col, uOpacity), 1.0);
-  }}
+  float alpha = min(smoothstep(0.0, 0.3, length(col)), 1.0) * uOpacity;
+  outColor = vec4(col * alpha, alpha);
 }}`;
 
-      const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-      const keyOf = (palette, repel, warp) => (palette ? 4 : 0) + (repel ? 2 : 0) + (warp ? 1 : 0);
+    const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 
-      const start = (gl, palette, repel, warp) => {{
-        const defines = `${{palette ? '#define PALETTE\\n' : ''}}${{repel ? '#define REPEL\\n' : ''}}${{warp ? '#define WARP\\n' : ''}}`;
-        const program = gl.createProgram();
-        const vertex = gl.createShader(gl.VERTEX_SHADER);
-        const fragment = gl.createShader(gl.FRAGMENT_SHADER);
-        if (!program || !vertex || !fragment) return null;
-        gl.shaderSource(vertex, VERTEX);
-        gl.shaderSource(fragment, FRAGMENT.replace('\\n', `\\n${{defines}}`));
-        gl.compileShader(vertex);
-        gl.compileShader(fragment);
-        gl.attachShader(program, vertex);
-        gl.attachShader(program, fragment);
-        gl.bindAttribLocation(program, 0, 'aPosition');
-        gl.linkProgram(program);
-        gl.deleteShader(vertex);
-        gl.deleteShader(fragment);
-        return program;
-      }};
+    const s = {{
+      focal: [0.5, 0.5],
+      rotation: [1.0, 0.0],
+      starSpeed: 0.22,
+      density: 0.85,
+      hueShift: 140,
+      disableAnimation: false,
+      speed: 0.55,
+      mouseInteraction: true,
+      glowIntensity: 0.22,
+      saturation: 0.0,
+      mouseRepulsion: true,
+      repulsionStrength: 1.4,
+      twinkleIntensity: 0.22,
+      rotationSpeed: 0.025,
+      autoCenterRepulsion: 0,
+      transparent: true,
+      lightMode: false,
+      palette: ['#527DFF', '#55D6E8', '#A8C7FF', '#E1E9FF'],
+      starSize: 0.95,
+      flareIntensity: 0.35,
+      layers: 4,
+      reverse: false,
+      clickWarp: false,
+      intro: false,
+      backgroundColor: '#0A1020',
+      opacity: 0.68,
+      dpr: 1.75
+    }};
 
-      const finish = (gl, program) => {{
-        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return null;
-        const uniforms = {{}};
-        const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
-        for (let i = 0; i < count; i++) {{
-          const info = gl.getActiveUniform(program, i);
-          if (info) uniforms[info.name.replace('[0]', '')] = gl.getUniformLocation(program, info.name);
-        }}
-        return {{ program, uniforms }};
-      }};
+    const parseHex = hex => {{
+      const h = hex.replace('#', '');
+      const n = parseInt(h, 16);
+      return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+    }};
 
-      const s = {{
-        focal: [0.5, 0.5],
-        rotation: [1.0, 0.0],
-        starSpeed: 0.5,
-        density: 1.0,
-        hueShift: 140,
-        disableAnimation: false,
-        speed: 1.0,
-        mouseInteraction: true,
-        glowIntensity: 0.38,
-        saturation: 0.35,
-        mouseRepulsion: true,
-        repulsionStrength: 2.0,
-        twinkleIntensity: 0.3,
-        rotationSpeed: 0.1,
-        autoCenterRepulsion: 0,
-        transparent: false,
-        lightMode: true,
-        palette: ['#1A56A0', '#0D7A75', '#1E3A5F', '#2563EB'],
-        starSize: 1.2,
-        flareIntensity: 1.0,
-        layers: 4,
-        reverse: false,
-        clickWarp: true,
-        intro: true,
-        backgroundColor: '#FAF9F6',
-        opacity: 0.85,
-        dpr: 2
-      }};
+    const colors = new Float32Array(MAX_COLORS * 3);
+    s.palette.forEach((c, idx) => colors.set(parseHex(c), idx * 3));
+    const bgRgb = parseHex(s.backgroundColor);
 
-      const programs = new Map();
-      const entry = (palette, repel, warp) => {{
-        const key = keyOf(palette, repel, warp);
-        let found = programs.get(key);
-        if (!found) {{
-          found = {{ program: start(gl, palette, repel, warp), linked: null, done: false }};
-          programs.set(key, found);
-        }}
-        return found;
-      }};
-      const variant = (palette, repel, warp) => {{
-        const found = entry(palette, repel, warp);
-        if (!found.done && found.program) {{
-          found.linked = finish(gl, found.program);
-          found.done = true;
-        }}
-        return found.linked;
-      }};
+    let gl = null;
+    let baseProg = null;
+    let repelProg = null;
+    let vao = null;
+    let buffer = null;
+    let lost = false;
 
-      if (variant(true, false, false)) {{
-        const buffer = gl.createBuffer();
-        const vao = gl.createVertexArray();
-        gl.bindVertexArray(vao);
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-        gl.enableVertexAttribArray(0);
-        gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+    const buildProgram = (glCtx, repel) => {{
+      const defines = repel ? '#define REPEL\\n' : '';
+      const prog = glCtx.createProgram();
+      const vs = glCtx.createShader(glCtx.VERTEX_SHADER);
+      const fs = glCtx.createShader(glCtx.FRAGMENT_SHADER);
+      if (!prog || !vs || !fs) return null;
+      glCtx.shaderSource(vs, VERTEX);
+      glCtx.shaderSource(fs, FRAGMENT.replace('\\n', '\\n' + defines));
+      glCtx.compileShader(vs);
+      glCtx.compileShader(fs);
+      glCtx.attachShader(prog, vs);
+      glCtx.attachShader(prog, fs);
+      glCtx.bindAttribLocation(prog, 0, 'aPosition');
+      glCtx.linkProgram(prog);
+      glCtx.deleteShader(vs);
+      glCtx.deleteShader(fs);
+      if (!glCtx.getProgramParameter(prog, glCtx.LINK_STATUS)) return null;
+      const uniforms = {{}};
+      const count = glCtx.getProgramParameter(prog, glCtx.ACTIVE_UNIFORMS);
+      for (let i = 0; i < count; i++) {{
+        const info = glCtx.getActiveUniform(prog, i);
+        if (info) uniforms[info.name.replace('[0]', '')] = glCtx.getUniformLocation(prog, info.name);
+      }}
+      return {{ program: prog, uniforms }};
+    }};
 
-        const probe = parentDoc.createElement('canvas').getContext('2d', {{ willReadFrequently: true }});
-        const reduce = parentWin.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-        const parse = (value, fallback) => {{
-          if (!value || !probe) return fallback;
-          probe.clearRect(0, 0, 1, 1);
-          probe.fillStyle = value;
-          probe.fillRect(0, 0, 1, 1);
-          const [r, g, b] = probe.getImageData(0, 0, 1, 1).data;
-          return [r / 255, g / 255, b / 255];
-        }};
+    const initGL = () => {{
+      gl = canvas.getContext('webgl2', {{
+        alpha: true,
+        premultipliedAlpha: true,
+        antialias: false,
+        depth: false,
+        stencil: false
+      }});
+      if (!gl) return false;
+      baseProg = buildProgram(gl, false);
+      repelProg = buildProgram(gl, true);
+      if (!baseProg) return false;
+      buffer = gl.createBuffer();
+      vao = gl.createVertexArray();
+      gl.bindVertexArray(vao);
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+      return true;
+    }};
 
-        const colors = new Float32Array(MAX_COLORS * 3);
-        s.palette.forEach((val, idx) => colors.set(parse(val, [0.1, 0.3, 0.6]), idx * 3));
-        const bgRgb = parse(s.backgroundColor, [0.98, 0.976, 0.965]);
+    if (!initGL()) return;
 
-        const pointer = {{ x: 0.5, y: 0.5, inside: false }};
-        const state = {{
-          time: 0, gloss: 0, depth: 0, angle: 0,
-          mx: 0.5, my: 0.5, active: 0, boost: 0,
-          reveal: s.intro && !reduce ? 0 : 1
-        }};
-        let raf = 0;
-        let last = 0;
+    const pointer = {{ x: 0.5, y: 0.5, inside: false }};
+    const state = {{
+      time: 0, gloss: 0, depth: 0, angle: 0,
+      mx: 0.5, my: 0.5, active: 0, boost: 0, reveal: 1
+    }};
+    let raf = 0;
+    let last = 0;
 
-        const render = () => {{
-          const mode = s.lightMode ? (s.transparent ? 3 : 2) : s.transparent ? 1 : 0;
-          const repel = s.mouseRepulsion && state.active > 0;
-          const warp = state.boost > 0;
-          const base = variant(true, false, false);
-          if (!base) return;
-          const program = (repel || warp ? variant(true, repel, warp) : null) ?? base;
-          const u = program.uniforms;
-          gl.viewport(0, 0, canvas.width, canvas.height);
-          gl.useProgram(program.program);
-          gl.bindVertexArray(vao);
-          gl.uniform1f(u.uTime, state.time);
-          gl.uniform2f(u.uResolution, canvas.width, canvas.height);
-          gl.uniform2f(u.uFocal, s.focal[0], s.focal[1]);
-          gl.uniform2f(u.uRotation, s.rotation[0], s.rotation[1]);
-          gl.uniform1f(u.uGloss, state.gloss);
-          gl.uniform1f(u.uDepth, state.depth);
-          gl.uniform1f(u.uDensity, s.density);
-          gl.uniform1f(u.uHueShift, s.hueShift);
-          gl.uniform1f(u.uSpeed, s.speed);
-          gl.uniform2f(u.uMouse, state.mx, state.my);
-          const stretch = 1 + state.boost * 5;
-          gl.uniform1f(u.uStarGlow, (0.05 * s.glowIntensity * s.starSize) / Math.pow(stretch, 0.6));
-          gl.uniform1f(u.uFlareGain, s.glowIntensity * s.flareIntensity);
-          gl.uniform1f(u.uSquash, 1 - 1 / (stretch * stretch));
-          gl.uniform1f(u.uSaturation, s.saturation);
-          gl.uniform1f(u.uMouseRepulsion, s.mouseRepulsion ? 1 : 0);
-          gl.uniform1f(u.uTwinkleIntensity, s.twinkleIntensity);
-          gl.uniform1f(u.uRotationAngle, state.angle);
-          gl.uniform1f(u.uRepulsionStrength, s.repulsionStrength);
-          gl.uniform1f(u.uMouseActiveFactor, state.active);
-          gl.uniform1f(u.uAutoCenterRepulsion, s.autoCenterRepulsion);
-          gl.uniform1i(u.uLayers, s.layers);
-          gl.uniform3fv(u.uColors, colors);
-          gl.uniform1i(u.uColorCount, s.palette.length);
-          gl.uniform1f(u.uWarp, state.boost);
-          const fade = Math.min(1, state.reveal / 0.35);
-          gl.uniform1f(u.uReveal, fade * fade * (3 - 2 * fade));
-          gl.uniform1f(u.uMode, mode);
-          gl.uniform3fv(u.uBackground, bgRgb);
-          gl.uniform1f(u.uOpacity, s.opacity);
-          gl.drawArrays(gl.TRIANGLES, 0, 3);
-        }};
+    const render = () => {{
+      if (!gl || lost) return;
+      const repel = s.mouseRepulsion && state.active > 0.005;
+      const prog = (repel && repelProg) ? repelProg : baseProg;
+      if (!prog) return;
+      const u = prog.uniforms;
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.useProgram(prog.program);
+      gl.bindVertexArray(vao);
+      gl.uniform1f(u.uTime, state.time);
+      gl.uniform2f(u.uResolution, canvas.width, canvas.height);
+      gl.uniform2f(u.uFocal, s.focal[0], s.focal[1]);
+      gl.uniform2f(u.uRotation, s.rotation[0], s.rotation[1]);
+      gl.uniform1f(u.uGloss, state.gloss);
+      gl.uniform1f(u.uDepth, state.depth);
+      gl.uniform1f(u.uDensity, s.density);
+      gl.uniform1f(u.uHueShift, s.hueShift);
+      gl.uniform1f(u.uSpeed, s.speed);
+      gl.uniform2f(u.uMouse, state.mx, state.my);
+      gl.uniform1f(u.uStarGlow, 0.05 * s.glowIntensity * s.starSize);
+      gl.uniform1f(u.uFlareGain, s.glowIntensity * s.flareIntensity);
+      gl.uniform1f(u.uSquash, 0.0);
+      gl.uniform1f(u.uSaturation, s.saturation);
+      gl.uniform1f(u.uMouseRepulsion, s.mouseRepulsion ? 1 : 0);
+      gl.uniform1f(u.uTwinkleIntensity, s.twinkleIntensity);
+      gl.uniform1f(u.uRotationAngle, state.angle);
+      gl.uniform1f(u.uRepulsionStrength, s.repulsionStrength);
+      gl.uniform1f(u.uMouseActiveFactor, state.active);
+      gl.uniform1f(u.uAutoCenterRepulsion, s.autoCenterRepulsion);
+      gl.uniform1i(u.uLayers, s.layers);
+      gl.uniform3fv(u.uColors, colors);
+      gl.uniform1i(u.uColorCount, s.palette.length);
+      gl.uniform1f(u.uWarp, 0.0);
+      gl.uniform1f(u.uReveal, 1.0);
+      gl.uniform1f(u.uMode, 1.0);
+      gl.uniform3fv(u.uBackground, bgRgb);
+      gl.uniform1f(u.uOpacity, s.opacity);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }};
 
-        const frame = now => {{
-          raf = 0;
-          if (parentDoc.hidden) return;
-          const dt = last ? clamp((now - last) / 1000, 0.0005, 0.05) : 1 / 60;
-          last = now;
-          const motion = s.disableAnimation || reduce ? 0 : 1;
-          if (s.intro && !reduce && state.reveal < 1) {{
-            state.reveal = Math.min(1, state.reveal + dt / INTRO_SECONDS);
-            state.boost = Math.max(state.boost, Math.pow(1 - state.reveal, 2) * 1.4);
-          }} else {{
-            state.reveal = 1;
-          }}
-          const flight = (s.starSpeed / 10) * (s.reverse ? -1 : 1);
-          state.time += dt * motion;
-          state.gloss += dt * flight * motion;
-          state.depth += dt * flight * s.speed * motion * (1 + state.boost * 14);
-          state.angle += dt * s.rotationSpeed * motion;
-          state.boost *= Math.exp(-dt * 1.3);
-          if (state.boost < 0.001) state.boost = 0;
+    const frame = now => {{
+      raf = 0;
+      if (doc.hidden || lost) return;
+      const dt = last ? clamp((now - last) / 1000, 0.0005, 0.05) : 1 / 60;
+      last = now;
+      const motion = (s.disableAnimation || reducedMotion) ? 0 : 1;
+      const flight = (s.starSpeed / 10);
+      state.time += dt * motion;
+      state.gloss += dt * flight * motion;
+      state.depth += dt * flight * s.speed * motion;
+      state.angle += dt * s.rotationSpeed * motion;
 
-          const follow = 1 - Math.exp(-dt / 0.325);
-          const engaged = s.mouseInteraction && pointer.inside && !reduce;
-          if (engaged) {{
-            state.mx += (pointer.x - state.mx) * follow;
-            state.my += (pointer.y - state.my) * follow;
-          }}
-          const target = engaged ? 1 : 0;
-          state.active += (target - state.active) * follow;
-          if (Math.abs(target - state.active) < 0.001) state.active = target;
+      const follow = 1 - Math.exp(-dt / 0.325);
+      const engaged = s.mouseInteraction && pointer.inside && !reducedMotion;
+      if (engaged) {{
+        state.mx += (pointer.x - state.mx) * follow;
+        state.my += (pointer.y - state.my) * follow;
+      }}
+      const target = engaged ? 1 : 0;
+      state.active += (target - state.active) * follow;
+      if (Math.abs(target - state.active) < 0.001) state.active = target;
 
-          render();
-          if (motion > 0 || state.boost > 0 || state.active !== target || state.reveal < 1) {{
-            raf = parentWin.requestAnimationFrame(frame);
-          }} else {{
-            last = 0;
-          }}
-        }};
+      render();
+      if (motion > 0 || state.active !== target) {{
+        raf = win.requestAnimationFrame(frame);
+      }} else {{
+        last = 0;
+      }}
+    }};
 
-        const wake = () => {{
-          if (!raf && !parentDoc.hidden) raf = parentWin.requestAnimationFrame(frame);
-        }};
+    const wake = () => {{
+      if (!raf && !doc.hidden && !lost) raf = win.requestAnimationFrame(frame);
+    }};
 
-        const resize = () => {{
-          const w = Math.max(1, parentWin.innerWidth);
-          const h = Math.max(1, parentWin.innerHeight);
-          const ratio = Math.min(s.dpr || parentWin.devicePixelRatio || 1, 2);
-          canvas.width = Math.max(1, Math.round(w * ratio));
-          canvas.height = Math.max(1, Math.round(h * ratio));
-          render();
-          wake();
-        }};
+    const resize = () => {{
+      const w = Math.max(1, win.innerWidth);
+      const h = Math.max(1, win.innerHeight);
+      const ratio = Math.min(s.dpr, win.devicePixelRatio || 1, 2);
+      const cw = Math.max(1, Math.round(w * ratio));
+      const ch = Math.max(1, Math.round(h * ratio));
+      if (canvas.width !== cw || canvas.height !== ch) {{
+        canvas.width = cw;
+        canvas.height = ch;
+      }}
+      render();
+      wake();
+    }};
 
-        parentWin.addEventListener('pointermove', ev => {{
-          const w = Math.max(1, parentWin.innerWidth);
-          const h = Math.max(1, parentWin.innerHeight);
-          pointer.inside = true;
-          pointer.x = ev.clientX / w;
-          pointer.y = 1 - ev.clientY / h;
-          wake();
-        }}, {{ passive: true }});
+    win.addEventListener('pointermove', ev => {{
+      pointer.inside = true;
+      pointer.x = ev.clientX / Math.max(1, win.innerWidth);
+      pointer.y = 1 - ev.clientY / Math.max(1, win.innerHeight);
+      wake();
+    }}, {{ passive: true }});
 
-        parentWin.addEventListener('pointerdown', () => {{
-          if (!s.clickWarp || reduce) return;
-          state.boost = Math.min(1.6, state.boost + 0.9);
-          wake();
-        }}, {{ passive: true }});
+    doc.documentElement.addEventListener('pointerleave', () => {{
+      pointer.inside = false;
+    }});
 
-        parentWin.addEventListener('resize', resize, {{ passive: true }});
+    doc.addEventListener('visibilitychange', () => {{
+      last = 0;
+      wake();
+    }});
+
+    canvas.addEventListener('webglcontextlost', ev => {{
+      ev.preventDefault();
+      lost = true;
+      if (raf) win.cancelAnimationFrame(raf);
+      raf = 0;
+    }});
+
+    canvas.addEventListener('webglcontextrestored', () => {{
+      lost = false;
+      if (initGL()) {{
         resize();
+        wake();
+      }}
+    }});
+
+    win.addEventListener('resize', resize, {{ passive: true }});
+    resize();
+  }})();
+
+
+  /* ========================================================================
+     СЛОЙ 2: <SplashCursor /> — React Bits Fluid Simulation (z-index: 1)
+     Параметры: rainbow=false, colors=['#527DFF','#55D6E8','#A8C7FF'],
+     colorSpeed=0.12, intensity=0.55, size=0.75, force=0.65, swirl=2,
+     trail=0.8, momentum=0.75, shading=0.55, glow=0.12, quality='medium',
+     clickSplash=false, intro=false, theme='dark'.
+     ======================================================================== */
+  (function startPersistentSplashCursor() {{
+    if (reducedMotion) return;
+
+    let splashWrap = doc.getElementById('ps-splash-layer');
+    if (!splashWrap) {{
+      splashWrap = doc.createElement('div');
+      splashWrap.id = 'ps-splash-layer';
+      splashWrap.setAttribute('aria-hidden', 'true');
+      const sCanvas = doc.createElement('canvas');
+      sCanvas.id = 'ps-splash-canvas';
+      splashWrap.appendChild(sCanvas);
+      const gLayer = doc.getElementById('ps-galaxy-layer');
+      if (gLayer && gLayer.nextSibling) {{
+        doc.body.insertBefore(splashWrap, gLayer.nextSibling);
+      }} else {{
+        doc.body.prepend(splashWrap);
       }}
     }}
+    const canvas = doc.getElementById('ps-splash-canvas');
+    if (!canvas) return;
+
+    const QUALITY = {{
+      low: {{ sim: 64, dye: 512, iterations: 10 }},
+      medium: {{ sim: 96, dye: 768, iterations: 14 }},
+      high: {{ sim: 128, dye: 1440, iterations: 20 }}
+    }};
+    const BLOOM_RESOLUTION = 192;
+    const BLOOM_ITERATIONS = 3;
+    const BLOOM_THRESHOLD = 0.35;
+    const BLOOM_KNEE = 0.7;
+
+    const VERTEX = `#version 300 es
+precision highp float;
+in vec2 aPosition;
+uniform vec2 texelSize;
+out vec2 vUv;
+out vec2 vL;
+out vec2 vR;
+out vec2 vT;
+out vec2 vB;
+void main() {{
+  vUv = aPosition * 0.5 + 0.5;
+  vL = vUv - vec2(texelSize.x, 0.0);
+  vR = vUv + vec2(texelSize.x, 0.0);
+  vT = vUv + vec2(0.0, texelSize.y);
+  vB = vUv - vec2(0.0, texelSize.y);
+  gl_Position = vec4(aPosition, 0.0, 1.0);
+}}`;
+
+    const HEADER = `#version 300 es
+precision highp float;
+precision highp sampler2D;
+in vec2 vUv;
+in vec2 vL;
+in vec2 vR;
+in vec2 vT;
+in vec2 vB;
+out vec4 outColor;
+`;
+
+    const SHADERS = {{
+      copy: `uniform sampler2D uTexture;
+void main() {{
+  outColor = texture(uTexture, vUv);
+}}`,
+      clear: `uniform sampler2D uTexture;
+uniform float value;
+void main() {{
+  outColor = value * texture(uTexture, vUv);
+}}`,
+      splat: `uniform sampler2D uTarget;
+uniform float aspectRatio;
+uniform vec3 color;
+uniform vec2 pointA;
+uniform vec2 pointB;
+uniform float radius;
+void main() {{
+  vec2 scale = vec2(aspectRatio, 1.0);
+  vec2 pa = (vUv - pointA) * scale;
+  vec2 ba = (pointB - pointA) * scale;
+  float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-9), 0.0, 1.0);
+  vec2 d = pa - ba * h;
+  vec3 base = texture(uTarget, vUv).xyz;
+  outColor = vec4(base + exp(-dot(d, d) / radius) * color, 1.0);
+}}`,
+      advection: `uniform sampler2D uVelocity;
+uniform sampler2D uSource;
+uniform vec2 texelSize;
+uniform float dt;
+uniform float dissipation;
+void main() {{
+  vec2 coord = vUv - dt * texture(uVelocity, vUv).xy * texelSize;
+  outColor = texture(uSource, coord) / (1.0 + dissipation * dt);
+}}`,
+      divergence: `uniform sampler2D uVelocity;
+void main() {{
+  float L = texture(uVelocity, vL).x;
+  float R = texture(uVelocity, vR).x;
+  float T = texture(uVelocity, vT).y;
+  float B = texture(uVelocity, vB).y;
+  vec2 C = texture(uVelocity, vUv).xy;
+  if (vL.x < 0.0) L = -C.x;
+  if (vR.x > 1.0) R = -C.x;
+  if (vT.y > 1.0) T = -C.y;
+  if (vB.y < 0.0) B = -C.y;
+  outColor = vec4(0.5 * (R - L + T - B), 0.0, 0.0, 1.0);
+}}`,
+      curl: `uniform sampler2D uVelocity;
+void main() {{
+  float L = texture(uVelocity, vL).y;
+  float R = texture(uVelocity, vR).y;
+  float T = texture(uVelocity, vT).x;
+  float B = texture(uVelocity, vB).x;
+  outColor = vec4(0.5 * (R - L - T + B), 0.0, 0.0, 1.0);
+}}`,
+      vorticity: `uniform sampler2D uVelocity;
+uniform sampler2D uCurl;
+uniform float curl;
+uniform float dt;
+void main() {{
+  float L = texture(uCurl, vL).x;
+  float R = texture(uCurl, vR).x;
+  float T = texture(uCurl, vT).x;
+  float B = texture(uCurl, vB).x;
+  float C = texture(uCurl, vUv).x;
+  vec2 force = 0.5 * vec2(abs(T) - abs(B), abs(R) - abs(L));
+  force /= length(force) + 0.0001;
+  force *= curl * C;
+  force.y *= -1.0;
+  vec2 velocity = texture(uVelocity, vUv).xy + force * dt;
+  outColor = vec4(clamp(velocity, -1000.0, 1000.0), 0.0, 1.0);
+}}`,
+      pressure: `uniform sampler2D uPressure;
+uniform sampler2D uDivergence;
+void main() {{
+  float L = texture(uPressure, vL).x;
+  float R = texture(uPressure, vR).x;
+  float T = texture(uPressure, vT).x;
+  float B = texture(uPressure, vB).x;
+  float divergence = texture(uDivergence, vUv).x;
+  outColor = vec4((L + R + B + T - divergence) * 0.25, 0.0, 0.0, 1.0);
+}}`,
+      gradient: `uniform sampler2D uPressure;
+uniform sampler2D uVelocity;
+void main() {{
+  float L = texture(uPressure, vL).x;
+  float R = texture(uPressure, vR).x;
+  float T = texture(uPressure, vT).x;
+  float B = texture(uPressure, vB).x;
+  vec2 velocity = texture(uVelocity, vUv).xy - vec2(R - L, T - B);
+  outColor = vec4(velocity, 0.0, 1.0);
+}}`,
+      prefilter: `uniform sampler2D uTexture;
+uniform vec3 curve;
+uniform float threshold;
+void main() {{
+  vec3 c = texture(uTexture, vUv).rgb;
+  float br = max(c.r, max(c.g, c.b));
+  float rq = clamp(br - curve.x, 0.0, curve.y);
+  rq = curve.z * rq * rq;
+  c *= max(rq, br - threshold) / max(br, 0.0001);
+  outColor = vec4(c, 0.0);
+}}`,
+      blur: `uniform sampler2D uTexture;
+uniform float intensity;
+void main() {{
+  vec4 sum = texture(uTexture, vL) + texture(uTexture, vR) + texture(uTexture, vT) + texture(uTexture, vB);
+  outColor = sum * 0.25 * intensity;
+}}`,
+      display: `uniform sampler2D uTexture;
+uniform sampler2D uBloom;
+uniform vec2 texelSize;
+uniform float shading;
+uniform float bloom;
+uniform float light;
+float hash(vec2 p) {{
+  vec3 q = fract(vec3(p.xyx) * 0.1031);
+  q += dot(q, q.yzx + 33.33);
+  return fract((q.x + q.y) * q.z);
+}}
+void main() {{
+  vec3 c = texture(uTexture, vUv).rgb;
+  if (shading > 0.0) {{
+    float dx = length(texture(uTexture, vR).rgb) - length(texture(uTexture, vL).rgb);
+    float dy = length(texture(uTexture, vT).rgb) - length(texture(uTexture, vB).rgb);
+    vec3 n = normalize(vec3(dx, dy, length(texelSize)));
+    c *= mix(1.0, clamp(n.z + 0.7, 0.7, 1.0), shading);
   }}
+  if (bloom > 0.0) {{
+    c += max(texture(uBloom, vUv).rgb, 0.0) * bloom;
+  }}
+  c = max(c, 0.0);
+  float peak = max(c.r, max(c.g, c.b));
+  float grain = (hash(gl_FragCoord.xy) - 0.5) / 255.0 * smoothstep(0.0, 0.03, peak);
+  c = max(c + grain, 0.0);
+  float alpha = clamp(max(c.r, max(c.g, c.b)), 0.0, 1.0);
+  outColor = vec4(min(c, vec3(alpha)), alpha);
+}}`
+    }};
 
-  /* ==========================================================================
-     3. <AnimatedContent /> — React Bits GSAP + ScrollTrigger Page Transitions
-     ========================================================================== */
-  const currentPage = {page_key!r};
-  const reduce = parentWin.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-  if (reduce) return;
+    const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+    const parseColor = value => {{
+      const hex = String(value).replace('#', '').trim();
+      const number = parseInt(hex.slice(0, 6), 16);
+      if (Number.isNaN(number)) return [1, 1, 1];
+      return [((number >> 16) & 255) / 255, ((number >> 8) & 255) / 255, (number & 255) / 255];
+    }};
 
+    const s = {{
+      palette: ['#527DFF', '#55D6E8', '#A8C7FF'].map(parseColor),
+      rainbow: false,
+      colorSpeed: 0.12,
+      intensity: 0.55,
+      size: 0.75,
+      force: 0.65,
+      swirl: 2.0,
+      trail: 0.8,
+      momentum: 0.75,
+      shading: 0.55,
+      glow: 0.12,
+      quality: 'medium',
+      clickSplash: false,
+      contained: false,
+      light: false
+    }};
+
+    const gl = canvas.getContext('webgl2', {{
+      alpha: true,
+      premultipliedAlpha: true,
+      antialias: false,
+      depth: false,
+      stencil: false,
+      preserveDrawingBuffer: false
+    }});
+    if (!gl) return;
+    gl.getExtension('EXT_color_buffer_float');
+    gl.getExtension('EXT_color_buffer_half_float');
+
+    const renderable = (internal, format) => {{
+      const texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, internal, 4, 4, 0, format, gl.HALF_FLOAT, null);
+      const fbo = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+      const complete = gl.checkFramebufferStatus(gl.FRAMEBUFFER) === gl.FRAMEBUFFER_COMPLETE;
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.deleteFramebuffer(fbo);
+      gl.deleteTexture(texture);
+      return complete;
+    }};
+    const rgba = {{ internal: gl.RGBA16F, format: gl.RGBA }};
+    if (!renderable(rgba.internal, rgba.format)) return;
+    const rg = renderable(gl.RG16F, gl.RG) ? {{ internal: gl.RG16F, format: gl.RG }} : rgba;
+    const r = renderable(gl.R16F, gl.RED) ? {{ internal: gl.R16F, format: gl.RED }} : rg;
+
+    const compile = (type, source) => {{
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      return shader;
+    }};
+    const vertex = compile(gl.VERTEX_SHADER, VERTEX);
+    const programs = {{}};
+    let broken = false;
+    Object.entries(SHADERS).forEach(([name, body]) => {{
+      const fragment = compile(gl.FRAGMENT_SHADER, HEADER + body);
+      const program = gl.createProgram();
+      gl.attachShader(program, vertex);
+      gl.attachShader(program, fragment);
+      gl.bindAttribLocation(program, 0, 'aPosition');
+      gl.linkProgram(program);
+      gl.deleteShader(fragment);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) broken = true;
+      const uniforms = {{}};
+      const count = gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS);
+      for (let i = 0; i < count; i++) {{
+        const info = gl.getActiveUniform(program, i);
+        if (info) uniforms[info.name] = gl.getUniformLocation(program, info.name);
+      }}
+      programs[name] = {{ program, uniforms }};
+    }});
+    gl.deleteShader(vertex);
+    if (broken) return;
+
+    const buffer = gl.createBuffer();
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+    const targets = new Set();
+    let lost = false;
+
+    const use = name => {{
+      const item = programs[name];
+      gl.useProgram(item.program);
+      return item.uniforms;
+    }};
+
+    const blit = target => {{
+      if (target) {{
+        gl.viewport(0, 0, target.width, target.height);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, target.fbo);
+      }} else {{
+        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      }}
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }};
+
+    const createTarget = (width, height, format, filter) => {{
+      gl.activeTexture(gl.TEXTURE0);
+      const texture = gl.createTexture();
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, format.internal, width, height, 0, format.format, gl.HALF_FLOAT, null);
+      const fbo = gl.createFramebuffer();
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+      gl.viewport(0, 0, width, height);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+      const target = {{
+        texture, fbo, width, height,
+        texelX: 1 / width, texelY: 1 / height,
+        attach: unit => {{
+          gl.activeTexture(gl.TEXTURE0 + unit);
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          return unit;
+        }}
+      }};
+      targets.add(target);
+      return target;
+    }};
+
+    const destroyTarget = target => {{
+      if (!target) return;
+      gl.deleteFramebuffer(target.fbo);
+      gl.deleteTexture(target.texture);
+      targets.delete(target);
+    }};
+
+    const reshape = (target, width, height, format) => {{
+      gl.bindTexture(gl.TEXTURE_2D, target.texture);
+      gl.texImage2D(gl.TEXTURE_2D, 0, format.internal, width, height, 0, format.format, gl.HALF_FLOAT, null);
+      target.width = width;
+      target.height = height;
+      target.texelX = 1 / width;
+      target.texelY = 1 / height;
+    }};
+
+    const createDouble = (width, height, format, filter) => {{
+      const pair = {{
+        read: createTarget(width, height, format, filter),
+        write: createTarget(width, height, format, filter),
+        width, height,
+        texelX: 1 / width, texelY: 1 / height,
+        swap: () => {{
+          const current = pair.read;
+          pair.read = pair.write;
+          pair.write = current;
+        }}
+      }};
+      return pair;
+    }};
+
+    const resizeDouble = (pair, width, height, format, filter, keep) => {{
+      if (keep) {{
+        const next = createTarget(width, height, format, filter);
+        const u = use('copy');
+        gl.uniform1i(u.uTexture, pair.read.attach(0));
+        blit(next);
+        destroyTarget(pair.read);
+        pair.read = next;
+      }} else {{
+        reshape(pair.read, width, height, format);
+      }}
+      reshape(pair.write, width, height, format);
+      pair.width = width;
+      pair.height = height;
+      pair.texelX = 1 / width;
+      pair.texelY = 1 / height;
+    }};
+
+    const resolution = base => {{
+      const width = gl.drawingBufferWidth;
+      const height = gl.drawingBufferHeight;
+      const aspect = Math.max(width, height) / Math.max(1, Math.min(width, height));
+      const shortSide = Math.round(base);
+      const longSide = Math.round(base * aspect);
+      return width > height ? {{ width: longSide, height: shortSide }} : {{ width: shortSide, height: longSide }};
+    }};
+
+    const fit = () => {{
+      const ratio = Math.min(win.devicePixelRatio || 1, 1.5);
+      const width = Math.max(1, Math.floor(win.innerWidth * ratio));
+      const height = Math.max(1, Math.floor(win.innerHeight * ratio));
+      if (canvas.width === width && canvas.height === height) return;
+      canvas.width = width;
+      canvas.height = height;
+    }};
+
+    const sizes = () => {{
+      const q = QUALITY[s.quality];
+      const shortSide = Math.min(gl.drawingBufferWidth, gl.drawingBufferHeight);
+      return {{ sim: resolution(q.sim), ink: resolution(Math.max(q.sim, Math.min(q.dye, shortSide))) }};
+    }};
+
+    fit();
+    const initial = sizes();
+    const dye = createDouble(initial.ink.width, initial.ink.height, rgba, gl.LINEAR);
+    const velocity = createDouble(initial.sim.width, initial.sim.height, rg, gl.LINEAR);
+    const pressure = createDouble(initial.sim.width, initial.sim.height, r, gl.NEAREST);
+    const divergence = createTarget(initial.sim.width, initial.sim.height, r, gl.NEAREST);
+    const curl = createTarget(initial.sim.width, initial.sim.height, r, gl.NEAREST);
+    let bloom = null;
+    let bloomChain = [];
+
+    const dropBloom = () => {{
+      destroyTarget(bloom);
+      bloomChain.forEach(destroyTarget);
+      bloom = null;
+      bloomChain = [];
+    }};
+
+    const ensureBloom = () => {{
+      if (bloom) return bloom;
+      const size = resolution(BLOOM_RESOLUTION);
+      const created = createTarget(size.width, size.height, rgba, gl.LINEAR);
+      for (let i = 0; i < BLOOM_ITERATIONS; i++) {{
+        const width = size.width >> (i + 1);
+        const height = size.height >> (i + 1);
+        if (width < 2 || height < 2) break;
+        bloomChain.push(createTarget(width, height, rgba, gl.LINEAR));
+      }}
+      bloom = created;
+      return created;
+    }};
+
+    const resize = () => {{
+      fit();
+      const next = sizes();
+      if (dye.width !== next.ink.width || dye.height !== next.ink.height) {{
+        resizeDouble(dye, next.ink.width, next.ink.height, rgba, gl.LINEAR, true);
+      }}
+      if (velocity.width !== next.sim.width || velocity.height !== next.sim.height) {{
+        resizeDouble(velocity, next.sim.width, next.sim.height, rg, gl.LINEAR, true);
+        resizeDouble(pressure, next.sim.width, next.sim.height, r, gl.NEAREST, false);
+        reshape(divergence, next.sim.width, next.sim.height, r);
+        reshape(curl, next.sim.width, next.sim.height, r);
+      }}
+      const glowSize = resolution(BLOOM_RESOLUTION);
+      if (bloom && (bloom.width !== glowSize.width || bloom.height !== glowSize.height)) dropBloom();
+    }};
+
+    const radiusFor = scale => {{
+      const aspect = canvas.width / canvas.height;
+      return ((0.2 * s.size * scale) / 100) * (aspect > 1 ? aspect : 1);
+    }};
+
+    const splat = (ax, ay, bx, by, vx, vy, color, radius) => {{
+      const u = use('splat');
+      gl.uniform1i(u.uTarget, velocity.read.attach(0));
+      gl.uniform1f(u.aspectRatio, canvas.width / canvas.height);
+      gl.uniform2f(u.pointA, ax, ay);
+      gl.uniform2f(u.pointB, bx, by);
+      gl.uniform3f(u.color, vx, vy, 0);
+      gl.uniform1f(u.radius, radius);
+      blit(velocity.write);
+      velocity.swap();
+      gl.uniform1i(u.uTarget, dye.read.attach(0));
+      gl.uniform3f(u.color, color[0], color[1], color[2]);
+      blit(dye.write);
+      dye.swap();
+    }};
+
+    const colorAt = (offset, now) => {{
+      const phase = (((offset + (now / 1000) * s.colorSpeed * 0.6) % 1) + 1) % 1;
+      const palette = s.palette;
+      const position = phase * palette.length;
+      const from = palette[Math.floor(position) % palette.length];
+      const to = palette[(Math.floor(position) + 1) % palette.length];
+      const t = position - Math.floor(position);
+      const blend = t * t * (3 - 2 * t);
+      return [
+        from[0] + (to[0] - from[0]) * blend,
+        from[1] + (to[1] - from[1]) * blend,
+        from[2] + (to[2] - from[2]) * blend
+      ];
+    }};
+
+    const flush = (pointer, dt, now) => {{
+      const aspect = canvas.width / canvas.height;
+      const length = Math.hypot((pointer.x - pointer.px) * aspect, pointer.y - pointer.py);
+      if (length > 0.35) {{
+        pointer.px = pointer.x;
+        pointer.py = pointer.y;
+        return;
+      }}
+      let dx = pointer.x - pointer.px;
+      let dy = pointer.y - pointer.py;
+      if (aspect < 1) dx *= aspect;
+      else dy /= aspect;
+      const radius = radiusFor(1);
+      const spread = 1 + length / (1.77 * Math.sqrt(radius));
+      const push = (6000 * s.force) / Math.sqrt(spread);
+      const amount = (0.15 * s.intensity * Math.min(dt * 60, 1)) / Math.sqrt(spread);
+      const color = colorAt(pointer.offset, now).map(c => c * amount);
+      splat(pointer.px, pointer.py, pointer.x, pointer.y, dx * push, dy * push, color, radius);
+      pointer.px = pointer.x;
+      pointer.py = pointer.y;
+    }};
+
+    const step = dt => {{
+      const iterations = QUALITY[s.quality].iterations;
+      gl.disable(gl.BLEND);
+
+      let u = use('curl');
+      gl.uniform2f(u.texelSize, velocity.texelX, velocity.texelY);
+      gl.uniform1i(u.uVelocity, velocity.read.attach(0));
+      blit(curl);
+
+      u = use('vorticity');
+      gl.uniform2f(u.texelSize, velocity.texelX, velocity.texelY);
+      gl.uniform1i(u.uVelocity, velocity.read.attach(0));
+      gl.uniform1i(u.uCurl, curl.attach(1));
+      gl.uniform1f(u.curl, s.swirl);
+      gl.uniform1f(u.dt, dt);
+      blit(velocity.write);
+      velocity.swap();
+
+      u = use('divergence');
+      gl.uniform2f(u.texelSize, velocity.texelX, velocity.texelY);
+      gl.uniform1i(u.uVelocity, velocity.read.attach(0));
+      blit(divergence);
+
+      u = use('clear');
+      gl.uniform1i(u.uTexture, pressure.read.attach(0));
+      gl.uniform1f(u.value, 0.1);
+      blit(pressure.write);
+      pressure.swap();
+
+      u = use('pressure');
+      gl.uniform2f(u.texelSize, velocity.texelX, velocity.texelY);
+      gl.uniform1i(u.uDivergence, divergence.attach(0));
+      for (let i = 0; i < iterations; i++) {{
+        gl.uniform1i(u.uPressure, pressure.read.attach(1));
+        blit(pressure.write);
+        pressure.swap();
+      }}
+
+      u = use('gradient');
+      gl.uniform2f(u.texelSize, velocity.texelX, velocity.texelY);
+      gl.uniform1i(u.uPressure, pressure.read.attach(0));
+      gl.uniform1i(u.uVelocity, velocity.read.attach(1));
+      blit(velocity.write);
+      velocity.swap();
+
+      u = use('advection');
+      gl.uniform2f(u.texelSize, velocity.texelX, velocity.texelY);
+      gl.uniform1i(u.uVelocity, velocity.read.attach(0));
+      gl.uniform1i(u.uSource, velocity.read.attach(0));
+      gl.uniform1f(u.dt, dt);
+      gl.uniform1f(u.dissipation, 2 / s.momentum);
+      blit(velocity.write);
+      velocity.swap();
+
+      gl.uniform1i(u.uVelocity, velocity.read.attach(0));
+      gl.uniform1i(u.uSource, dye.read.attach(1));
+      gl.uniform1f(u.dissipation, 3.5 / s.trail);
+      blit(dye.write);
+      dye.swap();
+    }};
+
+    const applyBloom = amount => {{
+      const base = ensureBloom();
+      if (!bloomChain.length) return;
+      gl.disable(gl.BLEND);
+      let u = use('prefilter');
+      const knee = BLOOM_THRESHOLD * BLOOM_KNEE + 0.0001;
+      gl.uniform3f(u.curve, BLOOM_THRESHOLD - knee, knee * 2, 0.25 / knee);
+      gl.uniform1f(u.threshold, BLOOM_THRESHOLD);
+      gl.uniform1i(u.uTexture, dye.read.attach(0));
+      blit(base);
+      u = use('blur');
+      gl.uniform1f(u.intensity, 1);
+      let lastT = base;
+      bloomChain.forEach(target => {{
+        gl.uniform2f(u.texelSize, lastT.texelX, lastT.texelY);
+        gl.uniform1i(u.uTexture, lastT.attach(0));
+        blit(target);
+        lastT = target;
+      }});
+      gl.blendFunc(gl.ONE, gl.ONE);
+      gl.enable(gl.BLEND);
+      for (let i = bloomChain.length - 2; i >= 0; i--) {{
+        const target = bloomChain[i];
+        gl.uniform2f(u.texelSize, lastT.texelX, lastT.texelY);
+        gl.uniform1i(u.uTexture, lastT.attach(0));
+        blit(target);
+        lastT = target;
+      }}
+      gl.disable(gl.BLEND);
+      gl.uniform1f(u.intensity, amount);
+      gl.uniform2f(u.texelSize, lastT.texelX, lastT.texelY);
+      gl.uniform1i(u.uTexture, lastT.attach(0));
+      blit(base);
+    }};
+
+    const render = () => {{
+      if (s.glow > 0) applyBloom(2 * s.glow);
+      gl.disable(gl.BLEND);
+      const u = use('display');
+      gl.uniform2f(u.texelSize, 1 / gl.drawingBufferWidth, 1 / gl.drawingBufferHeight);
+      gl.uniform1i(u.uTexture, dye.read.attach(0));
+      gl.uniform1i(u.uBloom, (bloom ?? dye.read).attach(1));
+      gl.uniform1f(u.shading, s.shading);
+      gl.uniform1f(u.bloom, s.glow > 0 ? 1 : 0);
+      gl.uniform1f(u.light, 0);
+      blit(null);
+    }};
+
+    const clearScreen = () => {{
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+      gl.clearColor(0, 0, 0, 0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+    }};
+
+    const pointers = new Map();
+    let raf = 0;
+    let last = 0;
+    let lastActivity = performance.now();
+
+    const frame = now => {{
+      raf = 0;
+      if (lost || doc.hidden) return;
+      const dt = clamp((now - last) / 1000, 0, 1 / 60);
+      last = now;
+      resize();
+      pointers.forEach(pointer => {{
+        if (!pointer.moved) return;
+        pointer.moved = false;
+        flush(pointer, dt, now);
+      }});
+      step(dt);
+      render();
+      const quiet = (2.2 * s.trail + 0.4) * 1000;
+      if (now - lastActivity < quiet) raf = win.requestAnimationFrame(frame);
+      else clearScreen();
+    }};
+
+    const wake = () => {{
+      lastActivity = performance.now();
+      if (raf || lost || doc.hidden) return;
+      last = performance.now();
+      raf = win.requestAnimationFrame(frame);
+    }};
+
+    const track = (id, clientX, clientY) => {{
+      const w = win.innerWidth;
+      const h = win.innerHeight;
+      if (!w || !h) return;
+      const x = clientX / w;
+      const y = 1 - clientY / h;
+      let pointer = pointers.get(id);
+      if (!pointer) {{
+        pointer = {{ x: 0, y: 0, px: 0, py: 0, ready: false, moved: false, offset: Math.random() }};
+        pointers.set(id, pointer);
+      }}
+      if (!pointer.ready) {{
+        pointer.x = pointer.px = x;
+        pointer.y = pointer.py = y;
+        pointer.ready = true;
+        return;
+      }}
+      pointer.x = x;
+      pointer.y = y;
+      pointer.moved = true;
+      wake();
+    }};
+
+    win.addEventListener('pointermove', ev => {{
+      if (ev.pointerType !== 'touch') track('p' + ev.pointerId, ev.clientX, ev.clientY);
+    }}, {{ passive: true }});
+
+    doc.documentElement.addEventListener('pointerleave', () => {{
+      pointers.forEach(p => {{ p.ready = false; }});
+    }});
+
+    canvas.addEventListener('webglcontextlost', ev => {{
+      ev.preventDefault();
+      lost = true;
+      if (raf) win.cancelAnimationFrame(raf);
+      raf = 0;
+    }});
+  }})();
+
+
+  /* ========================================================================
+     СЛОЙ 3: <AnimatedContent /> — Наблюдатель за переходами страниц
+     ======================================================================== */
   const runAnimatedContent = () => {{
-    const mainBlock = parentDoc.querySelector('[data-testid="stMainBlockContainer"], .block-container');
+    if (reducedMotion) return;
+    const mainBlock = doc.querySelector('[data-testid="stMainBlockContainer"], .block-container');
     if (!mainBlock) return;
 
-    const wrapper = mainBlock.querySelector('.ps-animated-page-root');
-    const targets = Array.from(
-      (wrapper || mainBlock).querySelectorAll(
+    const candidates = Array.from(
+      mainBlock.querySelectorAll(
         '.ps-anim-item, .ps-stat-box, .ps-card-finding, .ps-supp-row, [data-testid="stDataFrame"], [data-testid="stPlot"]'
       )
     );
 
-    const stamp = currentPage + '_' + targets.length;
-    if (mainBlock.dataset.psLastAnimated === stamp) return;
-    mainBlock.dataset.psLastAnimated = stamp;
+    const unAnimated = candidates.filter(el => !el.dataset.psAnimatedDone);
+    if (!unAnimated.length) return;
 
-    const gsapInstance = parentWin.gsap;
-    if (gsapInstance) {{
-      gsapInstance.killTweensOf(targets);
-      gsapInstance.fromTo(
-        targets,
-        {{ y: 55, opacity: 0, scale: 0.985 }},
-        {{
-          y: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.72,
-          ease: 'power3.out',
-          stagger: 0.07,
-          clearProps: 'transform'
-        }}
-      );
-    }} else {{
-      // Мгновенный аппаратный фоллбэк (power3.out = cubic-bezier(0.215, 0.61, 0.355, 1))
-      targets.forEach((el, idx) => {{
-        const delay = Math.min(idx * 65, 520);
-        el.style.opacity = '0';
-        el.style.transform = 'translate3d(0, 52px, 0) scale(0.985)';
-        el.style.transition = 'none';
-        setTimeout(() => {{
-          parentWin.requestAnimationFrame(() => {{
-            el.style.transition = 'opacity 720ms cubic-bezier(0.215, 0.61, 0.355, 1), transform 720ms cubic-bezier(0.215, 0.61, 0.355, 1)';
-            el.style.opacity = '1';
-            el.style.transform = 'translate3d(0, 0, 0) scale(1)';
-          }});
-        }}, 16 + delay);
-      }});
-    }}
+    unAnimated.forEach((el, idx) => {{
+      el.dataset.psAnimatedDone = '1';
+      const delay = Math.min(idx * 55, 420);
+      el.style.opacity = '0';
+      el.style.transform = 'translate3d(0, 28px, 0) scale(0.99)';
+      el.style.transition = 'none';
+      setTimeout(() => {{
+        win.requestAnimationFrame(() => {{
+          el.style.transition = 'opacity 560ms cubic-bezier(0.215, 0.61, 0.355, 1), transform 560ms cubic-bezier(0.215, 0.61, 0.355, 1)';
+          el.style.opacity = '1';
+          el.style.transform = 'translate3d(0, 0, 0) scale(1)';
+        }});
+      }}, 16 + delay);
+    }});
   }};
 
-  // Подгружаем GSAP + ScrollTrigger в родительское окно, если еще не загружен
-  if (!parentWin.gsap && !parentDoc.getElementById('ps-gsap-script')) {{
-    const s1 = parentDoc.createElement('script');
-    s1.id = 'ps-gsap-script';
-    s1.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
-    s1.onload = () => {{
-      const s2 = parentDoc.createElement('script');
-      s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
-      s2.onload = () => {{
-        if (parentWin.gsap && parentWin.ScrollTrigger) {{
-          parentWin.gsap.registerPlugin(parentWin.ScrollTrigger);
-        }}
-      }};
-      parentDoc.head.appendChild(s2);
-    }};
-    parentDoc.head.appendChild(s1);
+  win.__PS_TRIGGER_ANIMATED_CONTENT__ = runAnimatedContent;
+  runAnimatedContent();
+
+  // MutationObserver в родительском окне автоматически подхватывает смену страниц в Streamlit!
+  const appContainer = doc.querySelector('[data-testid="stAppViewContainer"]') || doc.body;
+  const domObserver = new MutationObserver(() => {{
+    runAnimatedContent();
+  }});
+  domObserver.observe(appContainer, {{ childList: true, subtree: true }});
+}}
+
+(function ensurePersistentParentEngine() {{
+  let parentWin, parentDoc;
+  try {{
+    parentWin = window.parent;
+    parentDoc = window.parent.document;
+    if (!parentDoc || !parentDoc.body || !parentDoc.head) return;
+  }} catch (e) {{
+    return;
   }}
 
-  runAnimatedContent();
-  setTimeout(runAnimatedContent, 80);
-  setTimeout(runAnimatedContent, 220);
+  if (parentWin.__PS_PERSISTENT_ENGINE_ACTIVE__) {{
+    if (typeof parentWin.__PS_TRIGGER_ANIMATED_CONTENT__ === 'function') {{
+      parentWin.__PS_TRIGGER_ANIMATED_CONTENT__();
+    }}
+    return;
+  }}
+
+  const legacyBg = parentDoc.getElementById('ps-galaxy-bg-container');
+  if (legacyBg) legacyBg.remove();
+  const legacyScript = parentDoc.getElementById('ps-persistent-engine-script');
+  if (legacyScript) legacyScript.remove();
+
+  const engineScript = parentDoc.createElement('script');
+  engineScript.id = 'ps-persistent-engine-script';
+  engineScript.textContent = '(' + initPharmaSentinelPersistentEngine.toString() + ')();';
+  parentDoc.head.appendChild(engineScript);
 }})();
 </script>
 </body>
