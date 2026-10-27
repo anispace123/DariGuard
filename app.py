@@ -83,6 +83,11 @@ I18N = {
         "stat_not_in_db_sub": "Не доказано как безопасное",
         "registry_title": "Реестр обнаруженных взаимодействий",
         "finding_label": "Клиническая оценка:",
+        "finding_mechanism": "Механизм взаимодействия",
+        "finding_clinical": "Клиническое значение",
+        "finding_management": "Рекомендованная тактика",
+        "audit_inn_count": "Веществ МНН:",
+        "audit_pairs_count": "Пар комбинаций:",
         "supp_box_title": "Доказанные взаимодействия с сопутствующими БАДами и пищей",
         "management_label": "Тактика:",
         "dup_warning": "Дублирование действующего вещества:",
@@ -179,6 +184,11 @@ I18N = {
         "stat_not_in_db_sub": "Not proven safe",
         "registry_title": "Pairwise Interaction Findings",
         "finding_label": "Clinical finding:",
+        "finding_mechanism": "Interaction Mechanism",
+        "finding_clinical": "Clinical Significance",
+        "finding_management": "Recommended Action",
+        "audit_inn_count": "Active INNs:",
+        "audit_pairs_count": "Pairwise checks:",
         "supp_box_title": "Verified Dietary and Herbal Interactions for Current Cohort",
         "management_label": "Management:",
         "dup_warning": "Therapeutic duplication detected:",
@@ -250,41 +260,46 @@ def t(key: str, **kwargs) -> str:
     return text
 
 
-# ─── Дизайн-система (Dark Scientific Palette) + Анимации переходов ───────────
+# ─── Дизайн-система (Clinical Sage Palette) + Анимации переходов ─────────────
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  --bg:           #0A1020;
-  --bg-sec:       #0D1628;
-  --bg-card:      rgba(16, 27, 48, 0.90);
-  --bg-elevated:  rgba(21, 35, 58, 0.94);
-  --bg-subtle:    rgba(13, 22, 40, 0.88);
-  --border:       rgba(147, 164, 191, 0.16);
-  --border-hover: rgba(82, 125, 255, 0.38);
-  --border-focus: #527DFF;
+  --bg:           #F3F6F2;
+  --bg-sec:       #EAF0E9;
+  --bg-card:      #FFFFFF;
+  --bg-elevated:  #F7F9F6;
+  --bg-subtle:    #EAF0E9;
+  --border:       #DCE4DA;
+  --border-hover: #BCCEC0;
+  --border-focus: #315E50;
 
-  --ink-primary:  #DCE7F7;
-  --ink-body:     #DCE7F7;
-  --ink-muted:    #93A4BF;
+  --ink-primary:  #26332D;
+  --ink-body:     #26332D;
+  --ink-muted:    #65736A;
 
-  --accent:       #527DFF;
-  --cyan:         #55D6E8;
-  --accent-light: rgba(16, 27, 48, 0.92);
-  --accent-hover: #6B90FF;
+  --accent:       #315E50;
+  --accent-hover: #264B40;
+  --accent-light: #EEF5F1;
+  --secondary-sage:#789483;
 
-  --sev-major:    #F87171;
-  --sev-major-bg: rgba(185, 28, 28, 0.18);
-  --sev-major-bd: rgba(248, 113, 113, 0.36);
-  --sev-mod:      #FBBF24;
-  --sev-mod-bg:   rgba(217, 119, 6, 0.18);
-  --sev-mod-bd:   rgba(251, 191, 36, 0.36);
-  --sev-minor:    #55D6E8;
-  --sev-minor-bg: rgba(85, 214, 232, 0.14);
-  --sev-minor-bd: rgba(85, 214, 232, 0.34);
-  --sev-none:     #93A4BF;
-  --sev-none-bg:  rgba(21, 35, 58, 0.85);
+  --info-blue:    #2E6171;
+  --info-blue-bg: #EBF3F5;
+  --info-blue-bd: #C6DDE4;
+
+  --sev-major:    #B83A38;
+  --sev-major-bg: #FDF2F2;
+  --sev-major-bd: #F7CACA;
+  --sev-mod:      #B4681E;
+  --sev-mod-bg:   #FDF6EE;
+  --sev-mod-bd:   #F7DFC2;
+  --sev-minor:    #315E50;
+  --sev-minor-bg: #EDF4F0;
+  --sev-minor-bd: #CFE2D7;
+  --sev-none:     #65736A;
+  --sev-none-bg:  #F2F5F2;
+  --sev-none-bd:  #DCE4DA;
 
   --font-ui:      'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-serif:   'Lora', Georgia, serif;
@@ -301,7 +316,7 @@ html, body, [class*="css"] {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Прозрачность оболочки Streamlit для видимости постоянных слоёв <Galaxy /> и <SplashCursor /> */
+/* Прозрачность оболочки Streamlit для видимости фоновой молекулярной сети */
 .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"], .main {
   background: transparent !important;
   color: var(--ink-body) !important;
@@ -321,30 +336,30 @@ html, body, [class*="css"] {
 /* ── Заголовки и типографика ── */
 [data-testid="stMarkdownContainer"] h1 {
   font-family: var(--font-serif) !important;
-  font-size: clamp(1.65rem, 3.2vw, 2.35rem) !important;
+  font-size: clamp(1.55rem, 2.8vw, 2.15rem) !important;
   font-weight: 500 !important;
   line-height: 1.25 !important;
-  letter-spacing: -0.02em !important;
+  letter-spacing: -0.015em !important;
   color: var(--ink-primary) !important;
-  margin: 0.15rem 0 0.5rem !important;
+  margin: 0.15rem 0 0.45rem !important;
 }
 
 [data-testid="stMarkdownContainer"] h2 {
   font-family: var(--font-serif) !important;
-  font-size: clamp(1.25rem, 2.2vw, 1.7rem) !important;
+  font-size: clamp(1.2rem, 2.0vw, 1.55rem) !important;
   font-weight: 500 !important;
   line-height: 1.3 !important;
   color: var(--ink-primary) !important;
-  margin: 1.25rem 0 0.4rem !important;
+  margin: 1.15rem 0 0.4rem !important;
 }
 
 [data-testid="stMarkdownContainer"] h3,
 [data-testid="stMarkdownContainer"] h4 {
   font-family: var(--font-ui) !important;
-  font-size: 1.05rem !important;
+  font-size: 1.02rem !important;
   font-weight: 600 !important;
   color: var(--ink-primary) !important;
-  margin: 1rem 0 0.35rem !important;
+  margin: 0.95rem 0 0.35rem !important;
 }
 
 [data-testid="stMarkdownContainer"] p,
@@ -363,35 +378,35 @@ hr {
   gap: 7px;
   background: var(--bg-card);
   border: 1px solid var(--border);
-  padding: 0.36rem 0.78rem;
+  padding: 0.35rem 0.75rem;
   border-radius: 3px;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 500;
-  color: var(--cyan);
+  color: var(--accent);
 }
 
 .ps-live-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--cyan);
-  box-shadow: 0 0 8px rgba(85, 214, 232, 0.65);
+  background: var(--accent);
+  box-shadow: 0 0 0 2px rgba(49, 94, 80, 0.2);
   animation: ps-pulse 2.2s infinite ease-in-out;
 }
 
 @keyframes ps-pulse {
-  0%, 100% { opacity: 0.45; }
+  0%, 100% { opacity: 0.55; }
   50% { opacity: 1; }
 }
 
-/* ── Навигационная полоса вкладок (строгая, без эмодзи) ── */
+/* ── Навигационная полоса вкладок ── */
 div[data-testid="stRadio"] > div[role="radiogroup"] {
   display: flex;
   flex-direction: row;
   gap: 0.35rem;
   flex-wrap: wrap;
-  background: var(--bg-subtle);
+  background: var(--bg-sec);
   padding: 4px;
   border-radius: 4px;
   border: 1px solid var(--border);
@@ -409,7 +424,7 @@ div[data-testid="stRadio"] > div[role="radiogroup"] > label {
   background: transparent;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform 150ms var(--ease-snappy), background 150ms ease, color 150ms ease, border-color 150ms ease;
+  transition: transform 140ms var(--ease-snappy), background 140ms ease, color 140ms ease, border-color 140ms ease;
 }
 
 div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
@@ -420,83 +435,86 @@ div[data-testid="stRadio"] > div[role="radiogroup"] > label p {
 
 div[data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
   color: var(--ink-primary) !important;
-  background: rgba(21, 35, 58, 0.65);
+  background: rgba(255, 255, 255, 0.7);
 }
 
 div[data-testid="stRadio"] > div[role="radiogroup"] > label[data-checked="true"],
 div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
-  background: var(--bg-elevated) !important;
-  color: var(--ink-primary) !important;
-  border-color: rgba(82, 125, 255, 0.38) !important;
+  background: #FFFFFF !important;
+  color: var(--accent) !important;
+  border-color: var(--border) !important;
   font-weight: 600 !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 1px 3px rgba(38, 51, 45, 0.07);
 }
 
-/* ── Формы ввода, селекты и теги препаратов на тёмных поверхностях #101B30 / #15233A ── */
+/* ── Формы ввода, селекты и теги препаратов на светлых поверхностях #FFFFFF / #F7F9F6 ── */
 label[data-testid="stWidgetLabel"] p {
   color: var(--ink-primary) !important;
-  font-weight: 500 !important;
-  font-size: 0.84rem !important;
+  font-weight: 600 !important;
+  font-size: 0.83rem !important;
 }
 
 div[data-baseweb="select"] > div,
 div[data-baseweb="input"] > div,
 div[data-baseweb="textarea"] {
-  background-color: #101B30 !important;
-  border-color: rgba(147, 164, 191, 0.24) !important;
-  color: #DCE7F7 !important;
+  background-color: #FFFFFF !important;
+  border-color: var(--border) !important;
+  color: var(--ink-primary) !important;
   border-radius: 3px !important;
 }
 
 div[data-baseweb="select"] > div:focus-within,
 div[data-baseweb="input"] > div:focus-within,
 div[data-baseweb="textarea"]:focus-within {
-  border-color: #527DFF !important;
-  box-shadow: 0 0 0 1px #527DFF !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent) !important;
 }
 
 div[data-baseweb="select"] input,
 div[data-baseweb="input"] input,
 div[data-baseweb="textarea"] textarea {
-  color: #DCE7F7 !important;
+  color: var(--ink-primary) !important;
 }
 
 span[data-baseweb="tag"] {
-  background-color: #15233A !important;
-  border: 1px solid rgba(82, 125, 255, 0.38) !important;
-  color: #DCE7F7 !important;
+  background-color: var(--accent-light) !important;
+  border: 1px solid #D2E4DA !important;
+  color: var(--ink-primary) !important;
   border-radius: 3px !important;
 }
 
 span[data-baseweb="tag"] span {
-  color: #DCE7F7 !important;
+  color: var(--ink-primary) !important;
+  font-weight: 500 !important;
 }
 
 ul[data-testid="stSelectboxVirtualDropdown"],
 div[data-baseweb="popover"] ul {
-  background-color: #101B30 !important;
-  border: 1px solid rgba(147, 164, 191, 0.22) !important;
+  background-color: #FFFFFF !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 4px 12px rgba(38, 51, 45, 0.08) !important;
 }
 
 div[data-baseweb="popover"] li {
-  color: #DCE7F7 !important;
+  color: var(--ink-primary) !important;
 }
 
 div[data-baseweb="popover"] li:hover,
 div[data-baseweb="popover"] li[aria-selected="true"] {
-  background-color: #15233A !important;
+  background-color: var(--bg-elevated) !important;
+  color: var(--accent) !important;
 }
 
 /* ── Таблицы и алерты ── */
 [data-testid="stDataFrame"] {
-  background: #101B30 !important;
+  background: #FFFFFF !important;
   border: 1px solid var(--border) !important;
   border-radius: 3px !important;
   padding: 2px;
 }
 
 [data-testid="stAlert"] {
-  background-color: var(--bg-card) !important;
+  background-color: #FFFFFF !important;
   border: 1px solid var(--border) !important;
   color: var(--ink-primary) !important;
   border-radius: 3px !important;
@@ -510,52 +528,53 @@ div[data-baseweb="popover"] li[aria-selected="true"] {
 @keyframes ps-page-enter {
   0% {
     opacity: 0;
-    transform: translate3d(0, 26px, 0) scale(0.992);
+    transform: translate3d(0, 18px, 0);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 .ps-animated-page-root {
-  animation: ps-page-enter 540ms var(--ease-power3) both;
+  animation: ps-page-enter 420ms var(--ease-snappy) both;
 }
 
 .ps-anim-item {
-  animation: ps-page-enter 580ms var(--ease-power3) both;
+  animation: ps-page-enter 440ms var(--ease-snappy) both;
 }
 
-.ps-stagger-1 { animation-delay: 40ms; }
-.ps-stagger-2 { animation-delay: 90ms; }
-.ps-stagger-3 { animation-delay: 140ms; }
-.ps-stagger-4 { animation-delay: 190ms; }
+.ps-stagger-1 { animation-delay: 35ms; }
+.ps-stagger-2 { animation-delay: 75ms; }
+.ps-stagger-3 { animation-delay: 115ms; }
+.ps-stagger-4 { animation-delay: 155ms; }
 
-/* ── Дисклеймер ── */
+/* ── Клинический дисклеймер (Сдержанный клинический синий / зеленый) ── */
 .ps-disclaimer {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  background: var(--bg-card);
+  background: #FFFFFF;
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   padding: 0.65rem 1rem;
   border-radius: 3px;
   margin-bottom: 1.25rem;
-  font-size: 0.82rem;
+  font-size: 0.81rem;
   line-height: 1.5;
-  color: var(--ink-muted);
+  color: var(--ink-body);
+  box-shadow: 0 1px 2px rgba(38, 51, 45, 0.03);
 }
 
 .ps-disclaimer-tag {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--cyan);
-  background: rgba(85, 214, 232, 0.12);
-  border: 1px solid rgba(85, 214, 232, 0.25);
+  color: var(--info-blue);
+  background: var(--info-blue-bg);
+  border: 1px solid var(--info-blue-bd);
   padding: 2px 6px;
   border-radius: 2px;
   white-space: nowrap;
@@ -564,21 +583,21 @@ div[data-baseweb="popover"] li[aria-selected="true"] {
 
 .ps-disclaimer b { color: var(--ink-primary); }
 
-/* ── Карточки и статистика (#101B30 и приподнятые #15233A) ── */
+/* ── Карточки и статистика (#FFFFFF / #F7F9F6) ── */
 .ps-stat-box {
-  background: var(--bg-card);
+  background: #FFFFFF;
   border: 1px solid var(--border);
   padding: 0.85rem 1rem;
   border-radius: 3px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 180ms var(--ease-snappy), border-color 180ms ease, background 180ms ease;
+  box-shadow: 0 1px 2px rgba(38, 51, 45, 0.03);
+  transition: transform 160ms var(--ease-snappy), border-color 160ms ease;
 }
 
 .ps-stat-box:hover {
-  transform: translateY(-2px);
-  background: var(--bg-elevated);
+  transform: translateY(-1px);
   border-color: var(--border-hover);
 }
 
@@ -592,7 +611,7 @@ div[data-baseweb="popover"] li[aria-selected="true"] {
 
 .ps-stat-number {
   font-family: var(--font-serif);
-  font-size: 1.55rem;
+  font-size: 1.5rem;
   line-height: 1.2;
   font-weight: 500;
   color: var(--ink-primary);
@@ -604,19 +623,19 @@ div[data-baseweb="popover"] li[aria-selected="true"] {
   color: var(--ink-muted);
 }
 
-/* ── Результаты анализа ── */
+/* ── Результаты анализа (Клиническая иерархия) ── */
 .ps-card-finding {
-  background: var(--bg-card);
+  background: #FFFFFF;
   border: 1px solid var(--border);
   border-radius: 3px;
   padding: 1rem 1.15rem;
-  margin-bottom: 0.65rem;
-  transition: border-color 150ms ease, transform 180ms var(--ease-snappy), background 150ms ease;
-  animation: ps-page-enter 520ms var(--ease-power3) both;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 2px rgba(38, 51, 45, 0.03);
+  transition: border-color 150ms ease, transform 160ms var(--ease-snappy);
+  animation: ps-page-enter 420ms var(--ease-snappy) both;
 }
 
 .ps-card-finding:hover {
-  background: var(--bg-elevated);
   border-color: var(--border-hover);
   transform: translateY(-1px);
 }
@@ -624,10 +643,12 @@ div[data-baseweb="popover"] li[aria-selected="true"] {
 .ps-finding-head {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
-  margin-bottom: 0.5rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0.65rem;
 }
 
 .ps-finding-drugs {
@@ -639,22 +660,53 @@ div[data-baseweb="popover"] li[aria-selected="true"] {
   overflow-wrap: break-word;
 }
 
-.ps-finding-body {
-  font-size: 0.85rem;
-  line-height: 1.6;
-  color: var(--ink-muted);
+.ps-finding-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.55rem;
 }
 
-.ps-finding-body b {
-  color: var(--ink-primary);
+.ps-finding-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
-/* ── Плашки тяжести ── */
-.ps-badge {
-  display: inline-block;
-  padding: 2px 8px;
+.ps-section-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--secondary-sage);
+}
+
+.ps-section-val {
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--ink-body);
+}
+
+.ps-rec-box {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 0.45rem 0.75rem;
   border-radius: 2px;
-  font-size: 0.7rem;
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ink-body);
+}
+
+/* ── Семантические плашки тяжести (не только цвет, но и нецветовые маркеры) ── */
+.ps-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2.5px 8px;
+  border-radius: 2px;
+  font-size: 0.71rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -665,17 +717,18 @@ div[data-baseweb="popover"] li[aria-selected="true"] {
 .ps-badge-major { color: var(--sev-major); background: var(--sev-major-bg); border-color: var(--sev-major-bd); }
 .ps-badge-mod   { color: var(--sev-mod);   background: var(--sev-mod-bg);   border-color: var(--sev-mod-bd); }
 .ps-badge-minor { color: var(--sev-minor); background: var(--sev-minor-bg); border-color: var(--sev-minor-bd); }
-.ps-badge-none  { color: var(--sev-none);  background: var(--sev-none-bg);  border-color: var(--border); }
+.ps-badge-none  { color: var(--sev-none);  background: var(--sev-none-bg);  border-color: var(--sev-none-bd); }
 
 /* ── БАД-карточка ── */
 .ps-supp-row {
   border: 1px solid var(--border);
   border-left: 3px solid var(--sev-major);
-  background: var(--bg-elevated);
+  background: #FFFFFF;
   padding: 0.75rem 0.95rem;
   border-radius: 0 3px 3px 0;
   margin-bottom: 0.5rem;
-  animation: ps-page-enter 560ms var(--ease-power3) both;
+  box-shadow: 0 1px 2px rgba(38, 51, 45, 0.02);
+  animation: ps-page-enter 440ms var(--ease-snappy) both;
 }
 
 /* ── Пресеты и кнопки ── */
@@ -683,28 +736,32 @@ div[data-baseweb="popover"] li[aria-selected="true"] {
   font-size: 0.8rem !important;
   font-weight: 500 !important;
   border-radius: 3px !important;
-  min-height: 40px !important;
+  min-height: 38px !important;
   color: var(--ink-primary) !important;
-  background: var(--bg-card) !important;
+  background: #FFFFFF !important;
   border: 1px solid var(--border) !important;
+  box-shadow: 0 1px 2px rgba(38, 51, 45, 0.03) !important;
   transition: transform 140ms var(--ease-snappy), border-color 140ms ease, background 140ms ease !important;
 }
 
 .stButton > button:hover {
   transform: translateY(-1px) !important;
   background: var(--bg-elevated) !important;
-  border-color: var(--accent) !important;
-  color: #FFFFFF !important;
+  border-color: var(--secondary-sage) !important;
+  color: var(--ink-primary) !important;
 }
 
 .stButton > button[kind="primary"] {
   background: var(--accent) !important;
   border-color: var(--accent) !important;
   color: #FFFFFF !important;
+  box-shadow: 0 1px 3px rgba(49, 94, 80, 0.2) !important;
 }
 
 .stButton > button[kind="primary"]:hover {
   background: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+  color: #FFFFFF !important;
 }
 
 .stButton > button:active {
@@ -743,34 +800,34 @@ def cached_evaluation(pairs: pd.DataFrame, drugs: pd.DataFrame):
     return train_and_evaluate(pairs, drugs)
 
 
-# ─── Семантические бейджи ────────────────────────────────────────────────────
+# ─── Семантические бейджи (с нецветовыми маркерами) ──────────────────────────
 def severity_badge(level: str) -> str:
     lang = st.session_state.get("lang", "RU")
     if level == "Major":
-        label = "Major · Высокий" if lang == "RU" else "Major Risk"
+        label = "Major · Высокий риск" if lang == "RU" else "Major Risk"
         return f'<span class="ps-badge ps-badge-major">● {label}</span>'
     elif level == "Moderate":
-        label = "Moderate · Умеренный" if lang == "RU" else "Moderate"
-        return f'<span class="ps-badge ps-badge-mod">◐ {label}</span>'
+        label = "Moderate · Умеренный" if lang == "RU" else "Moderate Risk"
+        return f'<span class="ps-badge ps-badge-mod">▲ {label}</span>'
     elif level == "Minor":
-        label = "Minor · Малый" if lang == "RU" else "Minor"
+        label = "Minor · Низкий риск" if lang == "RU" else "Minor Risk"
         return f'<span class="ps-badge ps-badge-minor">○ {label}</span>'
     elif level == "Unknown":
-        label = "Unknown" if lang == "EN" else "Не классифицирован"
-        return f'<span class="ps-badge ps-badge-none">{label}</span>'
+        label = "Не классифицирован" if lang == "RU" else "Unknown"
+        return f'<span class="ps-badge ps-badge-none">? {label}</span>'
     else:
-        label = "Not in DDInter" if lang == "EN" else "Нет в DDInter"
-        return f'<span class="ps-badge ps-badge-none">{label}</span>'
+        label = "Нет в DDInter" if lang == "RU" else "Not in DDInter"
+        return f'<span class="ps-badge ps-badge-none">— {label}</span>'
 
 
-# ─── Верхняя панель (<TechText /> + <Galaxy /> + <SplashCursor /> + RU/EN) ───
+# ─── Верхняя панель (<TechText /> + <MolecularNetwork /> + RU/EN) ──────────
 def render_top_bar():
     c_brand, c_meta, c_lang = st.columns([3.2, 2.0, 1.0])
 
     current_page = st.session_state.get("nav_page", "workspace")
 
     with c_brand:
-        # Интерактивный заголовок <TechText /> из React Bits + постоянные слои <Galaxy /> и <SplashCursor /> в window.parent
+        # Интерактивный заголовок <TechText /> + постоянная фоновая молекулярная сеть в window.parent
         # Важно: не передаём page_key, чтобы HTML-строка оставалась неизменной и Streamlit не пересоздавал iframe при смене вкладок!
         tech_html = render_tech_text_and_effects_html(
             text="PHARMA SENTINEL",
@@ -926,10 +983,18 @@ def view_workspace(pairs: pd.DataFrame, drugs: pd.DataFrame, normalizer: DrugNor
         )
 
     with col_meta:
+        inn_count = len(selected_drugs)
+        pairs_count = len(selected_drugs) * (len(selected_drugs) - 1) // 2 if len(selected_drugs) >= 2 else 0
         st.markdown(
             f'<div class="ps-stat-box ps-anim-item ps-stagger-2" style="height:100%;">'
+            f'<div>'
             f'<div class="ps-stat-label">{t("audit_protocol")}</div>'
-            f'<div style="font-size:0.8rem; color:var(--ink-body); line-height:1.5; margin-top:0.35rem;">{t("audit_desc")}</div>'
+            f'<div style="font-size:0.82rem; color:var(--ink-body); line-height:1.5; margin-top:0.35rem;">{t("audit_desc")}</div>'
+            f'</div>'
+            f'<div style="margin-top:0.75rem; padding-top:0.6rem; border-top:1px solid var(--border); font-size:0.75rem; color:var(--ink-muted); font-family:var(--font-mono);">'
+            f'<div>{t("audit_inn_count")} <b>{inn_count}</b></div>'
+            f'<div style="margin-top:2px;">{t("audit_pairs_count")} <b>{pairs_count}</b></div>'
+            f'</div>'
             f'</div>',
             unsafe_allow_html=True
         )
@@ -996,18 +1061,32 @@ def view_workspace(pairs: pd.DataFrame, drugs: pd.DataFrame, normalizer: DrugNor
             unsafe_allow_html=True
         )
 
-    # ── Карточки взаимодействий ──
+    # ── Карточки взаимодействий (Клиническая иерархия) ──
     st.markdown(f'<h3 class="ps-anim-item ps-stagger-3" style="margin-top:1.5rem;">{t("registry_title")}</h3>', unsafe_allow_html=True)
 
     for idx, p in enumerate(report.pairs):
-        delay_ms = min(120 + idx * 55, 600)
+        delay_ms = min(100 + idx * 45, 500)
+        expl_data = generate_structured_explanation(p.drug_a, p.drug_b, p.level if p.in_ddinter else None)
         st.markdown(
             f'<div class="ps-card-finding" style="animation-delay:{delay_ms}ms;">'
             f'<div class="ps-finding-head">'
-            f'<div class="ps-finding-drugs">{p.display_a} <span style="color:var(--ink-muted); font-weight:400; margin:0 4px;">↔</span> {p.display_b}</div>'
+            f'<div class="ps-finding-drugs">{p.display_a} <span style="color:var(--secondary-sage); font-weight:400; margin:0 6px;">↔</span> {p.display_b}</div>'
             f'<div>{severity_badge(p.level)}</div>'
             f'</div>'
-            f'<div class="ps-finding-body"><b>{t("finding_label")}</b> {p.explanation}</div>'
+            f'<div class="ps-finding-grid">'
+            f'<div class="ps-finding-col">'
+            f'<div class="ps-section-label">{t("finding_mechanism")}</div>'
+            f'<div class="ps-section-val">{p.explanation}</div>'
+            f'</div>'
+            f'<div class="ps-finding-col">'
+            f'<div class="ps-section-label">{t("finding_clinical")}</div>'
+            f'<div class="ps-section-val">{expl_data["clinical_meaning"]}</div>'
+            f'</div>'
+            f'<div class="ps-finding-col">'
+            f'<div class="ps-section-label">{t("finding_management")}</div>'
+            f'<div class="ps-rec-box">{expl_data["recommendation"]}</div>'
+            f'</div>'
+            f'</div>'
             f'</div>',
             unsafe_allow_html=True
         )
@@ -1123,14 +1202,14 @@ def view_network(pairs: pd.DataFrame, drugs: pd.DataFrame, names: list[str]):
     else:
         try:
             from pyvis.network import Network
-            net = Network(height="480px", width="100%", bgcolor="#0D1628", font_color="#DCE7F7", directed=False, cdn_resources="in_line")
-            net.set_options('{"physics":{"solver":"forceAtlas2Based","forceAtlas2Based":{"gravitationalConstant":-60,"centralGravity":0.02,"springLength":130,"springConstant":0.08},"stabilization":{"iterations":80}},"nodes":{"font":{"size":14,"face":"Inter, sans-serif","color":"#DCE7F7"}},"edges":{"smooth":{"type":"continuous"},"width":2}}')
-            net.add_node(center, label=center.title(), color={"background": "#527DFF", "border": "#55D6E8"}, font={"color": "#FFFFFF"}, size=28)
-            cmap = {"Major": "#F87171", "Moderate": "#FBBF24", "Minor": "#55D6E8", "Unknown": "#93A4BF"}
+            net = Network(height="480px", width="100%", bgcolor="#F7F9F6", font_color="#26332D", directed=False, cdn_resources="in_line")
+            net.set_options('{"physics":{"solver":"forceAtlas2Based","forceAtlas2Based":{"gravitationalConstant":-60,"centralGravity":0.02,"springLength":130,"springConstant":0.08},"stabilization":{"iterations":80}},"nodes":{"font":{"size":14,"face":"Inter, sans-serif","color":"#26332D"}},"edges":{"smooth":{"type":"continuous"},"width":2}}')
+            net.add_node(center, label=center.title(), color={"background": "#315E50", "border": "#26332D"}, font={"color": "#FFFFFF"}, size=28)
+            cmap = {"Major": "#B83A38", "Moderate": "#B4681E", "Minor": "#315E50", "Unknown": "#65736A"}
             for _, r in near.iterrows():
                 nbr, lvl = r["Neighbor"], r["Level"]
-                net.add_node(nbr, label=nbr.title(), color={"background": "#15233A", "border": "#527DFF"}, font={"color": "#DCE7F7"}, size=16)
-                net.add_edge(center, nbr, color=cmap.get(lvl, "#93A4BF"), width=3 if lvl == "Major" else 2)
+                net.add_node(nbr, label=nbr.title(), color={"background": "#FFFFFF", "border": "#789483"}, font={"color": "#26332D"}, size=16)
+                net.add_edge(center, nbr, color=cmap.get(lvl, "#65736A"), width=3 if lvl == "Major" else 2)
             components.html(net.generate_html(), height=500, scrolling=False)
         except Exception as exc:
             st.error(f"Render error: {exc}")
@@ -1162,25 +1241,25 @@ def view_ml(pairs: pd.DataFrame, drugs: pd.DataFrame):
     st.caption(t("ml_sample", train=f"{result['train_examples']:,}".replace(",", " "), test=f"{result['test_examples']:,}".replace(",", " ")))
 
     fig, ax = plt.subplots(figsize=(8, 3.8))
-    fig.patch.set_facecolor("#101B30")
-    ax.set_facecolor("#0D1628")
-    ax.tick_params(colors="#93A4BF")
-    ax.xaxis.label.set_color("#DCE7F7")
-    ax.yaxis.label.set_color("#DCE7F7")
-    ax.title.set_color("#DCE7F7")
+    fig.patch.set_facecolor("#FFFFFF")
+    ax.set_facecolor("#F7F9F6")
+    ax.tick_params(colors="#65736A")
+    ax.xaxis.label.set_color("#26332D")
+    ax.yaxis.label.set_color("#26332D")
+    ax.title.set_color("#26332D")
     for sp in ax.spines.values():
-        sp.set_color("#1E2F4D")
+        sp.set_color("#DCE4DA")
 
-    palette = ["#527DFF", "#55D6E8", "#FBBF24", "#F87171", "#A8C7FF"]
+    palette = ["#315E50", "#789483", "#2E6171", "#B83A38", "#B4681E"]
     for (name, (fpr, tpr)), col in zip(result["roc"].items(), palette):
         auc = metrics.loc[metrics["Метод"] == name, "ROC-AUC"].iloc[0]
         ax.plot(fpr, tpr, label=f"{name} · AUC {auc:.3f}", color=col, linewidth=2)
-    ax.plot([0, 1], [0, 1], "--", color="#475569", linewidth=1)
+    ax.plot([0, 1], [0, 1], "--", color="#BCCEC0", linewidth=1)
     ax.set(xlabel="False Positive Rate (FPR)", ylabel="True Positive Rate (TPR)", title="ROC Curves — Held-out DDInter Test Set")
-    ax.grid(alpha=0.22, color="#1E2F4D")
-    leg = ax.legend(frameon=True, facecolor="#15233A", edgecolor="#2A3F66", fontsize=8.5, loc="lower right")
+    ax.grid(alpha=0.4, color="#DCE4DA")
+    leg = ax.legend(frameon=True, facecolor="#FFFFFF", edgecolor="#DCE4DA", fontsize=8.5, loc="lower right")
     for text_obj in leg.get_texts():
-        text_obj.set_color("#DCE7F7")
+        text_obj.set_color("#26332D")
     fig.tight_layout()
     st.pyplot(fig, use_container_width=True)
 
