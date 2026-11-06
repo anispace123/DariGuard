@@ -1030,7 +1030,7 @@ def build_presentation():
     p.space_before = Pt(1)
 
     # =========================================================================
-    # СЛАЙД 10: ЗАКЛЮЧЕНИЕ (THE FINALE)
+    # СЛАЙД 10: ЗАКЛЮЧЕНИЕ (THE FINALE · С QR-КОДОМ ОНЛАЙН-ПЛАТФОРМЫ)
     # =========================================================================
     s10 = prs.slides.add_slide(blank_layout)
     add_slide_fade_transition(s10)
@@ -1040,55 +1040,146 @@ def build_presentation():
     bg10.fill.fore_color.rgb = COLOR_BLACK
     bg10.line.fill.background()
 
-    quote_tb = s10.shapes.add_textbox(Inches(1.2), Inches(1.8), Inches(10.933), Inches(3.2)).text_frame
+    # Логотип КРМУ в левом верхнем углу
+    if os.path.exists(logo_path):
+        s10.shapes.add_picture(logo_path, Inches(1.0), Inches(0.45), width=Inches(0.85), height=Inches(0.85))
+
+    uni_fin_tb = s10.shapes.add_textbox(Inches(2.0), Inches(0.5), Inches(10.3), Inches(0.75)).text_frame
+    uni_fin_tb.word_wrap = True
+    p = uni_fin_tb.paragraphs[0]
+    p.text = "КАЗАХСТАНСКО-РОССИЙСКИЙ МЕДИЦИНСКИЙ УНИВЕРСИТЕТ (КРМУ)  ·  АЛМАТЫ, 2026"
+    p.font.name = FONT_MONO
+    p.font.size = Pt(10)
+    p.font.bold = True
+    p.font.color.rgb = COLOR_MUTED
+
+    # Центральная цитата манифеста
+    quote_tb = s10.shapes.add_textbox(Inches(1.0), Inches(1.4), Inches(11.3), Inches(2.1)).text_frame
     quote_tb.word_wrap = True
 
     p = quote_tb.paragraphs[0]
     p.text = "«БУДУЩЕЕ МЕДИЦИНЫ ПРИНАДЛЕЖИТ НЕ ТЕМ, КТО ИСПРАВЛЯЕТ ОШИБКИ,"
     p.font.name = FONT_HERO
-    p.font.size = Pt(32)
+    p.font.size = Pt(28)
     p.font.bold = True
     p.font.color.rgb = COLOR_WHITE
 
     p = quote_tb.add_paragraph()
     p.text = "А ТЕМ, КТО ДЕЛАЕТ ИХ НЕВОЗМОЖНЫМИ.»"
     p.font.name = FONT_HERO
-    p.font.size = Pt(38)
+    p.font.size = Pt(34)
     p.font.bold = True
     p.font.color.rgb = COLOR_EMERALD
-    p.space_before = Pt(6)
+    p.space_before = Pt(4)
 
-    fin_tb = s10.shapes.add_textbox(Inches(1.2), Inches(5.2), Inches(10.933), Inches(1.6)).text_frame
+    # Левая карточка: Авторы, руководитель и благодарность
+    card_fin_w = Inches(7.8)
+    card_fin_h = Inches(3.35)
+    y_fin_cards = Inches(3.65)
+    create_card(s10, Inches(1.0), y_fin_cards, card_fin_w, card_fin_h, border_color=COLOR_CYAN, border_width=1.5)
+
+    fin_tb = s10.shapes.add_textbox(Inches(1.2), y_fin_cards + Inches(0.18), card_fin_w - Inches(0.4), card_fin_h - Inches(0.35)).text_frame
     fin_tb.word_wrap = True
 
     p = fin_tb.paragraphs[0]
-    p.text = "PHARMA SENTINEL  ·  КАЗАХСТАНСКО-РОССИЙСКИЙ МЕДИЦИНСКИЙ УНИВЕРСИТЕТ"
+    p.text = "PHARMA SENTINEL  ·  THE CLINICAL INTELLIGENCE PLATFORM"
     p.font.name = FONT_MONO
-    p.font.size = Pt(12)
+    p.font.size = Pt(10.5)
     p.font.bold = True
     p.font.color.rgb = COLOR_CYAN
 
     p = fin_tb.add_paragraph()
-    p.text = "Накипов Адилжан  ·  Ернур Аханаев   |   Группа 107 Б"
+    p.text = "Орындағандар / Авторы проекта:"
+    p.font.name = FONT_MONO
+    p.font.size = Pt(9.5)
+    p.font.bold = True
+    p.font.color.rgb = COLOR_MUTED
+    p.space_before = Pt(8)
+
+    p = fin_tb.add_paragraph()
+    p.text = "Накипов Адилжан  ·  Ернур Аханаев   (Группа 107 Б)"
     p.font.name = FONT_HERO
-    p.font.size = Pt(16)
+    p.font.size = Pt(15)
     p.font.bold = True
     p.font.color.rgb = COLOR_WHITE
-    p.space_before = Pt(3)
+    p.space_before = Pt(2)
 
     p = fin_tb.add_paragraph()
-    p.text = "Ғылыми жетекші: «Қоғамдық пәндер» каф. аға оқытушысы, пед. ғ. магистрі Баймаханова А. Б."
+    p.text = "Ғылыми жетекші / Научный руководитель:"
+    p.font.name = FONT_MONO
+    p.font.size = Pt(9.5)
+    p.font.bold = True
+    p.font.color.rgb = COLOR_MUTED
+    p.space_before = Pt(8)
+
+    p = fin_tb.add_paragraph()
+    p.text = "Баймаханова Айгуль Бекмолдаевна"
+    p.font.name = FONT_HERO
+    p.font.size = Pt(14)
+    p.font.bold = True
+    p.font.color.rgb = COLOR_EMERALD
+    p.space_before = Pt(2)
+
+    p = fin_tb.add_paragraph()
+    p.text = "«Қоғамдық пәндер» кафедрасының аға оқытушысы, педагогика ғылымдарының магистрі"
+    p.font.name = FONT_BODY
+    p.font.size = Pt(10.5)
+    p.font.color.rgb = COLOR_MUTED
+    p.space_before = Pt(1)
+
+    p = fin_tb.add_paragraph()
+    p.text = "Благодарим за внимание! Мы готовы ответить на вопросы комиссии."
     p.font.name = FONT_BODY
     p.font.size = Pt(12)
-    p.font.color.rgb = COLOR_EMERALD
-    p.space_before = Pt(3)
+    p.font.bold = True
+    p.font.color.rgb = COLOR_WHITE
+    p.space_before = Pt(10)
 
-    p = fin_tb.add_paragraph()
-    p.text = "Благодарим за внимание. Мы готовы ответить на вопросы комиссии."
+    # Правая карточка: QR-КОД ОНЛАЙН-ПЛАТФОРМЫ И РЕПОЗИТОРИЯ
+    card_qr_w = Inches(3.2)
+    x_qr_card = Inches(9.1)
+    create_card(s10, x_qr_card, y_fin_cards, card_qr_w, card_fin_h, border_color=COLOR_EMERALD, border_width=1.5)
+
+    qr_top_tb = s10.shapes.add_textbox(x_qr_card + Inches(0.1), y_fin_cards + Inches(0.15), card_qr_w - Inches(0.2), Inches(0.55)).text_frame
+    qr_top_tb.word_wrap = True
+    p = qr_top_tb.paragraphs[0]
+    p.text = "СКАНДАҢЫЗ / SCAN ME"
+    p.font.name = FONT_MONO
+    p.font.size = Pt(9.5)
+    p.font.bold = True
+    p.font.color.rgb = COLOR_EMERALD
+    p.alignment = PP_ALIGN.CENTER
+
+    p = qr_top_tb.add_paragraph()
+    p.text = "Онлайн-платформа & Репозиторий"
     p.font.name = FONT_BODY
-    p.font.size = Pt(13)
+    p.font.size = Pt(9)
     p.font.color.rgb = COLOR_MUTED
-    p.space_before = Pt(5)
+    p.alignment = PP_ALIGN.CENTER
+    p.space_before = Pt(1)
+
+    # Изображение QR-кода
+    qr_path = "assets/presentation/qr_code_platform.png"
+    if os.path.exists(qr_path):
+        s10.shapes.add_picture(qr_path, Inches(9.8), y_fin_cards + Inches(0.75), width=Inches(1.8), height=Inches(1.8))
+
+    qr_bot_tb = s10.shapes.add_textbox(x_qr_card + Inches(0.1), y_fin_cards + Inches(2.6), card_qr_w - Inches(0.2), Inches(0.65)).text_frame
+    qr_bot_tb.word_wrap = True
+    p = qr_bot_tb.paragraphs[0]
+    p.text = "anispace123/pharma_sentinel"
+    p.font.name = FONT_MONO
+    p.font.size = Pt(8)
+    p.font.bold = True
+    p.font.color.rgb = COLOR_CYAN
+    p.alignment = PP_ALIGN.CENTER
+
+    p = qr_bot_tb.add_paragraph()
+    p.text = "github.com  ·  Streamlit Demo"
+    p.font.name = FONT_BODY
+    p.font.size = Pt(8)
+    p.font.color.rgb = COLOR_MUTED
+    p.alignment = PP_ALIGN.CENTER
+    p.space_before = Pt(1)
 
     output_path = "Pharma_Sentinel_Steve_Jobs_Keynote.pptx"
     prs.save(output_path)
