@@ -41,9 +41,24 @@ class TestAppIntegration(unittest.TestCase):
         report = self.checker.check_list(["Нурофен", "Ксарелто", "Парацетамол", "Аспирин Кардио"])
         self.assertIsInstance(report.resolved_drugs, list)
         self.assertGreaterEqual(len(report.pairs), 6)  # 4 вещества -> 6 пар
+        self.assertIn(report.overall_risk_code, ("HIGH", "MODERATE", "LOW", "UNDETERMINED", "NO_DATA"))
+        self.assertTrue(hasattr(report, "duplicates_structured"))
+        for p in report.pairs:
+            self.assertTrue(bool(p.explanation_code))
         df = report.to_dataframe()
         self.assertEqual(len(df), len(report.pairs))
         self.assertIn("Уровень риска", df.columns)
+
+    def test_trilingual_explanations(self):
+        """Проверка генерации объяснений на всех трёх языках (kk, ru, en)."""
+        for lang in ("kk", "ru", "en"):
+            exp = generate_structured_explanation("warfarin", "aspirin", "Major", lang=lang)
+            self.assertIn("summary", exp)
+            self.assertIn("clinical_meaning", exp)
+            self.assertIn("recommendation", exp)
+            self.assertTrue(bool(exp["summary"].strip()))
+            self.assertTrue(bool(exp["clinical_meaning"].strip()))
+            self.assertTrue(bool(exp["recommendation"].strip()))
 
     def test_supplement_linkage_with_pipeline(self):
         """Проверка связи препаратов списка с базой БАДов."""

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="utf-8">
+    <title>Pharma Sentinel · Clinical Protocol</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 15mm 15mm 15mm 15mm;
+        }
+        @media print {
+            body {
+                background: #FFFFFF !important;
+                color: #000000 !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .section-card {
+                box-shadow: none !important;
+                border: 1px solid #CCCCCC !important;
+                page-break-inside: avoid;
+            }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: #F3F6F2;
+            color: #26332D;
+            line-height: 1.5;
+            margin: 0;
+            padding: 30px;
+        }
+        .report-wrapper {
+            max-width: 980px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            padding: 36px 42px;
+            border-radius: 4px;
+            border: 1px solid #DCE4DA;
+            box-shadow: 0 2px 12px rgba(49, 94, 80, 0.05);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #315E50;
+            padding-bottom: 18px;
+            margin-bottom: 24px;
+        }
+        .brand-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #315E50;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        .brand-sub {
+            font-size: 11px;
+            color: #65736A;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 3px;
+        }
+        .meta-block {
+            text-align: right;
+            font-size: 12px;
+            color: #65736A;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .stat-cell {
+            background: #F7F9F6;
+            border: 1px solid #DCE4DA;
+            padding: 12px;
+            border-radius: 3px;
+            text-align: center;
+        }
+        .stat-cell-title {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #65736A;
+            letter-spacing: 0.04em;
+        }
+        .stat-cell-val {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+        .section-card {
+            background: #FFFFFF;
+            border: 1px solid #DCE4DA;
+            padding: 18px 20px;
+            border-radius: 3px;
+            margin-bottom: 20px;
+        }
+        .alert-card {
+            background: #FDF4F4;
+            border-color: #E8B4B3;
+        }
+        .safe-card {
+            background: #EEF5F1;
+            border-color: #BCCEC0;
+        }
+        h3 {
+            font-size: 15px;
+            color: #315E50;
+            margin-top: 0;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+            margin-top: 8px;
+        }
+        .report-table th {
+            background: #EAF0E9;
+            color: #26332D;
+            text-align: left;
+            padding: 8px 10px;
+            font-weight: 600;
+            border-bottom: 1px solid #DCE4DA;
+        }
+        .report-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #EAF0E9;
+            vertical-align: top;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 7px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+        .badge-major { background: #FDF4F4; color: #B83A38; border: 1px solid #E8B4B3; }
+        .badge-mod { background: #FDF8F0; color: #B4681E; border: 1px solid #EBD5B3; }
+        .badge-minor { background: #EEF5F1; color: #315E50; border: 1px solid #BCCEC0; }
+        .badge-none { background: #EAF0E9; color: #65736A; border: 1px solid #DCE4DA; }
+        .disclaimer-box {
+            background: #F7F9F6;
+            border: 1px solid #DCE4DA;
+            border-left: 4px solid #789483;
+            padding: 14px 16px;
+            font-size: 11.5px;
+            color: #65736A;
+            line-height: 1.5;
+            margin-top: 24px;
+        }
+        .print-btn {
+            background: #315E50;
+            color: #FFFFFF;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 3px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-wrapper">
+        <div class="no-print" style="text-align:right;">
+            <button class="print-btn" onclick="window.print()">Распечатать протокол (Print)</button>
+        </div>
+        <div class="header">
+            <div>
+                <div class="brand-title">Pharma Sentinel · Clinical Protocol</div>
+                <div class="brand-sub">Clinical Pharmacoinformatics & Patient Safety System</div>
+            </div>
+            <div class="meta-block">
+                <div>ID: REF-CLIN-2026</div>
+                <div>2026-10-29 02:32:22 UTC</div>
+                <div>Engine: DDInter v2024.11 / PubChem 3D</div>
+            </div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <h2 style="font-size:18px; margin:0 0 6px 0; color:#26332D;">ПОЛИПРАГМАЗИЯ ЖӘНЕ ДӘРІЛІК ӨЗАРА ӘРЕКЕТТЕСУДІ КЛИНИКАЛЫҚ АУДИТ ХАТТАМАСЫ</h2>
+            <div style="font-size:12px; color:#65736A;">Автоматизированный скрининг риска неблагоприятных межлекарственных реакций, фармакодинамических конфликтов и сопутствующих фармаконутриентных взаимодействий.</div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-cell">
+                <div class="stat-cell-title">Общий риск</div>
+                <div class="stat-cell-val" style="color:#B83A38;">ЖОҒАРЫ ҚАУІП</div>
+            </div>
+            <div class="stat-cell">
+                <div class="stat-cell-title">Major (Высокий)</div>
+                <div class="stat-cell-val" style="color:#B83A38;">3</div>
+            </div>
+            <div class="stat-cell">
+                <div class="stat-cell-title">Moderate (Умеренный)</div>
+                <div class="stat-cell-val" style="color:#B4681E;">0</div>
+            </div>
+            <div class="stat-cell">
+                <div class="stat-cell-title">Minor (Низкий)</div>
+                <div class="stat-cell-val" style="color:#315E50;">0</div>
+            </div>
+            <div class="stat-cell">
+                <div class="stat-cell-title">Вне базы DDInter</div>
+                <div class="stat-cell-val" style="color:#65736A;">0</div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h3>Фармакотерапия режимі (ХПА) (3)</h3>
+            <table class="report-table">
+                <thead><tr><th>#</th><th>МНН / Препарат</th><th>Форма приема</th><th>Статус верификации</th></tr></thead>
+                <tbody><tr><td>1</td><td><b>Варфарин [warfarin]</b></td><td>Оральный / Парентеральный</td><td>Верифицирован в формуляре</td></tr><tr><td>2</td><td><b>Амиодарон [amiodarone]</b></td><td>Оральный / Парентеральный</td><td>Верифицирован в формуляре</td></tr><tr><td>3</td><td><b>Флуконазол [fluconazole]</b></td><td>Оральный / Парентеральный</td><td>Верифицирован в формуляре</td></tr></tbody>
+            </table>
+        </div>
+
+        
+        <div class="section-card safe-card">
+            <h3 style="color:#264B40; margin-top:0;">Терапиялық қайталануды талдау</h3>
+            <p style="font-size:13px; color:#264B40; margin-bottom:0;">Терапевтического дублирования одинаковых молекулярных МНН в анализируемом наборе не выявлено.</p>
+        </div>
+        
+
+        <div class="section-card">
+            <h3>Дәрілік өзара әрекеттесулер (DDInter / Тізілім)</h3>
+            
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>Взаимодействующая пара</th>
+                    <th>Уровень</th>
+                    <th>Механизм (Фармакодинамика/Фармакокинетика)</th>
+                    <th>Клинический исход</th>
+                    <th>Рекомендация по ведению</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            <tr>
+                <td style="white-space:nowrap;"><b>Amiodarone (amiodarone)</b> ↔ <b>Fluconazole (fluconazole)</b></td>
+                <td><span class="badge badge-major">Major</span></td>
+                <td>Клиникалық мәні жоғары өзара әрекеттесу қаупі. Дәрігердің бағалауын қажет етеді.</td>
+                <td>Ғылыми әдебиеттерде ауыр жағымсыз реакциялар немесе терапияның тиімсіздігін тудыруы мүмкін клиникалық маңызды өзара әрекеттесу тіркелген.</td>
+                <td><b>Дәрігердің жоғары бақылауы, қауіп/пайда арақатынасын бағалауы және балама дәрілерді қарастыруы талап етіледі.</b></td>
+            </tr>
+            
+            <tr>
+                <td style="white-space:nowrap;"><b>Amiodarone (amiodarone)</b> ↔ <b>Warfarin (warfarin)</b></td>
+                <td><span class="badge badge-major">Major</span></td>
+                <td>Клиникалық мәні жоғары өзара әрекеттесу қаупі. Дәрігердің бағалауын қажет етеді.</td>
+                <td>Ғылыми әдебиеттерде ауыр жағымсыз реакциялар немесе терапияның тиімсіздігін тудыруы мүмкін клиникалық маңызды өзара әрекеттесу тіркелген.</td>
+                <td><b>Дәрігердің жоғары бақылауы, қауіп/пайда арақатынасын бағалауы және балама дәрілерді қарастыруы талап етіледі.</b></td>
+            </tr>
+            
+            <tr>
+                <td style="white-space:nowrap;"><b>Fluconazole (fluconazole)</b> ↔ <b>Warfarin (warfarin)</b></td>
+                <td><span class="badge badge-major">Major</span></td>
+                <td>Клиникалық мәні жоғары өзара әрекеттесу қаупі. Дәрігердің бағалауын қажет етеді.</td>
+                <td>Ғылыми әдебиеттерде ауыр жағымсыз реакциялар немесе терапияның тиімсіздігін тудыруы мүмкін клиникалық маңызды өзара әрекеттесу тіркелген.</td>
+                <td><b>Дәрігердің жоғары бақылауы, қауіп/пайда арақатынасын бағалауы және балама дәрілерді қарастыруы талап етіледі.</b></td>
+            </tr>
+            
+            </tbody>
+        </table>
+        
+        </div>
+
+        
+        <div class="section-card">
+            <h3>БАД / фитопрепараттармен фармаконутриенттік әрекеттесулер</h3>
+            <table class="report-table">
+                <thead><tr><th>Комбинация</th><th>Тяжесть</th><th>Доказательность</th><th>Механизм</th><th>Клиническая тактика</th></tr></thead>
+                <tbody>
+            <tr>
+                <td><b>Зверобой продырявленный (Hypericum perforatum)</b> + <b>Варфарин</b></td>
+                <td><span class="badge badge-mod">Major</span></td>
+                <td>Level A</td>
+                <td>Гиперфорин в составе зверобоя является мощным агонистом прегнанового X-рецептора (PXR) и индуцирует изоферменты цитохрома P450 (CYP2C9, CYP3A4) и гликопротеин P (P-gp).</td>
+                <td>Совместное применение противопоказано. При отмене зверобоя требуется экстренный контроль МНО во избежание кровотечений.</td>
+            </tr>
+            
+            <tr>
+                <td><b>Витамин K (высокие дозы / фитоменадион) (Phytomenadione / Menaquinone)</b> + <b>Варфарин</b></td>
+                <td><span class="badge badge-mod">Major</span></td>
+                <td>Level A</td>
+                <td>Витамин K напрямую преодолевает конкурентное ингибирование эпоксидредуктазы варфарином, восстанавливая синтез факторов II, VII, IX, X.</td>
+                <td>Поддерживать стабильное постоянное суточное потребление витамина K без резких колебаний и избегать концентрированных БАДов без согласования с врачом.</td>
+            </tr>
+            
+            <tr>
+                <td><b>Гинкго Билоба (стандартизированный экстракт EGb 761) (Ginkgo biloba)</b> + <b>Варфарин</b></td>
+                <td><span class="badge badge-mod">Major</span></td>
+                <td>Level A</td>
+                <td>Терпеновые лактоны (гинкголид B) мощно ингибируют фактор активации тромбоцитов (PAF), нарушая первичный тромбоцитарный гемостаз на фоне блокады плазменных факторов свертывания II, VII, IX, X варфарином.</td>
+                <td>Категорически избегать самолечения препаратами Гинкго Билоба на фоне терапии варфарином. При появлении петехий, носовых кровотечений или головной боли — немедленная отмена БАД и контроль МНО.</td>
+            </tr>
+            
+            <tr>
+                <td><b>Омега-3 ПНЖК (Рыбий жир, ЭПК/ДГК > 2 г/сут) (Omega-3 Polyunsaturated Fatty Acids (EPA/DHA))</b> + <b>Варфарин</b></td>
+                <td><span class="badge badge-mod">Moderate</span></td>
+                <td>Level B</td>
+                <td>Эйкозапентаеновая (ЭПК) и докозагексаеновая (ДГК) кислоты конкурируют с арахидоновой кислотой за ЦОГ-1 тромбоцитов, снижая синтез проагреганта TXA2 и умеренно подавляя витамин-K-зависимые факторы свертывания.</td>
+                <td>Не начинать прием высокодозных добавок Омега-3 и не менять их дозировку без ведома врача; при старте БАД контролировать МНО через 5–7 дней.</td>
+            </tr>
+            
+            <tr>
+                <td><b>Куркумин / Экстракт куркумы с пиперином (Curcuma longa / Piper nigrum)</b> + <b>Варфарин</b></td>
+                <td><span class="badge badge-mod">Major</span></td>
+                <td>Level B</td>
+                <td>Куркумин и пиперин подавляют активность печеночного изофермента CYP2C9 и эффлюксного транспортера P-gp, замедляя метаболический клиренс S-варфарина, а также ингибируют агрегацию тромбоцитов, индуцированную АДФ и коллагеном.</td>
+                <td>Исключить прием концентрированных БАДов куркумина (особенно усиленных черным перцем/пиперином) у пациентов, получающих антикоагулянты.</td>
+            </tr>
+            
+            <tr>
+                <td><b>Коэнзим Q10 (Убихинон) (Ubiquinone / Coenzyme Q10)</b> + <b>Варфарин</b></td>
+                <td><span class="badge badge-mod">Moderate</span></td>
+                <td>Level B</td>
+                <td>Убихинон имеет боковую изопреноидную цепь, структурно близкую к витамину K2 (менахинону), и способен частично реактивировать карбоксилирование факторов свертывания II, VII, IX, X в гепатоцитах.</td>
+                <td>Не начинать и не прекращать прием Коэнзима Q10 самостоятельно; при необходимости назначения — еженедельный контроль МНО в течение первого месяца.</td>
+            </tr>
+            
+            <tr>
+                <td><b>Женьшень обыкновенный (Гинзенозиды) (Panax ginseng)</b> + <b>Варфарин</b></td>
+                <td><span class="badge badge-mod">Moderate</span></td>
+                <td>Level A</td>
+                <td>Гинзенозиды ускоряют метаболическую биотрансформацию варфарина в печени и снижают его равновесную концентрацию в плазме крови.</td>
+                <td>Не принимать тонизирующие БАДы с женьшенем на фоне терапии варфарином без согласования с кардиологом.</td>
+            </tr>
+            </tbody>
+            </table>
+        </div>
+        
+
+        <div class="section-card">
+            <h3>Клиникалық-зертханалық мониторинг бойынша ұсыныстар</h3>
+            <ul style="font-size:12.5px; line-height:1.6; margin:0; padding-left:18px;">
+                <li><b>Контроль системы гемостаза:</b> При одновременном назначении антикоагулянтов и антиагрегантов / НПВП обязателен мониторинг МНО (INR) каждые 48-72 часа до стабилизации терапевтического диапазона.</li>
+                <li><b>Почечная гемодинамика и электролиты:</b> При комбинации ингибиторов АПФ/БРА, диуретиков и НПВП проводить биохимический анализ сыворотки крови (креатинин, СКФ/eGFR, калий) через 7-14 дней после начала сочетанного курса.</li>
+                <li><b>ЭКГ-мониторинг:</b> При сочетании антиаритмических препаратов и ингибиторов метаболизма контролировать длительность интервала QTc.</li>
+                <li><b>Обучение пациента:</b> Проинформировать пациента о ранних клинических признаках микрокровотечений (петехии, носовые кровотечения, дегтеобразный стул) и симптомах задержки жидкости.</li>
+            </ul>
+        </div>
+
+        <div class="disclaimer-box">
+            <b>Хаттаманың құқықтық және дәлелдік мәртебесі:</b> Настоящий протокол сгенерирован алгоритмическим комплексом Pharma Sentinel в качестве инструмента поддержки принятия врачебных решений (Clinical Decision Support). Протокол не заменяет врачебное суждение и требует сопоставления с индивидуальным анамнезом, функциями печени (Child-Pugh) и почек (CKD-EPI) пациента. Отсутствие данных в справочных базах не гарантирует абсолютной безопасности фармакотерапии.
+        </div>
+    </div>
+</body>
+</html>

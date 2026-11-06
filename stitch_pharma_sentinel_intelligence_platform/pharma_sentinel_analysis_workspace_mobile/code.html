@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "on-tertiary": "#ffffff", "border-hairline": "#E2E4E1", "surface-warm": "#FBFBFA", "surface-tint": "#455f87", "primary": "#022448", "on-secondary-fixed-variant": "#00504c", "surface-variant": "#e1e2e8", "severity-moderate": "#D97706", "secondary-container": "#96efe8", "on-error-container": "#93000a", "outline": "#74777f", "severity-severe": "#C93B2B", "surface-dim": "#d8dadf", "secondary-fixed": "#99f2eb", "on-error": "#ffffff", "on-secondary-container": "#006f6a", "primary-container": "#1e3a5f", "surface": "#f8f9ff", "outline-variant": "#c4c6cf", "surface-subtle": "#F7F7F5", "error-container": "#ffdad6", "on-secondary": "#ffffff", "surface-container": "#FFFFFF", "primary-fixed": "#d5e3ff", "surface-container-low": "#f2f3f9", "on-primary-container": "#8aa4cf", "inverse-on-surface": "#eff0f6", "on-primary-fixed-variant": "#2d486d", "secondary": "#006a65", "surface-bright": "#f8f9ff", "on-tertiary-fixed": "#001b3d", "tertiary-fixed": "#d6e3ff", "on-surface": "#191c20", "severity-mild": "#0D7A75", "surface-container-highest": "#e1e2e8", "primary-fixed-dim": "#adc8f5", "on-tertiary-fixed-variant": "#254778", "surface-container-lowest": "#ffffff", "tertiary": "#00234c", "on-background": "#191c20", "tertiary-fixed-dim": "#a9c7ff", "text-muted": "#5A6578", "secondary-fixed-dim": "#7dd5cf", "on-secondary-fixed": "#00201e", "inverse-surface": "#2e3135", "surface-container-high": "#e6e8ee", "tertiary-container": "#14396a", "background": "#f8f9ff", "on-surface-variant": "#43474e", "on-primary": "#ffffff", "on-primary-fixed": "#001c3b", "inverse-primary": "#adc8f5", "error": "#ba1a1a", "on-tertiary-container": "#85a4db" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "margin-mobile": "1rem", "gutter-mobile": "1rem", "space-xl": "2.5rem", "space-lg": "1.5rem", "margin": "3rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-md": "1rem", "gutter": "1.5rem" }, "fontFamily": { "body-lg": ["Newsreader"], "headline-lg-mobile": ["Newsreader"], "label-sm": ["Work Sans"], "display-lg-mobile": ["Newsreader"], "display-lg": ["Newsreader"], "label-lg": ["Work Sans"], "headline-md": ["Newsreader"], "label-md": ["Work Sans"], "headline-sm": ["Work Sans"], "headline-lg": ["Newsreader"], "body-md": ["Work Sans"], "body-sm": ["Work Sans"] }, "fontSize": { "body-lg": ["1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" }], "headline-lg-mobile": ["1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.01em", "fontWeight": "400" }], "label-sm": ["0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.06em", "fontWeight": "600" }], "display-lg-mobile": ["2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.01em", "fontWeight": "400" }], "display-lg": ["3.5rem", { "lineHeight": "4rem", "letterSpacing": "-0.02em", "fontWeight": "400" }], "label-lg": ["0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "0.01em", "fontWeight": "600" }], "headline-md": ["1.75rem", { "lineHeight": "2.25rem", "fontWeight": "500" }], "label-md": ["0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.04em", "fontWeight": "500" }], "headline-sm": ["1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.01em", "fontWeight": "600" }], "headline-lg": ["2.5rem", { "lineHeight": "3rem", "letterSpacing": "-0.015em", "fontWeight": "400" }], "body-md": ["0.9375rem", { "lineHeight": "1.5rem", "fontWeight": "400" }], "body-sm": ["0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "400" }] } } } };</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface-warm font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface-warm/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-gutter-mobile flex items-center justify-between gap-space-xs"><div class="flex items-center gap-space-sm"><button aria-label="Navigation Menu" class="w-11 h-11 flex items-center justify-center text-on-surface hover:text-primary transition-colors"><span class="material-symbols-outlined text-[24px]">menu</span></button><div class="flex flex-col"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm tracking-tight text-primary font-semibold">PHARMA SENTINEL</span><span class="px-1.5 py-0.5 text-[10px] leading-none uppercase font-semibold tracking-wider bg-surface-subtle text-text-muted rounded-DEFAULT">v3.4-Clinical</span></div><span class="font-label-sm text-label-sm text-text-muted tracking-wide">Interaction Matrix</span></div></div><div class="flex items-center gap-space-xs"><a class="h-9 px-3 flex items-center gap-1.5 bg-primary-container text-white rounded-lg hover:bg-primary transition-colors" data-path="interaction-matrix" href="#"><span class="material-symbols-outlined text-[18px]">biotech</span><span class="font-label-md text-label-md uppercase tracking-wider font-semibold">Analyze</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-20 bg-surface-warm"><div class="flex flex-col w-full">
+<!-- Active Protocol & Meta Bar -->
+<div class="bg-surface-subtle px-margin-mobile py-space-sm shadow-sm">
+<div class="flex items-center justify-between gap-space-sm">
+<div class="min-w-0">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-severity-severe animate-pulse"></span>
+<p class="font-label-sm text-label-sm text-text-muted uppercase tracking-wider truncate">Protocol PS-8924</p>
+</div>
+<p class="font-body-sm text-body-sm text-primary font-medium truncate mt-0.5">Cardiovascular &amp; Anticoagulant Triad</p>
+</div>
+<div class="flex items-center gap-2 shrink-0">
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-DEFAULT bg-primary-container text-on-primary font-semibold">3 Active</span>
+<button class="font-label-sm text-label-sm px-2 py-1 rounded-DEFAULT bg-surface-container text-text-muted hover:text-severity-severe hover:bg-error-container transition-colors" id="clear-all-btn">
+          Clear
+        </button>
+</div>
+</div>
+</div>
+<div class="p-margin-mobile flex flex-col gap-space-md">
+<!-- Search and Drug Selectors -->
+<div class="bg-surface-container rounded-xl p-space-md shadow-sm flex flex-col gap-space-sm">
+<div class="relative w-full">
+<label class="sr-only" for="drug-search-input">Search by generic name, brand, or RxNorm ID</label>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-[20px]">search</span>
+<input class="w-full h-12 pl-10 pr-10 bg-surface-subtle text-on-surface font-body-md text-body-md rounded-lg focus:outline-none focus:bg-surface-warm placeholder:text-text-muted/70 transition-all" id="drug-search-input" placeholder="Search generic, brand, or RxNorm ID..." type="search"/>
+<button aria-label="Scan barcode or monograph" class="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-DEFAULT flex items-center justify-center text-text-muted hover:text-primary" id="camera-scan-btn">
+<span class="material-symbols-outlined text-[19px]">qr_code_scanner</span>
+</button>
+</div>
+<!-- Active Compounds Matrix List -->
+<div class="flex flex-col gap-1.5" id="active-compounds-container">
+<!-- Compound 1 -->
+<div class="group flex items-center justify-between p-2.5 rounded-lg bg-surface-subtle hover:bg-surface-variant transition-colors" data-compound="warfarin">
+<div class="flex flex-col min-w-0 pr-2">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="font-headline-sm text-body-md font-semibold text-primary">Warfarin</span>
+<span class="font-label-sm text-label-sm text-text-muted">5mg oral</span>
+<span class="px-1.5 py-0.2 bg-surface-warm text-severity-severe font-label-sm text-[10px] rounded">CYP2C9 Substrate</span>
+</div>
+<span class="font-body-sm text-body-sm text-text-muted truncate">Anticoagulant • Vitamin K Antagonist</span>
+</div>
+<button aria-label="Remove Warfarin" class="remove-chip-btn w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-severity-severe hover:bg-surface-container shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Compound 2 -->
+<div class="group flex items-center justify-between p-2.5 rounded-lg bg-surface-subtle hover:bg-surface-variant transition-colors" data-compound="amiodarone">
+<div class="flex flex-col min-w-0 pr-2">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="font-headline-sm text-body-md font-semibold text-primary">Amiodarone</span>
+<span class="font-label-sm text-label-sm text-text-muted">200mg oral</span>
+<span class="px-1.5 py-0.2 bg-surface-warm text-severity-moderate font-label-sm text-[10px] rounded">CYP2C9/3A4 Inhibitor</span>
+</div>
+<span class="font-body-sm text-body-sm text-text-muted truncate">Class III Antiarrhythmic • Multi-channel</span>
+</div>
+<button aria-label="Remove Amiodarone" class="remove-chip-btn w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-severity-severe hover:bg-surface-container shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Compound 3 -->
+<div class="group flex items-center justify-between p-2.5 rounded-lg bg-surface-subtle hover:bg-surface-variant transition-colors" data-compound="fluconazole">
+<div class="flex flex-col min-w-0 pr-2">
+<div class="flex items-center gap-1.5 flex-wrap">
+<span class="font-headline-sm text-body-md font-semibold text-primary">Fluconazole</span>
+<span class="font-label-sm text-label-sm text-text-muted">150mg oral</span>
+<span class="px-1.5 py-0.2 bg-surface-warm text-severity-severe font-label-sm text-[10px] rounded">Potent CYP2C9 Inh.</span>
+</div>
+<span class="font-body-sm text-body-sm text-text-muted truncate">Systemic Azole Antifungal</span>
+</div>
+<button aria-label="Remove Fluconazole" class="remove-chip-btn w-8 h-8 rounded-full flex items-center justify-center text-text-muted hover:text-severity-severe hover:bg-surface-container shrink-0 transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+<button class="w-full h-11 flex items-center justify-center gap-2 bg-surface-subtle hover:bg-surface-variant text-primary font-label-lg text-label-lg rounded-lg transition-colors" id="add-agent-btn">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+        Add Another Agent
+      </button>
+</div>
+<!-- Pharmacokinetic Alert Banner (Triad Severity) -->
+<div class="relative overflow-hidden rounded-xl bg-error-container text-on-error-container p-space-md shadow-sm">
+<div class="flex items-start gap-space-sm">
+<div class="w-9 h-9 rounded-lg bg-severity-severe text-on-error flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-2 flex-wrap">
+<span class="font-label-sm text-label-sm uppercase font-bold tracking-wider text-severity-severe">Tier 1 Severe Alert</span>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-severity-severe text-on-error uppercase">Action Required</span>
+</div>
+<p class="font-headline-sm text-body-md font-semibold mt-0.5 leading-snug">
+            Critical Pharmacokinetic Interaction Detected
+          </p>
+<p class="font-body-sm text-body-sm mt-1 text-on-error-container/90">
+            Concurrent dual CYP2C9 metabolic shutdown by Fluconazole and Amiodarone arrests S-warfarin clearance. Predicted INR elevation &gt;4.5x with extreme systemic bleeding and spontaneous hemorrhage risk.
+          </p>
+<div class="mt-3 pt-3 flex items-center justify-between text-on-error-container/80">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">stacked_line_chart</span>
+<span class="font-label-sm text-label-sm">AUC Increase: <strong class="text-severity-severe font-semibold">+312%</strong></span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">timer</span>
+<span class="font-label-sm text-label-sm">t½ Extended: <strong class="text-severity-severe font-semibold">140 hrs</strong></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Segmented Control View Switcher -->
+<div class="bg-surface-subtle p-1 rounded-xl flex items-center gap-1">
+<button class="tab-toggle flex-1 py-2 px-2 rounded-lg font-label-md text-label-md text-center transition-all bg-surface-container text-primary font-semibold shadow-sm" data-tab="results">
+        Interactions (3)
+      </button>
+<button class="tab-toggle flex-1 py-2 px-2 rounded-lg font-label-md text-label-md text-center transition-all text-text-muted hover:text-primary" data-tab="graph">
+        Network Graph
+      </button>
+<button class="tab-toggle flex-1 py-2 px-2 rounded-lg font-label-md text-label-md text-center transition-all text-text-muted hover:text-primary" data-tab="discrepancies">
+        Discrepancies
+      </button>
+<button class="tab-toggle flex-1 py-2 px-2 rounded-lg font-label-md text-label-md text-center transition-all text-text-muted hover:text-primary" data-tab="empty">
+        Empty State
+      </button>
+</div>
+<!-- Tab Section 1: Interaction Dossier Cards -->
+<div class="tab-view flex flex-col gap-space-sm" id="view-results">
+<div class="flex items-center justify-between px-1">
+<h2 class="font-label-sm text-label-sm uppercase tracking-wider text-text-muted">Pairwise Analysis Matrix</h2>
+<span class="font-label-sm text-label-sm text-text-muted">Sorted by Kinetic Gravity</span>
+</div>
+<!-- Dossier Card 1 -->
+<div class="bg-surface-container rounded-xl p-space-md shadow-sm transition-all hover:shadow-md cursor-pointer card-expandable" data-evidence-id="warf-fluc">
+<div class="flex items-start justify-between gap-2">
+<div>
+<div class="flex items-center gap-1.5 mb-1">
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-severity-severe/10 text-severity-severe">Severe Contraindication</span>
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-secondary-container text-on-secondary-container">Level 1A</span>
+</div>
+<h3 class="font-headline-sm text-body-lg font-semibold text-primary">Warfarin + Fluconazole</h3>
+</div>
+<span class="material-symbols-outlined text-text-muted text-[20px] shrink-0 mt-1">expand_more</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-2">
+          Competitive inhibition of S-warfarin 7-hydroxylation via high-affinity catalytic pocket binding at CYP2C9.
+        </p>
+<div class="mt-3 p-2.5 rounded-lg bg-surface-subtle flex items-center justify-between text-text-muted">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified</span>
+<span class="font-label-sm text-label-sm">4 RCTs • 14 FDA MedWatch Registries</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold flex items-center gap-1">
+            Dossier
+            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</span>
+</div>
+</div>
+<!-- Dossier Card 2 -->
+<div class="bg-surface-container rounded-xl p-space-md shadow-sm transition-all hover:shadow-md cursor-pointer card-expandable" data-evidence-id="warf-amio">
+<div class="flex items-start justify-between gap-2">
+<div>
+<div class="flex items-center gap-1.5 mb-1">
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-severity-moderate/15 text-severity-moderate">Major Interaction</span>
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-secondary-container text-on-secondary-container">Level 1A</span>
+</div>
+<h3 class="font-headline-sm text-body-lg font-semibold text-primary">Warfarin + Amiodarone</h3>
+</div>
+<span class="material-symbols-outlined text-text-muted text-[20px] shrink-0 mt-1">expand_more</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-2">
+          Time-dependent irreversible CYP2C9 mechanism-based inactivation; S-warfarin biological half-life prolonged up to 60 days.
+        </p>
+<div class="mt-3 p-2.5 rounded-lg bg-surface-subtle flex items-center justify-between text-text-muted">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-secondary">verified</span>
+<span class="font-label-sm text-label-sm">ACC/AHA Guidelines (Class I, LOE A)</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold flex items-center gap-1">
+            Dossier
+            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</span>
+</div>
+</div>
+<!-- Dossier Card 3 -->
+<div class="bg-surface-container rounded-xl p-space-md shadow-sm transition-all hover:shadow-md cursor-pointer card-expandable" data-evidence-id="fluc-amio">
+<div class="flex items-start justify-between gap-2">
+<div>
+<div class="flex items-center gap-1.5 mb-1">
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-primary-fixed text-on-primary-fixed-variant">Moderate Risk</span>
+<span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-surface-variant text-on-surface-variant">Level 2B Hypothesis</span>
+</div>
+<h3 class="font-headline-sm text-body-lg font-semibold text-primary">Fluconazole + Amiodarone</h3>
+</div>
+<span class="material-symbols-outlined text-text-muted text-[20px] shrink-0 mt-1">expand_more</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-2">
+          Additive hERG potassium channel blockade yielding cumulative cardiac repolarization delay and elevated polymorphic VT/Torsades de Pointes hazard.
+        </p>
+<div class="mt-3 p-2.5 rounded-lg bg-surface-subtle flex items-center justify-between text-text-muted">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">biotech</span>
+<span class="font-label-sm text-label-sm">In Silico Patch Clamp Simulation</span>
+</div>
+<span class="font-label-sm text-label-sm text-primary font-semibold flex items-center gap-1">
+            Dossier
+            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</span>
+</div>
+</div>
+</div>
+<!-- Tab Section 2: Molecular Graph Visualization -->
+<div class="tab-view hidden flex flex-col gap-space-sm" id="view-graph">
+<div class="bg-surface-container rounded-xl p-space-md shadow-sm">
+<div class="flex items-center justify-between mb-3">
+<div>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-text-muted">Pathway Topography</span>
+<p class="font-headline-sm text-body-md font-semibold text-primary">Multi-Node Interaction Map</p>
+</div>
+<button aria-label="Recenter Graph" class="w-8 h-8 rounded-DEFAULT bg-surface-subtle flex items-center justify-center text-primary" id="reset-graph-btn">
+<span class="material-symbols-outlined text-[18px]">center_focus_strong</span>
+</button>
+</div>
+<!-- SVG Vector Molecular Graph -->
+<div class="relative w-full h-72 rounded-lg bg-surface-subtle flex items-center justify-center overflow-hidden">
+<svg class="w-full h-full" fill="none" viewbox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient gradientunits="userSpaceOnUse" id="edge-severe" x1="60" x2="260" y1="180" y2="180">
+<stop stop-color="#022448"></stop>
+<stop offset="0.5" stop-color="#C93B2B"></stop>
+<stop offset="1" stop-color="#BA1A1A"></stop>
+</lineargradient>
+<lineargradient gradientunits="userSpaceOnUse" id="edge-major" x1="160" x2="60" y1="60" y2="180">
+<stop stop-color="#14396a"></stop>
+<stop offset="0.6" stop-color="#D97706"></stop>
+<stop offset="1" stop-color="#022448"></stop>
+</lineargradient>
+<lineargradient gradientunits="userSpaceOnUse" id="edge-mod" x1="160" x2="260" y1="60" y2="180">
+<stop stop-color="#14396a"></stop>
+<stop offset="0.5" stop-color="#006a65"></stop>
+<stop offset="1" stop-color="#022448"></stop>
+</lineargradient>
+</defs>
+<!-- Background subtle orbital guides -->
+<circle cx="160" cy="140" r="95" stroke="#E2E4E1" stroke-dasharray="4 4" stroke-width="1"></circle>
+<circle cx="160" cy="140" r="40" stroke="#E2E4E1" stroke-dasharray="2 2" stroke-width="1"></circle>
+<!-- Edge 1: Warfarin - Fluconazole (Severe - Thick, Crimson Pulsing Stroke) -->
+<line stroke="url(#edge-severe)" stroke-linecap="round" stroke-width="4.5" x1="70" x2="250" y1="190" y2="190"></line>
+<!-- Edge 2: Amiodarone - Warfarin (Major - Amber Stroke) -->
+<line stroke="url(#edge-major)" stroke-linecap="round" stroke-width="3" x1="160" x2="70" y1="70" y2="190"></line>
+<!-- Edge 3: Amiodarone - Fluconazole (Moderate - Blue/Teal) -->
+<line stroke="url(#edge-mod)" stroke-dasharray="3 3" stroke-width="2" x1="160" x2="250" y1="70" y2="190"></line>
+<!-- Interaction Weight Badges in SVG -->
+<rect fill="#C93B2B" height="20" rx="4" width="40" x="140" y="180"></rect>
+<text fill="#FFFFFF" font-family="Work Sans" font-size="10" font-weight="700" text-anchor="middle" x="160" y="194">INR 4.5x</text>
+<rect fill="#D97706" height="16" rx="3" width="36" x="92" y="115"></rect>
+<text fill="#FFFFFF" font-family="Work Sans" font-size="9" font-weight="600" text-anchor="middle" x="110" y="127">t½ ×2.8</text>
+<rect fill="#006A65" height="16" rx="3" width="42" x="195" y="115"></rect>
+<text fill="#FFFFFF" font-family="Work Sans" font-size="9" font-weight="600" text-anchor="middle" x="216" y="127">ΔQTc +28</text>
+<!-- Node 1: Amiodarone (Top Center) -->
+<g class="cursor-pointer" id="node-amio">
+<circle cx="160" cy="70" fill="#FFFFFF" r="24" stroke="#022448" stroke-width="2"></circle>
+<circle cx="160" cy="70" fill="#F2F3F9" r="19"></circle>
+<text fill="#022448" font-family="Work Sans" font-size="10" font-weight="700" text-anchor="middle" x="160" y="73">AMIO</text>
+<text fill="#5A6578" font-family="Work Sans" font-size="10" font-weight="500" text-anchor="middle" x="160" y="40">200mg</text>
+</g>
+<!-- Node 2: Warfarin (Bottom Left) -->
+<g class="cursor-pointer" id="node-warf">
+<circle cx="70" cy="190" fill="#FFFFFF" r="26" stroke="#C93B2B" stroke-width="2.5"></circle>
+<circle cx="70" cy="190" fill="#FFDAD6" r="20"></circle>
+<text fill="#93000A" font-family="Work Sans" font-size="10" font-weight="700" text-anchor="middle" x="70" y="193">WARF</text>
+<text fill="#C93B2B" font-family="Work Sans" font-size="10" font-weight="600" text-anchor="middle" x="70" y="226">Target 5mg</text>
+</g>
+<!-- Node 3: Fluconazole (Bottom Right) -->
+<g class="cursor-pointer" id="node-fluc">
+<circle cx="250" cy="190" fill="#FFFFFF" r="24" stroke="#022448" stroke-width="2"></circle>
+<circle cx="250" cy="190" fill="#F2F3F9" r="19"></circle>
+<text fill="#022448" font-family="Work Sans" font-size="10" font-weight="700" text-anchor="middle" x="250" y="193">FLUC</text>
+<text fill="#5A6578" font-family="Work Sans" font-size="10" font-weight="500" text-anchor="middle" x="250" y="226">150mg</text>
+</g>
+</svg>
+<!-- Interaction HUD Overlay -->
+<div class="absolute bottom-2 left-2 right-2 flex items-center justify-between pointer-events-none">
+<span class="font-label-sm text-[10px] text-text-muted bg-surface-container/90 backdrop-blur px-2 py-0.5 rounded shadow-sm">Kinetic Coupling Intensity</span>
+<span class="font-label-sm text-[10px] text-primary bg-surface-container/90 backdrop-blur px-2 py-0.5 rounded shadow-sm">Pinch to Zoom</span>
+</div>
+</div>
+<div class="mt-3 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-severity-severe"></span>
+<span class="font-label-sm text-label-sm text-text-muted">Severe</span>
+<span class="w-2.5 h-2.5 rounded-full bg-severity-moderate ml-1"></span>
+<span class="font-label-sm text-label-sm text-text-muted">Major</span>
+<span class="w-2.5 h-2.5 rounded-full bg-secondary ml-1"></span>
+<span class="font-label-sm text-label-sm text-text-muted">Additive</span>
+</div>
+<button class="font-label-sm text-label-sm text-primary font-semibold flex items-center gap-1 hover:underline" id="toggle-list-view-btn">
+<span class="material-symbols-outlined text-[16px]">view_agenda</span>
+            List Details
+          </button>
+</div>
+</div>
+</div>
+<!-- Tab Section 3: Discrepancy Log -->
+<div class="tab-view hidden flex flex-col gap-space-sm" id="view-discrepancies">
+<div class="bg-surface-container rounded-xl p-space-md shadow-sm">
+<div class="flex items-center justify-between mb-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-text-muted">Regulatory Harmonization</span>
+<span class="px-2 py-0.5 bg-severity-moderate/15 text-severity-moderate text-[11px] font-semibold rounded">1 Conflict Found</span>
+</div>
+<h3 class="font-headline-sm text-body-lg font-semibold text-primary">Cross-Guideline Discrepancy Log</h3>
+<p class="font-body-sm text-body-sm text-text-muted mt-1">
+          Algorithmic comparison between FDA package insert recommendations vs. EMA CPMP guidelines for Amiodarone dose reduction during Warfarin initiation.
+        </p>
+<div class="mt-3 space-y-2">
+<div class="p-3 bg-surface-subtle rounded-lg flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm font-semibold text-primary">FDA Prescribing Info (US)</span>
+<span class="font-label-sm text-[10px] text-text-muted">Rev. 2023</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface">Recommend empirical Warfarin dose decrease of <strong>33% to 50%</strong> upon initiating Amiodarone therapy.</p>
+</div>
+<div class="p-3 bg-surface-subtle rounded-lg flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm font-semibold text-primary">EMA SmPC (EU Regulatory)</span>
+<span class="font-label-sm text-[10px] text-text-muted">Rev. 2022</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface">Recommends fixed <strong>50% dose decrement</strong> and tri-weekly INR assessment until stable steady-state is validated.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Tab Section 4: Clever Pharmacological Empty State -->
+<div class="tab-view hidden flex flex-col gap-space-sm" id="view-empty">
+<div class="bg-surface-container rounded-xl p-space-lg text-center shadow-sm flex flex-col items-center">
+<!-- Living Flask Animated SVG Illustration -->
+<div class="w-20 h-20 rounded-full bg-surface-subtle flex items-center justify-center mb-3 text-secondary">
+<svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M9.75 3.75v3.5m4.5-3.5v3.5M6 7.25h12M7.2 20.25h9.6a1.5 1.5 0 001.4-2.05L15 9.25H9L5.8 18.2a1.5 1.5 0 001.4 2.05z" stroke-linecap="round" stroke-linejoin="round"></path>
+<circle cx="12" cy="15" fill="currentColor" opacity="0.4" r="1.5"></circle>
+<circle cx="14" cy="17" fill="currentColor" opacity="0.6" r="1"></circle>
+</svg>
+</div>
+<h3 class="font-headline-sm text-body-lg font-semibold text-primary">Laboratory Matrix Cleared</h3>
+<p class="font-body-sm text-body-sm text-text-muted mt-1 max-w-[260px]">
+          No bioactive compounds selected. Add at least two therapeutics to launch enzymatic cross-reactivity profiling.
+        </p>
+<!-- Quick Protocol Load Pills -->
+<div class="mt-4 flex flex-col w-full gap-2">
+<span class="font-label-sm text-[11px] uppercase tracking-wider text-text-muted">Preset Test Clusters</span>
+<button class="w-full py-2 px-3 rounded-lg bg-surface-subtle hover:bg-surface-variant text-primary font-label-md text-label-md flex items-center justify-between transition-colors" id="load-anticoag-preset">
+<span>Triple Therapy: DOAC + Clopidogrel + ASA</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+<button class="w-full py-2 px-3 rounded-lg bg-surface-subtle hover:bg-surface-variant text-primary font-label-md text-label-md flex items-center justify-between transition-colors" id="load-transplant-preset">
+<span>Transplant: Tacrolimus + Clarithromycin</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Institutional Methodological Disclaimer -->
+<div class="bg-surface-subtle rounded-xl p-space-md shadow-sm">
+<div class="flex items-start gap-2.5">
+<span class="material-symbols-outlined text-text-muted text-[20px] shrink-0 mt-0.5">verified_user</span>
+<div>
+<h4 class="font-label-sm text-label-sm uppercase tracking-wider font-semibold text-primary">Validation Heuristics &amp; Clinical Use</h4>
+<p class="font-body-sm text-body-sm text-text-muted mt-0.5">
+            Pharma Sentinel v3.4 is intended strictly for credentialed clinical pharmacists and medical researchers. Predictions combine peer-reviewed in vivo trials with machine-learned QSAR enzymatic docking simulations.
+          </p>
+<div class="mt-2 flex items-center gap-3">
+<span class="font-label-sm text-label-sm text-secondary font-medium">Core DB: v2024.11-Rel</span>
+<span class="font-label-sm text-label-sm text-text-muted">•</span>
+<span class="font-label-sm text-label-sm text-primary font-medium hover:underline cursor-pointer">Methodology Spec</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Sheet Drawer / Evidence Modal Preview -->
+<div class="fixed inset-x-0 bottom-0 z-50 transform translate-y-full transition-transform duration-300 ease-out bg-surface-container rounded-t-2xl shadow-xl max-h-[751px] flex flex-col" id="evidence-sheet">
+<!-- Drag Handle -->
+<div class="w-full py-2 flex items-center justify-center cursor-pointer" id="sheet-handle">
+<div class="w-12 h-1.5 rounded-full bg-border-hairline"></div>
+</div>
+<!-- Drawer Content -->
+<div class="px-margin-mobile pb-space-lg flex-1 overflow-y-auto flex flex-col gap-space-sm">
+<div class="flex items-start justify-between">
+<div>
+<div class="flex items-center gap-1.5 mb-1">
+<span class="px-2 py-0.5 bg-severity-severe text-on-error font-label-sm text-[10px] rounded uppercase font-semibold">Empirical Evidence Level 1A</span>
+<span class="font-label-sm text-[10px] text-text-muted">PMID: 28491024</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary font-bold">Warfarin &amp; Fluconazole</h3>
+</div>
+<button class="w-9 h-9 rounded-full bg-surface-subtle flex items-center justify-center text-text-muted hover:text-primary" id="close-sheet-btn">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Provenance Metric Grid -->
+<div class="grid grid-cols-2 gap-2 mt-1">
+<div class="p-2.5 rounded-lg bg-surface-subtle flex flex-col">
+<span class="font-label-sm text-[10px] text-text-muted uppercase">Clearance Delta (CL/F)</span>
+<span class="font-headline-sm text-body-lg font-bold text-severity-severe">-68.4%</span>
+<span class="font-body-sm text-[11px] text-text-muted">P &lt; 0.0001 (Human In Vivo)</span>
+</div>
+<div class="p-2.5 rounded-lg bg-surface-subtle flex flex-col">
+<span class="font-label-sm text-[10px] text-text-muted uppercase">Mean INR Peak</span>
+<span class="font-headline-sm text-body-lg font-bold text-severity-severe">5.8 ± 1.2</span>
+<span class="font-body-sm text-[11px] text-text-muted">Target: 2.0 - 3.0</span>
+</div>
+</div>
+<!-- Mechanistic Insight Panel -->
+<div class="flex flex-col gap-1 mt-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-text-muted">Molecular Pathway Provenance</span>
+<p class="font-body-md text-body-sm text-on-surface">
+          Fluconazole non-competitively occludes the active heme iron cavity of hepatic cytochrome P450 2C9, preventing metabolic oxidation of the active S-warfarin stereoisomer. Unbound S-warfarin plasma fraction surges within 48 hours of co-administration.
+        </p>
+</div>
+<!-- Action Protocol -->
+<div class="p-3 rounded-lg bg-error-container text-on-error-container flex flex-col gap-1 mt-1">
+<span class="font-label-sm text-label-sm uppercase font-bold text-severity-severe">Clinical Intervention Protocol</span>
+<p class="font-body-sm text-body-sm">
+          Avoid concomitant administration. If antifungal therapy is mandatory, select topical or non-azole alternative (e.g., Caspofungin). Alternatively, preemptively reduce Warfarin dose by 50-75% with daily international normalized ratio tracking.
+        </p>
+</div>
+<!-- Interactive Actions -->
+<div class="mt-2 pt-2 flex items-center gap-2">
+<button class="flex-1 h-11 rounded-lg bg-primary text-on-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-1.5 shadow-sm hover:bg-primary-container transition-colors" id="copy-citation-btn">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+          Copy Clinical Monograph
+        </button>
+<button aria-label="Bookmark interaction" class="w-11 h-11 rounded-lg bg-surface-subtle text-primary flex items-center justify-center shrink-0 hover:bg-surface-variant transition-colors" id="favorite-pair-btn">
+<span class="material-symbols-outlined text-[20px]">bookmark_border</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Backdrop for Modal -->
+<div class="fixed inset-0 z-40 bg-on-surface/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" id="modal-backdrop"></div>
+<!-- Notification Toast Container -->
+<div class="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-primary text-on-primary font-label-sm text-label-sm shadow-md flex items-center gap-2 transform -translate-y-6 opacity-0 pointer-events-none transition-all duration-300" id="toast">
+<span class="material-symbols-outlined text-[16px] text-secondary-container">check_circle</span>
+<span id="toast-message">Notification text</span>
+</div>
+</div>
+<script>
+  (function initPharmaSentinelMobile() {
+    // Tab Switching Logic
+    const tabButtons = document.querySelectorAll('.tab-toggle');
+    const tabViews = {
+      results: document.getElementById('view-results'),
+      graph: document.getElementById('view-graph'),
+      discrepancies: document.getElementById('view-discrepancies'),
+      empty: document.getElementById('view-empty')
+    };
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-tab');
+
+        // Update Button Active Styling
+        tabButtons.forEach(b => {
+          b.classList.remove('bg-surface-container', 'text-primary', 'font-semibold', 'shadow-sm');
+          b.classList.add('text-text-muted');
+        });
+        btn.classList.add('bg-surface-container', 'text-primary', 'font-semibold', 'shadow-sm');
+        btn.classList.remove('text-text-muted');
+
+        // Toggle Views
+        Object.keys(tabViews).forEach(tabKey => {
+          if (tabKey === targetTab) {
+            tabViews[tabKey].classList.remove('hidden');
+          } else {
+            tabViews[tabKey].classList.add('hidden');
+          }
+        });
+      });
+    });
+
+    // Evidence Sheet Drawer Handling
+    const sheet = document.getElementById('evidence-sheet');
+    const backdrop = document.getElementById('modal-backdrop');
+    const closeSheetBtn = document.getElementById('close-sheet-btn');
+    const expandableCards = document.querySelectorAll('.card-expandable');
+
+    function openEvidenceSheet() {
+      sheet.classList.remove('translate-y-full');
+      backdrop.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeEvidenceSheet() {
+      sheet.classList.add('translate-y-full');
+      backdrop.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    expandableCards.forEach(card => card.addEventListener('click', openEvidenceSheet));
+    closeSheetBtn.addEventListener('click', closeEvidenceSheet);
+    backdrop.addEventListener('click', closeEvidenceSheet);
+
+    // List Details Button on Graph View switches to Results tab
+    const toggleListViewBtn = document.getElementById('toggle-list-view-btn');
+    if (toggleListViewBtn) {
+      toggleListViewBtn.addEventListener('click', () => {
+        const resultsTabBtn = document.querySelector('[data-tab="results"]');
+        if (resultsTabBtn) resultsTabBtn.click();
+      });
+    }
+
+    // Toast Utility
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-message');
+    let toastTimeout;
+
+    function showToast(message) {
+      clearTimeout(toastTimeout);
+      toastMsg.textContent = message;
+      toast.classList.remove('-translate-y-6', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('-translate-y-6', 'opacity-0', 'pointer-events-none');
+      }, 2600);
+    }
+
+    // Copy Monograph Action
+    const copyBtn = document.getElementById('copy-citation-btn');
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        showToast('Clinical Monograph copied to clipboard');
+        setTimeout(closeEvidenceSheet, 400);
+      });
+    }
+
+    // Favorite Button Action
+    const favBtn = document.getElementById('favorite-pair-btn');
+    if (favBtn) {
+      favBtn.addEventListener('click', () => {
+        const icon = favBtn.querySelector('.material-symbols-outlined');
+        if (icon.textContent === 'bookmark_border') {
+          icon.textContent = 'bookmark';
+          icon.style.fontVariationSettings = "'FILL' 1";
+          showToast('Pair pinned to protocol workspace');
+        } else {
+          icon.textContent = 'bookmark_border';
+          icon.style.fontVariationSettings = "'FILL' 0";
+          showToast('Interaction unpinned');
+        }
+      });
+    }
+
+    // Compound Removal Micro-interaction
+    const removeBtns = document.querySelectorAll('.remove-chip-btn');
+    removeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const parentChip = btn.closest('[data-compound]');
+        if (parentChip) {
+          parentChip.style.opacity = '0';
+          parentChip.style.transform = 'scale(0.95)';
+          parentChip.style.transition = 'all 0.2s ease';
+          setTimeout(() => {
+            parentChip.remove();
+            showToast('Compound removed from active calculation');
+          }, 200);
+        }
+      });
+    });
+
+    // Clear All Trigger -> Switch to Clever Empty State
+    const clearAllBtn = document.getElementById('clear-all-btn');
+    if (clearAllBtn) {
+      clearAllBtn.addEventListener('click', () => {
+        const emptyTabBtn = document.querySelector('[data-tab="empty"]');
+        if (emptyTabBtn) emptyTabBtn.click();
+        showToast('Session buffer cleared');
+      });
+    }
+
+    // Preset Loaders in Empty State
+    const loadAnticoagBtn = document.getElementById('load-anticoag-preset');
+    if (loadAnticoagBtn) {
+      loadAnticoagBtn.addEventListener('click', () => {
+        const resultsTabBtn = document.querySelector('[data-tab="results"]');
+        if (resultsTabBtn) resultsTabBtn.click();
+        showToast('Loaded Anticoagulant Triad Protocol');
+      });
+    }
+
+    const loadTransplantBtn = document.getElementById('load-transplant-preset');
+    if (loadTransplantBtn) {
+      loadTransplantBtn.addEventListener('click', () => {
+        const resultsTabBtn = document.querySelector('[data-tab="results"]');
+        if (resultsTabBtn) resultsTabBtn.click();
+        showToast('Loaded Transplant Cluster');
+      });
+    }
+
+    // Barcode scanner trigger
+    const scanBtn = document.getElementById('camera-scan-btn');
+    if (scanBtn) {
+      scanBtn.addEventListener('click', () => {
+        showToast('Camera scanner ready: Align NDC barcode');
+      });
+    }
+
+    // Interactive Graph Node Highlights
+    const nodes = ['node-warf', 'node-amio', 'node-fluc'];
+    nodes.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('click', () => {
+          showToast('Inspecting kinetic affinity constant (Ki)');
+        });
+      }
+    });
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-warm/95 backdrop-blur-xl shadow-[0_-1px_8px_rgba(0,0,0,0.04)]" data-active-classes="text-primary font-semibold"><div class="flex justify-around items-center h-16 px-2"><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="overview-research" href="#"><span class="material-symbols-outlined text-[20px]">menu_book</span><span class="font-label-sm text-label-sm tracking-tight truncate max-w-[76px] text-center mt-0.5">Overview</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-1 transition-colors text-primary font-semibold" data-path="interaction-matrix" href="#"><span class="material-symbols-outlined text-[20px]">hub</span><span class="font-label-sm text-label-sm tracking-tight truncate max-w-[76px] text-center mt-0.5">Matrix</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="evidence-provenance" href="#"><span class="material-symbols-outlined text-[20px]">verified</span><span class="font-label-sm text-label-sm tracking-tight truncate max-w-[76px] text-center mt-0.5">Provenance</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] px-1 text-on-surface-variant hover:text-on-surface transition-colors" data-path="methodology-safety" href="#"><span class="material-symbols-outlined text-[20px]">shield</span><span class="font-label-sm text-label-sm tracking-tight truncate max-w-[76px] text-center mt-0.5">Methodology</span></a></div></nav></body></html>

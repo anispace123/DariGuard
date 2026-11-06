@@ -27,8 +27,15 @@ class NormalizationResult:
     components: list[str] = field(default_factory=list)
     clarification_needed: bool = False
     message: str = ""
+    message_code: str = field(default_factory=str)
+    message_params: dict[str, Any] = field(default_factory=dict)
     suggestions: list[str] = field(default_factory=list)
     details: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if not self.message_code:
+            status = getattr(self, "status", "unknown")
+            self.message_code = f"norm_{status}"
 
     @property
     def is_resolved(self) -> bool:
@@ -39,6 +46,14 @@ class NormalizationResult:
     def is_combination(self) -> bool:
         """Является ли препарат подтверждённой многокомпонентной комбинацией."""
         return self.status == "combination" and len(self.components) > 1
+
+    def __getattr__(self, name: str) -> Any:
+        if name == "message_code":
+            status = getattr(self, "status", "unknown")
+            return f"norm_{status}"
+        if name == "message_params":
+            return {}
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 
 
 class DrugNormalizer:
@@ -86,7 +101,9 @@ class DrugNormalizer:
                 status="canonical",
                 canonical_name=clean,
                 display_name=clean,
-                message=f"Найдено прямое совпадение в DDInter: {clean}."
+                message=f"Найдено прямое совпадение в DDInter: {clean}.",
+                message_code="norm_canonical",
+                message_params={"canonical": clean}
             )
 
         # 2. Проверка комбинаций (многокомпонентных составов)
@@ -102,6 +119,8 @@ class DrugNormalizer:
                 components=comp_list,
                 clarification_needed=True,
                 message=f"«{ru_name}» — многокомпонентный препарат. {desc}",
+                message_code="norm_combination",
+                message_params={"name": ru_name, "components": comp_list, "desc": desc},
                 details=comb
             )
 
@@ -119,6 +138,8 @@ class DrugNormalizer:
                     canonical_name=canonical,
                     display_name=f"{ru_name} ({en_inn})",
                     message=f"Синоним «{ru_name}» сопоставлен с каноническим МНН «{canonical}».",
+                    message_code="norm_synonym",
+                    message_params={"alias": ru_name, "canonical": canonical},
                     details=entry
                 )
             else:
@@ -128,6 +149,8 @@ class DrugNormalizer:
                     canonical_name=canonical,
                     display_name=ru_name,
                     message=f"Вещество «{canonical}» известно, но отсутствует в текущем срезе DDInter.",
+                    message_code="norm_unsupported_inn",
+                    message_params={"canonical": canonical},
                     details=entry
                 )
 
@@ -141,6 +164,8 @@ class DrugNormalizer:
                 status="unsupported",
                 display_name=ru_name,
                 message=f"«{ru_name}» распознан, но не поддерживается: {reason}",
+                message_code="norm_unsupported",
+                message_params={"name": ru_name, "reason": reason},
                 details=unsup
             )
 
@@ -152,6 +177,7 @@ class DrugNormalizer:
             raw_query=query,
             status="not_found",
             message="Препарат не найден в базе DDInter и справочнике синонимов.",
+            message_code="norm_not_found",
             suggestions=suggestions
         )
 
@@ -181,3 +207,88 @@ class DrugNormalizer:
                 seen.add(label.lower())
                 unique_items.append((label, val))
         return unique_items
+
+    def get_canonical_catalog_label(self, canonical_or_query: str) -> str | None:
+        """Находит приоритетную отображаемую метку в каталоге для заданного препарата."""
+        return get_canonical_catalog_label(self, canonical_or_query)
+
+    def __getattr__(self, name: str) -> Any:
+        if name == "get_canonical_catalog_label":
+            return lambda query: get_canonical_catalog_label(self, query)
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+
+
+def get_canonical_catalog_label(normalizer: Any, canonical_or_query: str) -> str | None:
+    """Находит приоритетную отображаемую метку в каталоге для заданного препарата.
+
+    Приоритет:
+    1. Официальный перевод МНН (type == 'inn_translation'), например 'Эналаприл [enalapril]'
+    2. Известный бренд (type == 'brand'), например 'Кордарон [amiodarone]'
+    3. Каноническое английское имя из базы DDInter
+    """
+    if hasattr(normalizer, "normalize"):
+        try:
+            norm = normalizer.normalize(canonical_or_query)
+            canon = norm.canonical_name if getattr(norm, "is_resolved", False) and norm.canonical_name else (canonical_or_query or "").strip().lower()
+        except Exception:
+            canon = (canonical_or_query or "").strip().lower()
+    else:
+        canon = (canonical_or_query or "").strip().lower()
+
+    synonyms = getattr(normalizer, "synonyms", {})
+    canonical_drugs = getattr(normalizer, "canonical_drugs", set())
+
+    # 1. Поиск официального МНН в справочнике
+    for alias, info in sorted(synonyms.items()):
+        if info.get("canonical") == canon and info.get("type") == "inn_translation":
+            ru = info.get("ru", alias.title())
+            return f"{ru} [{canon}]"
+
+    # 2. Поиск по брендам
+    for alias, info in sorted(synonyms.items()):
+        if info.get("canonical") == canon:
+            ru = info.get("ru", alias.title())
+            return f"{ru} [{canon}]"
+
+    # 3. Английское МНН
+    if canon in canonical_drugs:
+        return canon
+
+    return None
+
+
+def safe_catalog_label(
+    norm: Any,
+    query: str,
+    labels: list[str] | None = None,
+    mapping: dict[str, str] | None = None
+) -> str | None:
+    """Безопасный поиск отображаемой метки препарата с тройным уровнем защиты от устаревших кэшей."""
+    lbl = None
+    fn = getattr(norm, "get_canonical_catalog_label", None)
+    if fn is not None:
+        try:
+            lbl = fn(query)
+        except Exception:
+            lbl = None
+    if not lbl:
+        try:
+            lbl = get_canonical_catalog_label(norm, query)
+        except Exception:
+            lbl = None
+
+    if lbl and (labels is None or lbl in labels):
+        return lbl
+
+    clean_q = (query or "").strip().lower()
+    if labels:
+        if mapping:
+            for l, val in mapping.items():
+                if val == clean_q:
+                    return l
+        for l in labels:
+            if clean_q in l.lower():
+                return l
+    return None
+
+

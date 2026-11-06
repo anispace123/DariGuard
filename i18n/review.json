@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Pharma Sentinel Medical Terminology Clinical Review Registry",
+  "version": "1.0.0",
+  "policy": "Non-destructive preservation: INNs, DDInter IDs, chemical formulas, and Latin taxa are never translated. UI and clinical guidance translations in Kazakh and English are cataloged below with reviewer status.",
+  "terms": [
+    {
+      "key": "ws_eyebrow",
+      "term_kk": "Полипрагмазияны талдау",
+      "term_ru": "Анализ полипрагмазии",
+      "term_en": "Polypharmacy analysis",
+      "status": "pending_expert_review",
+      "notes": "Standard WHO/Kazakh MOH terminology for simultaneous multiple drug administration."
+    },
+    {
+      "key": "preset_whammy",
+      "term_kk": "Triple Whammy",
+      "term_ru": "Triple Whammy",
+      "term_en": "Triple Whammy",
+      "status": "approved_pharmacology_standard",
+      "notes": "International clinical eponym for ACEI/ARB + Diuretic + NSAID nephrotoxicity triad. Retained universally as Triple Whammy."
+    },
+    {
+      "key": "preset_bleeding",
+      "term_kk": "Геморрагиялық қақтығыс",
+      "term_ru": "Геморрагический конфликт",
+      "term_en": "Hemorrhagic Conflict",
+      "status": "pending_expert_review",
+      "notes": "Anticoagulant + antiplatelet synergistic bleeding risk."
+    },
+    {
+      "key": "dup_warning",
+      "term_kk": "Әсер етуші заттың қайталануы",
+      "term_ru": "Дублирование действующего вещества",
+      "term_en": "Therapeutic duplication",
+      "status": "approved_pharmacology_standard",
+      "notes": "Refers to multiple trade drugs containing the identical INN."
+    },
+    {
+      "key": "finding_mechanism",
+      "term_kk": "Өзара әрекеттесу механизмі",
+      "term_ru": "Механизм взаимодействия",
+      "term_en": "Interaction Mechanism",
+      "status": "approved_pharmacology_standard",
+      "notes": "Standard clinical heading."
+    },
+    {
+      "key": "supp_desc",
+      "term_kk": "Фармакокинетикалық қақтығыстар",
+      "term_ru": "Фармакокинетические конфликты",
+      "term_en": "Pharmacokinetic conflicts",
+      "status": "pending_expert_review",
+      "notes": "CYP450 enzyme induction/inhibition and P-glycoprotein efflux transport alterations."
+    }
+  ]
+}

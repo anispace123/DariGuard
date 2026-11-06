@@ -145,7 +145,167 @@
       "clinical_management": "Принимать левотироксин строго натощак за 30-60 минут до еды, а препараты кальция/железа — с интервалом не менее 4 часов.",
       "evidence_level": "Level A",
       "citations": [
-        "Campbell NR. et al. Ferrous sulfate reduces thyroxine efficacy in patients with hypothyroidism. Ann Intern Med. 1992;117(12):1010-1013."
+        "Campbell NR. et al. Ferrous sulfate reduces thyroxine efficacy in patients with hypothyroidism. Ann Intern Med. 1992;117(12):1010-1013. PMID: 1443969"
+      ]
+    },
+    {
+      "id": "SUPP-009",
+      "supplement_ru": "Гинкго Билоба (стандартизированный экстракт EGb 761)",
+      "supplement_lat": "Ginkgo biloba",
+      "supplement_key": "ginkgo",
+      "drug_canonical": "warfarin",
+      "drug_ru": "Варфарин",
+      "severity": "Major",
+      "interaction_type": "Фармакодинамическое и фармакокинетическое (антагонизм PAF + модуляция CYP2C9)",
+      "mechanism": "Терпеновые лактоны (гинкголид B) мощно ингибируют фактор активации тромбоцитов (PAF), нарушая первичный тромбоцитарный гемостаз на фоне блокады плазменных факторов свертывания II, VII, IX, X варфарином.",
+      "clinical_consequence": "Резкое возрастание риска внутричерепных, ретробульбарных и желудочно-кишечных кровотечений даже при формально целевом МНО (2.0–3.0).",
+      "clinical_management": "Категорически избегать самолечения препаратами Гинкго Билоба на фоне терапии варфарином. При появлении петехий, носовых кровотечений или головной боли — немедленная отмена БАД и контроль МНО.",
+      "evidence_level": "Level A",
+      "citations": [
+        "Matthews MK Jr. Association of Ginkgo biloba with intracerebral hemorrhage. Neurology. 1998;50(6):1933-1934. PMID: 9633765",
+        "Jiang X. et al. Effect of ginkgo and ginger on the pharmacokinetics and pharmacodynamics of warfarin in healthy subjects. Br J Clin Pharmacol. 2005;59(4):425-432. PMID: 15801737"
+      ]
+    },
+    {
+      "id": "SUPP-010",
+      "supplement_ru": "Омега-3 ПНЖК (Рыбий жир, ЭПК/ДГК > 2 г/сут)",
+      "supplement_lat": "Omega-3 Polyunsaturated Fatty Acids (EPA/DHA)",
+      "supplement_key": "omega_3",
+      "drug_canonical": "warfarin",
+      "drug_ru": "Варфарин",
+      "severity": "Moderate",
+      "interaction_type": "Фармакодинамический синергизм (снижение тромбоксана A2 и фактора V)",
+      "mechanism": "Эйкозапентаеновая (ЭПК) и докозагексаеновая (ДГК) кислоты конкурируют с арахидоновой кислотой за ЦОГ-1 тромбоцитов, снижая синтез проагреганта TXA2 и умеренно подавляя витамин-K-зависимые факторы свертывания.",
+      "clinical_consequence": "Удлинение времени кровотечения, возможное непредсказуемое повышение МНО до > 4.0 при приеме высоких доз Омега-3 (> 2000 мг/сут), риск субдуральной гематомы и экхимозов.",
+      "clinical_management": "Не начинать прием высокодозных добавок Омега-3 и не менять их дозировку без ведома врача; при старте БАД контролировать МНО через 5–7 дней.",
+      "evidence_level": "Level B",
+      "citations": [
+        "Buckley MS. et al. Fish oil interaction with warfarin. Ann Pharmacother. 2004;38(1):50-52. PMID: 14742793",
+        "McClaskey EM. et al. Subdural hematoma after a fall in an elderly patient taking high-dose omega-3 fatty acids with warfarin and aspirin. Pharmacotherapy. 2007;27(1):152-160. PMID: 17192169"
+      ]
+    },
+    {
+      "id": "SUPP-011",
+      "supplement_ru": "Куркумин / Экстракт куркумы с пиперином",
+      "supplement_lat": "Curcuma longa / Piper nigrum",
+      "supplement_key": "curcumin",
+      "drug_canonical": "warfarin",
+      "drug_ru": "Варфарин",
+      "severity": "Major",
+      "interaction_type": "Фармакокинетическое (ингибирование CYP2C9 и P-gp) + антиагрегантное",
+      "mechanism": "Куркумин и пиперин подавляют активность печеночного изофермента CYP2C9 и эффлюксного транспортера P-gp, замедляя метаболический клиренс S-варфарина, а также ингибируют агрегацию тромбоцитов, индуцированную АДФ и коллагеном.",
+      "clinical_consequence": "Повышение плазменной концентрации варфарина (AUC), выход МНО за верхнюю границу терапевтического окна и высокий риск системных кровотечений.",
+      "clinical_management": "Исключить прием концентрированных БАДов куркумина (особенно усиленных черным перцем/пиперином) у пациентов, получающих антикоагулянты.",
+      "evidence_level": "Level B",
+      "citations": [
+        "Volak LP. et al. Curcuminoids inhibit multiple human cytochromes P450 (CYP2C9, CYP3A4), UDP-glucuronosyltransferases, and sulfotransferases. Drug Metab Dispos. 2008;36(8):1594-1605. PMID: 18480186",
+        "Shah BH. et al. Inhibitory effect of curcumin, a food spice from turmeric, on platelet-activating factor- and arachidonic acid-mediated platelet aggregation. Biochem Pharmacol. 1999;58(7):1167-1172. PMID: 10484061"
+      ]
+    },
+    {
+      "id": "SUPP-012",
+      "supplement_ru": "Экстракт чеснока (Аллицин / Выдержанный экстракт)",
+      "supplement_lat": "Allium sativum",
+      "supplement_key": "garlic",
+      "drug_canonical": "acetylsalicylic acid",
+      "drug_ru": "Ацетилсалициловая кислота (Аспирин)",
+      "severity": "Moderate",
+      "interaction_type": "Фармакодинамическое (аддитивная блокада агрегации тромбоцитов)",
+      "mechanism": "Ажоен и аллицин необратимо модифицируют рецепторы фибриногена GPIIb/IIIa на мембране тромбоцитов и дополнительно ингибируют циклооксигеназу-1, потенцируя эффект аспирина.",
+      "clinical_consequence": "Увеличение риска спонтанных эпидуральных гематом, послеоперационных и желудочно-кишечных кровотечений.",
+      "clinical_management": "Избегать приема капсулированных экстрактов чеснока на фоне антиагрегантной терапии; отменить БАД минимум за 7–10 дней до любых инвазивных процедур.",
+      "evidence_level": "Level B",
+      "citations": [
+        "Ang-Lee MK. et al. Herbal medicines and perioperative care. JAMA. 2001;286(2):208-216. PMID: 11448284",
+        "Macan H. et al. Aged garlic extract may be safe for patients on warfarin therapy. J Nutr. 2006;136(3 Suppl):793S-795S. PMID: 16484565"
+      ]
+    },
+    {
+      "id": "SUPP-013",
+      "supplement_ru": "Коэнзим Q10 (Убихинон)",
+      "supplement_lat": "Ubiquinone / Coenzyme Q10",
+      "supplement_key": "coq10",
+      "drug_canonical": "warfarin",
+      "drug_ru": "Варфарин",
+      "severity": "Moderate",
+      "interaction_type": "Фармакодинамический антагонизм (структурный аналог менахинона / витамина K2)",
+      "mechanism": "Убихинон имеет боковую изопреноидную цепь, структурно близкую к витамину K2 (менахинону), и способен частично реактивировать карбоксилирование факторов свертывания II, VII, IX, X в гепатоцитах.",
+      "clinical_consequence": "Снижение МНО ниже 2.0, потеря антикоагулянтной защиты и риск тромбоэмболических осложнений (инсульт, тромбоз глубоких вен).",
+      "clinical_management": "Не начинать и не прекращать прием Коэнзима Q10 самостоятельно; при необходимости назначения — еженедельный контроль МНО в течение первого месяца.",
+      "evidence_level": "Level B",
+      "citations": [
+        "Spigset O. Reduced effect of warfarin caused by ubidecarenone. Lancet. 1994;344(8933):1372-1373. PMID: 7968057",
+        "Heck AM. et al. Potential interactions between alternative therapies and warfarin. Am J Health Syst Pharm. 2000;57(13):1221-1227. PMID: 10902065"
+      ]
+    },
+    {
+      "id": "SUPP-014",
+      "supplement_ru": "Препараты калия / Калийсодержащие БАД и заменители соли",
+      "supplement_lat": "Potassium citrate / Potassium aspartate / KCl",
+      "supplement_key": "potassium",
+      "drug_canonical": "enalapril",
+      "drug_ru": "Эналаприл",
+      "severity": "Major",
+      "interaction_type": "Фармакодинамическое (кумуляция ионов K+ на фоне гипоальдостеронизма)",
+      "mechanism": "Эналаприл подавляет образование ангиотензина II и секрецию альдостерона корой надпочечников, снижая экскрецию калия в собирательных трубочках нефрона. Дополнительное поступление калия с БАД блокирует компенсаторный резерв.",
+      "clinical_consequence": "Высокий риск жизнеугрожающей гиперкалиемии (K+ > 5.5–6.0 ммоль/л), брадикардии, атриовентрикулярной блокады и фатальных желудочковых аритмий.",
+      "clinical_management": "Запрещено бесконтрольное применение препаратов калия (аспаркама, панангина, цитрата калия) без лабораторного контроля K+ и креатинина сыворотки.",
+      "evidence_level": "Level A",
+      "citations": [
+        "Palmer BF. Managing hyperkalemia caused by inhibitors of the renin-angiotensin-aldosterone system. N Engl J Med. 2004;351(6):585-592. PMID: 15295051",
+        "Raebel MA. Hyperkalemia associated with use of angiotensin-converting enzyme inhibitors and angiotensin receptor blockers. Cardiovasc Ther. 2012;30(3):e156-e166. PMID: 20840195"
+      ]
+    },
+    {
+      "id": "SUPP-015",
+      "supplement_ru": "Красный дрожжевой рис (Монаколин K)",
+      "supplement_lat": "Monascus purpureus (Red Yeast Rice)",
+      "supplement_key": "red_yeast_rice",
+      "drug_canonical": "simvastatin",
+      "drug_ru": "Симвастатин",
+      "severity": "Major",
+      "interaction_type": "Фармакодинамическое и фармакокинетическое дублирование (скрытый ловастатин)",
+      "mechanism": "Красный дрожжевой рис содержит монаколин K — вещество, химически идентичное ловастатину (ингибитор ГМГ-КоА-редуктазы и субстрат CYP3A4). Совместный прием с симвастатином приводит к скрытой передозировке статинов.",
+      "clinical_consequence": "Резкий рост риска токсической миопатии, некроза скелетных мышц (рабдомиолиза), массивного подъема КФК и миоглобинурийного острого повреждения почек.",
+      "clinical_management": "Строго противопоказано сочетать БАДы на основе красного дрожжевого риса с любыми рецептурными статинами.",
+      "evidence_level": "Level A",
+      "citations": [
+        "Gordon RY. et al. Marked variability of monacolin levels in commercial red yeast rice products. Arch Intern Med. 2010;170(19):1722-1727. PMID: 20975018",
+        "Mazzanti G. et al. Adverse reactions to dietary supplements containing red yeast rice: assessment of cases from the Italian surveillance system. Br J Clin Pharmacol. 2017;83(4):894-908. PMID: 28093797"
+      ]
+    },
+    {
+      "id": "SUPP-016",
+      "supplement_ru": "Корень солодки (Глицирризиновая кислота)",
+      "supplement_lat": "Glycyrrhiza glabra (Licorice Root)",
+      "supplement_key": "licorice",
+      "drug_canonical": "furosemide",
+      "drug_ru": "Фуросемид",
+      "severity": "Major",
+      "interaction_type": "Фармакодинамический синергизм потери калия (псевдогиперальдостеронизм)",
+      "mechanism": "Глицирризиновая кислота ингибирует фермент 11-бета-гидроксистероиддегидрогеназу 2-го типа (11β-HSD2), позволяя кортизолу активировать минералокортикоидные рецепторы почек и усиливая калийурез, вызванный петлевым диуретиком.",
+      "clinical_consequence": "Тяжелая гипокалиемия (K+ < 3.0 ммоль/л), метаболический алкалоз, мышечный паралич, удлинение интервала QT и риск пируэтной тахикардии (Torsades de Pointes).",
+      "clinical_management": "Исключить прием сиропов и фитосборов с корнем солодки у пациентов, принимающих петлевые или тиазидные диуретики.",
+      "evidence_level": "Level A",
+      "citations": [
+        "Omar HR. et al. Licorice abuse: time to send a warning message. Ther Adv Endocrinol Metab. 2012;3(4):125-138. PMID: 23185686"
+      ]
+    },
+    {
+      "id": "SUPP-017",
+      "supplement_ru": "Женьшень обыкновенный (Гинзенозиды)",
+      "supplement_lat": "Panax ginseng",
+      "supplement_key": "ginseng",
+      "drug_canonical": "warfarin",
+      "drug_ru": "Варфарин",
+      "severity": "Moderate",
+      "interaction_type": "Фармакокинетическое (индукция печеночного клиренса CYP450)",
+      "mechanism": "Гинзенозиды ускоряют метаболическую биотрансформацию варфарина в печени и снижают его равновесную концентрацию в плазме крови.",
+      "clinical_consequence": "Статистически значимое снижение МНО и ослабление антикоагулянтного эффекта вплоть до развития тромбозов.",
+      "clinical_management": "Не принимать тонизирующие БАДы с женьшенем на фоне терапии варфарином без согласования с кардиологом.",
+      "evidence_level": "Level A",
+      "citations": [
+        "Yuan CS. et al. Brief communication: American ginseng reduces warfarin's effect in healthy patients: a randomized, controlled trial. Ann Intern Med. 2004;141(1):23-27. PMID: 15238367"
       ]
     }
   ]

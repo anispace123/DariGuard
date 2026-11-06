@@ -23,11 +23,11 @@ LEVEL_RANK = {
 }
 
 SEVERITY_BADGES = {
-    "Major": "🔴 Major (Высокий риск)",
-    "Moderate": "🟠 Moderate (Умеренный)",
-    "Minor": "🟢 Minor (Незначительный)",
-    "Unknown": "⚪ Unknown (Не классифицирован)",
-    "Not in DB": "⚠️ В базе нет записи"
+    "Major": "Major (Высокий риск)",
+    "Moderate": "Moderate (Умеренный)",
+    "Minor": "Minor (Незначительный)",
+    "Unknown": "Unknown (Не классифицирован)",
+    "Not in DB": "В базе нет записи"
 }
 
 
@@ -41,7 +41,33 @@ class PairwiseInteraction:
     level: str  # 'Major', 'Moderate', 'Minor', 'Unknown', 'Not in DB'
     in_ddinter: bool
     explanation: str = ""
+    explanation_code: str = field(default_factory=str)
     severity_rank: int = 0
+
+    def __post_init__(self) -> None:
+        if not self.explanation_code:
+            lvl = getattr(self, "level", "Not in DB")
+            code_map = {
+                "Major": "exp_major",
+                "Moderate": "exp_moderate",
+                "Minor": "exp_minor",
+                "Unknown": "exp_unknown",
+                "Not in DB": "exp_not_in_db",
+            }
+            self.explanation_code = code_map.get(lvl, "exp_not_in_db")
+
+    def __getattr__(self, name: str) -> Any:
+        if name == "explanation_code":
+            lvl = getattr(self, "level", "Not in DB")
+            code_map = {
+                "Major": "exp_major",
+                "Moderate": "exp_moderate",
+                "Minor": "exp_minor",
+                "Unknown": "exp_unknown",
+                "Not in DB": "exp_not_in_db",
+            }
+            return code_map.get(lvl, "exp_not_in_db")
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 
 
 @dataclass
@@ -56,6 +82,89 @@ class MultiCheckReport:
     summary_counts: dict[str, int]
     overall_risk: str
     safety_disclaimer: str
+    overall_risk_code: str = field(default_factory=str)
+    safety_disclaimer_code: str = field(default_factory=lambda: "disclaimer_text")
+    duplicates_structured: list[tuple[str, list[str]]] = field(default_factory=list)
+    duplicates: list[str] = field(default_factory=list)
+
+    def __post_init__(self) -> None:
+        """Обеспечивает синхронизацию и обратную совместимость дубликатов и кодов риска."""
+        if not self.duplicates and self.duplicates_detected:
+            self.duplicates = list(self.duplicates_detected)
+        elif not self.duplicates_detected and self.duplicates:
+            self.duplicates_detected = list(self.duplicates)
+
+        if not self.duplicates_structured and self.drug_to_inputs:
+            self.duplicates_structured = [
+                (canon, list(inputs))
+                for canon, inputs in self.drug_to_inputs.items()
+                if len(inputs) > 1
+            ]
+
+        # Автоматическая синхронизация кода общего риска
+        if not getattr(self, "overall_risk_code", None):
+            counts = getattr(self, "summary_counts", {}) or {}
+            dups = getattr(self, "duplicates_structured", []) or getattr(self, "duplicates_detected", []) or []
+            if counts.get("Major", 0) > 0 or len(dups) > 0:
+                self.overall_risk_code = "HIGH"
+            elif counts.get("Moderate", 0) > 0:
+                self.overall_risk_code = "MODERATE"
+            elif counts.get("Minor", 0) > 0:
+                self.overall_risk_code = "LOW"
+            elif counts.get("Unknown", 0) > 0:
+                self.overall_risk_code = "UNDETERMINED"
+            elif getattr(self, "overall_risk", ""):
+                risk_upper = str(self.overall_risk).upper()
+                if "ВЫСОК" in risk_upper or "HIGH" in risk_upper:
+                    self.overall_risk_code = "HIGH"
+                elif "УМЕРЕН" in risk_upper or "MODERATE" in risk_upper:
+                    self.overall_risk_code = "MODERATE"
+                elif "НИЗК" in risk_upper or "LOW" in risk_upper:
+                    self.overall_risk_code = "LOW"
+                elif "НЕОПРЕДЕЛ" in risk_upper or "UNDETERMINED" in risk_upper:
+                    self.overall_risk_code = "UNDETERMINED"
+                else:
+                    self.overall_risk_code = "NO_DATA"
+            else:
+                self.overall_risk_code = "NO_DATA"
+
+    def __getattr__(self, name: str) -> Any:
+        if name == "duplicates_structured":
+            if hasattr(self, "drug_to_inputs") and self.drug_to_inputs:
+                return [
+                    (canon, list(inputs))
+                    for canon, inputs in self.drug_to_inputs.items()
+                    if len(inputs) > 1
+                ]
+            return []
+        if name == "duplicates":
+            return getattr(self, "duplicates_detected", [])
+        if name == "duplicates_detected":
+            return getattr(self, "duplicates", [])
+        if name == "overall_risk_code":
+            counts = getattr(self, "summary_counts", {}) or {}
+            dups = getattr(self, "duplicates_structured", []) or getattr(self, "duplicates_detected", []) or []
+            if counts.get("Major", 0) > 0 or len(dups) > 0:
+                return "HIGH"
+            if counts.get("Moderate", 0) > 0:
+                return "MODERATE"
+            if counts.get("Minor", 0) > 0:
+                return "LOW"
+            if counts.get("Unknown", 0) > 0:
+                return "UNDETERMINED"
+            risk_upper = str(getattr(self, "overall_risk", "")).upper()
+            if "ВЫСОК" in risk_upper or "HIGH" in risk_upper:
+                return "HIGH"
+            if "УМЕРЕН" in risk_upper or "MODERATE" in risk_upper:
+                return "MODERATE"
+            if "НИЗК" in risk_upper or "LOW" in risk_upper:
+                return "LOW"
+            if "НЕОПРЕДЕЛ" in risk_upper or "UNDETERMINED" in risk_upper:
+                return "UNDETERMINED"
+            return "NO_DATA"
+        if name == "safety_disclaimer_code":
+            return "disclaimer_text"
+        raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
 
     def to_dataframe(self) -> pd.DataFrame:
         """Формирует структурированную таблицу результатов для отображения в UI."""
@@ -108,11 +217,13 @@ class MultiDrugChecker:
 
         # 2. Обнаружение опасного дублирования активных веществ
         duplicates: list[str] = []
+        duplicates_structured: list[tuple[str, list[str]]] = []
         for canon, inputs in resolved_map.items():
             if len(inputs) > 1:
                 duplicates.append(
                     f"Терапевтическое дублирование: действующее вещество «{canon}» входит одновременно в несколько выбранных позиций: {', '.join(inputs)}."
                 )
+                duplicates_structured.append((canon, inputs))
 
         # 3. Анализ всех уникальных пар
         canonical_list = sorted(resolved_map.keys())
@@ -130,14 +241,19 @@ class MultiDrugChecker:
 
             if level == "Major":
                 exp = "Высокий риск клинически значимого взаимодействия. Требует оценки врачом."
+                exp_code = "exp_major"
             elif level == "Moderate":
                 exp = "Умеренный риск. Возможно изменение терапевтической концентрации или эффекта."
+                exp_code = "exp_moderate"
             elif level == "Minor":
                 exp = "Незначительный риск по классификации DDInter."
+                exp_code = "exp_minor"
             elif level == "Unknown":
                 exp = "Запись зарегистрирована в исследовательской базе, но степень тяжести не указана."
+                exp_code = "exp_unknown"
             else:
                 exp = "Запись в DDInter не найдена. Отсутствие записи НЕ подтверждает безопасность."
+                exp_code = "exp_not_in_db"
 
             pairwise_results.append(PairwiseInteraction(
                 drug_a=drug_a,
@@ -147,6 +263,7 @@ class MultiDrugChecker:
                 level=level,
                 in_ddinter=in_db,
                 explanation=exp,
+                explanation_code=exp_code,
                 severity_rank=LEVEL_RANK.get(level, 0)
             ))
 
@@ -156,14 +273,19 @@ class MultiDrugChecker:
         # Оценка общего уровня риска профиля
         if counts["Major"] > 0 or len(duplicates) > 0:
             overall = "ВЫСОКИЙ РИСК"
+            overall_code = "HIGH"
         elif counts["Moderate"] > 0:
             overall = "УМЕРЕННЫЙ РИСК"
+            overall_code = "MODERATE"
         elif counts["Minor"] > 0:
             overall = "НИЗКИЙ РИСК"
+            overall_code = "LOW"
         elif counts["Unknown"] > 0:
             overall = "НЕОПРЕДЕЛЁННЫЙ РИСК"
+            overall_code = "UNDETERMINED"
         else:
             overall = "ДАННЫЕ В DDINTER ОТСУТСТВУЮТ"
+            overall_code = "NO_DATA"
 
         disclaimer = (
             "Внимание: Анализ основан исключительно на сопоставлении с научной базой DDInter. "
@@ -180,5 +302,9 @@ class MultiDrugChecker:
             pairs=pairwise_results,
             summary_counts=counts,
             overall_risk=overall,
-            safety_disclaimer=disclaimer
+            safety_disclaimer=disclaimer,
+            overall_risk_code=overall_code,
+            safety_disclaimer_code="disclaimer_text",
+            duplicates_structured=duplicates_structured,
+            duplicates=duplicates
         )

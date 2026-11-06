@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix, roc_auc_score, roc_curve
+from sklearn.metrics import auc, confusion_matrix, precision_recall_curve, roc_auc_score, roc_curve
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -96,17 +96,24 @@ def train_and_evaluate(pairs: pd.DataFrame, drugs: pd.DataFrame) -> dict:
     forest.fit(x_train, y_train)
 
     # Простые baseline-оценки используют те же признаки и тот же тест.
-    raw_scores = {
-        "Случайный лес": forest.predict_proba(x_test)[:, 1],
-        "Логистическая регрессия": logistic.predict_proba(x_test)[:, 1],
-        "Только общие соседи": x_test[:, 0],
-        "Только степень": x_test[:, 3] * x_test[:, 4],
-        "Случайное угадывание": rng.random(len(y_test)),
-    }
+    methods_meta = [
+        ("random_forest", "Случайный лес", forest.predict_proba(x_test)[:, 1]),
+        ("logreg", "Логистическая регрессия", logistic.predict_proba(x_test)[:, 1]),
+        ("common_neighbors", "Только общие соседи", x_test[:, 0]),
+        ("degree", "Только степень", x_test[:, 3] * x_test[:, 4]),
+        ("random", "Случайное угадывание", rng.random(len(y_test))),
+    ]
+    raw_scores = {name: scores for _, name, scores in methods_meta}
     metric_rows, roc_data = [], {}
-    for name, scores in raw_scores.items():
-        metric_rows.append({"Метод": name, "ROC-AUC": roc_auc_score(y_test, scores),
-                            "Precision@5000": float(y_test[np.argsort(scores)[::-1][:min(5000, len(scores))]].mean())})
+    for method_id, name, scores in methods_meta:
+        precisions, recalls, _ = precision_recall_curve(y_test, scores)
+        metric_rows.append({
+            "method_id": method_id,
+            "Метод": name,
+            "ROC-AUC": roc_auc_score(y_test, scores),
+            "PR-AUC": auc(recalls, precisions),
+            "Precision@5000": float(y_test[np.argsort(scores)[::-1][:min(5000, len(scores))]].mean())
+        })
         fpr, tpr, _ = roc_curve(y_test, scores)
         roc_data[name] = (fpr, tpr)
     predictions = (raw_scores["Случайный лес"] >= 0.5).astype(int)
@@ -117,8 +124,112 @@ def train_and_evaluate(pairs: pd.DataFrame, drugs: pd.DataFrame) -> dict:
         "confusion": np.array([[tn, fp], [fn, tp]]),
         "train_examples": len(y_train), "test_examples": len(y_test),
         "train_positive": len(train_pos), "test_positive": len(test_pos),
-        "best_name": "Случайный лес", "best_model": forest,
+        "best_name": "Случайный лес", "best_method_id": "random_forest", "best_model": forest,
+        "logreg_model": logistic,
         "feature_matrices": (common, degree, aa), "n": n,
+    }
+
+
+def predict_pair_ml_intelligence(
+    drug_a: str,
+    drug_b: str,
+    pairs: pd.DataFrame,
+    drugs: pd.DataFrame,
+    evaluation: dict,
+    top_bridges: int = 8,
+) -> dict:
+    """Выполняет персональный ML-прогноз и топологический аудит для конкретной пары препаратов.
+
+    Возвращает:
+    - rf_score: Оценка RandomForest (0.0 - 1.0)
+    - logreg_score: Оценка LogisticRegression (0.0 - 1.0)
+    - ensemble_score: Комбинированный индекс структурного сродства в графе DDInter (0.0 - 1.0)
+    - common_neighbors_count: Число общих соседей в обучающем графе
+    - jaccard: Коэффициент Жаккара
+    - adamic_adar: Индекс Адамик-Адара
+    - degree_a, degree_b: Степени связности препаратов A и B
+    - major_links_a, major_links_b: Число критических (Major) взаимодействий каждого препарата в DDInter
+    - shared_bridges: Список общих препаратов-посредников, связывающих Drug A и Drug B в клинической сети
+    - in_ddinter_level: Зарегистрированный уровень в DDInter (или None)
+    """
+    norm_a = (drug_a or "").strip().lower()
+    norm_b = (drug_b or "").strip().lower()
+    ids = dict(zip(drugs["drug"], drugs["node_id"]))
+    common, degree, aa = evaluation["feature_matrices"]
+
+    idx_a = ids.get(norm_a)
+    idx_b = ids.get(norm_b)
+
+    if idx_a is None or idx_b is None or idx_a == idx_b:
+        return {
+            "valid": False,
+            "rf_score": 0.0,
+            "logreg_score": 0.0,
+            "ensemble_score": 0.0,
+            "common_neighbors_count": 0,
+            "jaccard": 0.0,
+            "adamic_adar": 0.0,
+            "degree_a": 0,
+            "degree_b": 0,
+            "major_links_a": 0,
+            "major_links_b": 0,
+            "shared_bridges": [],
+            "in_ddinter_level": None,
+        }
+
+    pair_arr = np.array([[min(idx_a, idx_b), max(idx_a, idx_b)]], dtype=np.int32)
+    feats = pair_features(pair_arr, common, degree, aa)
+    rf_model = evaluation["best_model"]
+    rf_prob = float(rf_model.predict_proba(feats)[0, 1])
+
+    logreg_model = evaluation.get("logreg_model")
+    lr_prob = float(logreg_model.predict_proba(feats)[0, 1]) if logreg_model is not None else rf_prob
+    ensemble_prob = float(0.7 * rf_prob + 0.3 * lr_prob)
+
+    # Поиск реального статуса в DDInter и общих препаратов-посредников (Bridge Drugs)
+    low_d, high_d = min(norm_a, norm_b), max(norm_a, norm_b)
+    direct_match = pairs[(pairs["Drug_A"] == low_d) & (pairs["Drug_B"] == high_d)]
+    in_ddinter_level = str(direct_match.iloc[0]["Level"]) if not direct_match.empty else None
+
+    rows_a = pairs[(pairs["Drug_A"] == norm_a) | (pairs["Drug_B"] == norm_a)]
+    rows_b = pairs[(pairs["Drug_A"] == norm_b) | (pairs["Drug_B"] == norm_b)]
+
+    major_a = int((rows_a["Level"] == "Major").sum())
+    major_b = int((rows_b["Level"] == "Major").sum())
+
+    nbrs_a = dict(zip(np.where(rows_a["Drug_A"] == norm_a, rows_a["Drug_B"], rows_a["Drug_A"]), rows_a["Level"]))
+    nbrs_b = dict(zip(np.where(rows_b["Drug_A"] == norm_b, rows_b["Drug_B"], rows_b["Drug_A"]), rows_b["Level"]))
+
+    shared_keys = set(nbrs_a.keys()).intersection(nbrs_b.keys()) - {norm_a, norm_b}
+    sev_rank = {"Major": 0, "Moderate": 1, "Minor": 2, "Unknown": 3}
+    bridge_rows = []
+    for br in shared_keys:
+        lvl_a = nbrs_a[br]
+        lvl_b = nbrs_b[br]
+        score_rank = sev_rank.get(lvl_a, 3) + sev_rank.get(lvl_b, 3)
+        bridge_rows.append({
+            "bridge_drug": br,
+            "level_with_a": lvl_a,
+            "level_with_b": lvl_b,
+            "rank": score_rank,
+        })
+    bridge_rows.sort(key=lambda x: (x["rank"], x["bridge_drug"]))
+
+    return {
+        "valid": True,
+        "rf_score": rf_prob,
+        "logreg_score": lr_prob,
+        "ensemble_score": ensemble_prob,
+        "common_neighbors_count": int(feats[0, 0]),
+        "jaccard": float(feats[0, 1]),
+        "adamic_adar": float(feats[0, 2]),
+        "degree_a": int(degree[idx_a]),
+        "degree_b": int(degree[idx_b]),
+        "full_common_neighbors_count": len(shared_keys),
+        "major_links_a": major_a,
+        "major_links_b": major_b,
+        "shared_bridges": bridge_rows[:top_bridges],
+        "in_ddinter_level": in_ddinter_level,
     }
 
 

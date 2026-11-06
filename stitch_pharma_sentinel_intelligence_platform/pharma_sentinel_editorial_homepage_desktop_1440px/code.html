@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_standard" name="shell-type"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&amp;family=Work+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "error": "#ba1a1a", "on-secondary-fixed-variant": "#00504c", "secondary": "#006a65", "primary": "#022448", "surface-subtle": "#F7F7F5", "on-error": "#ffffff", "surface-warm": "#FBFBFA", "surface-dim": "#d8dadf", "on-primary-container": "#8aa4cf", "surface": "#f8f9ff", "secondary-container": "#96efe8", "background": "#f8f9ff", "on-background": "#191c20", "on-tertiary-fixed-variant": "#254778", "on-secondary-fixed": "#00201e", "surface-tint": "#455f87", "tertiary-container": "#14396a", "tertiary": "#00234c", "surface-variant": "#e1e2e8", "error-container": "#ffdad6", "primary-container": "#1e3a5f", "on-primary": "#ffffff", "on-tertiary": "#ffffff", "on-tertiary-container": "#85a4db", "primary-fixed": "#d5e3ff", "on-primary-fixed": "#001c3b", "on-secondary-container": "#006f6a", "surface-container-highest": "#e1e2e8", "surface-container-high": "#e6e8ee", "surface-bright": "#f8f9ff", "on-primary-fixed-variant": "#2d486d", "border-hairline": "#E2E4E1", "surface-container": "#FFFFFF", "inverse-on-surface": "#eff0f6", "tertiary-fixed-dim": "#a9c7ff", "primary-fixed-dim": "#adc8f5", "secondary-fixed": "#99f2eb", "inverse-primary": "#adc8f5", "surface-container-lowest": "#ffffff", "on-error-container": "#93000a", "inverse-surface": "#2e3135", "secondary-fixed-dim": "#7dd5cf", "severity-moderate": "#D97706", "on-surface": "#191c20", "outline": "#74777f", "tertiary-fixed": "#d6e3ff", "severity-severe": "#C93B2B", "surface-container-low": "#f2f3f9", "on-tertiary-fixed": "#001b3d", "on-secondary": "#ffffff", "text-muted": "#5A6578", "outline-variant": "#c4c6cf", "severity-mild": "#0D7A75", "on-surface-variant": "#43474e" }, "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, "spacing": { "space-md": "1rem", "space-xl": "2.5rem", "margin": "3rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "margin-mobile": "1rem", "gutter-mobile": "1rem", "space-xs": "0.25rem", "gutter": "1.5rem" }, "fontFamily": { "label-lg": [ "Work Sans" ], "headline-md": [ "Newsreader" ], "display-lg": [ "Newsreader" ], "label-sm": [ "Work Sans" ], "body-lg": [ "Newsreader" ], "body-sm": [ "Work Sans" ], "headline-lg-mobile": [ "Newsreader" ], "body-md": [ "Work Sans" ], "headline-lg": [ "Newsreader" ], "display-lg-mobile": [ "Newsreader" ], "headline-sm": [ "Work Sans" ], "label-md": [ "Work Sans" ] }, "fontSize": { "label-lg": [ "0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "0.01em", "fontWeight": "600" } ], "headline-md": [ "1.75rem", { "lineHeight": "2.25rem", "fontWeight": "500" } ], "display-lg": [ "3.5rem", { "lineHeight": "4rem", "letterSpacing": "-0.02em", "fontWeight": "400" } ], "label-sm": [ "0.6875rem", { "lineHeight": "0.875rem", "letterSpacing": "0.06em", "fontWeight": "600" } ], "body-lg": [ "1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" } ], "body-sm": [ "0.8125rem", { "lineHeight": "1.25rem", "fontWeight": "400" } ], "headline-lg-mobile": [ "1.75rem", { "lineHeight": "2.25rem", "letterSpacing": "-0.01em", "fontWeight": "400" } ], "body-md": [ "0.9375rem", { "lineHeight": "1.5rem", "fontWeight": "400" } ], "headline-lg": [ "2.5rem", { "lineHeight": "3rem", "letterSpacing": "-0.015em", "fontWeight": "400" } ], "display-lg-mobile": [ "2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.01em", "fontWeight": "400" } ], "headline-sm": [ "1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "label-md": [ "0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.04em", "fontWeight": "500" } ] } } } };</script></head><body class="bg-surface-warm font-body-md text-on-surface antialiased"><header class="fixed top-0 w-full z-50 bg-surface-container/95 backdrop-blur-md shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-20 w-full px-gutter flex items-center justify-between"><div class="flex items-center gap-space-lg"><a class="flex flex-col text-left" data-path="overview" href="#"><span class="font-headline-sm text-headline-sm tracking-tight text-primary uppercase">Pharma Sentinel</span><span class="font-label-sm text-label-sm text-text-muted tracking-widest uppercase">Clinical Pharmacology Intelligence — v3.4</span></a><div class="h-8 w-px bg-border-hairline mx-space-sm hidden lg:block"></div><div class="hidden xl:flex items-center gap-space-xs px-space-sm py-1 bg-surface-subtle rounded-DEFAULT"><span class="w-1.5 h-1.5 rounded-full bg-secondary"></span><span class="font-label-sm text-label-sm text-text-muted uppercase">Core DB: v2024.11-Rel</span></div></div><nav class="hidden md:flex items-center gap-space-lg" data-active-classes="text-primary font-semibold"><a aria-current="page" class="uppercase tracking-wider transition-colors text-primary font-semibold" data-path="overview" href="#">Overview</a><a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors" data-path="architecture" href="#">Architecture</a><a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors" data-path="provenance" href="#">Provenance</a><a class="font-label-md text-label-md uppercase tracking-wider text-on-surface-variant hover:text-primary transition-colors" data-path="methodology" href="#">Methodology</a></nav><div class="flex items-center gap-space-md"><a class="inline-flex items-center gap-space-xs bg-primary-container hover:bg-tertiary-container text-on-primary px-5 py-2.5 rounded-lg font-label-lg text-label-lg transition-colors" data-path="analysis-workspace" href="#"><span class="material-symbols-outlined text-[18px]">biotech</span><span>Analysis Workspace</span></a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full pt-20 bg-surface-warm"><div class="flex flex-col w-full">
+<!-- SECTION 1: EDITORIAL HERO (12-Column Asymmetric Grid) -->
+<section class="w-full px-gutter max-w-7xl mx-auto py-space-xl">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<!-- Left Column (7 Columns) -->
+<div class="lg:col-span-7 flex flex-col gap-space-lg">
+<div class="flex items-center gap-space-sm flex-wrap">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-semibold">Initiative 2025</span>
+<span class="w-1.5 h-1.5 rounded-full bg-border-hairline"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-text-muted">Clinical Pharmacology Intelligence</span>
+<div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-surface-subtle border-hairline border rounded-DEFAULT">
+<span class="w-1.5 h-1.5 rounded-full bg-severity-mild animate-pulse"></span>
+<span class="font-label-sm text-label-sm uppercase tracking-wide text-primary">Live Engine v3.4</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-sm">
+<h1 class="font-display-lg text-display-lg text-primary tracking-tight leading-none text-balance">
+            Mapping the unseen boundaries of polypharmacy.
+          </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl leading-relaxed mt-space-xs">
+            A deterministic and mechanistic framework for predicting multi-agent pharmacokinetic clashes across hepatic, renal, and receptor clearance pathways.
+          </p>
+</div>
+<!-- Metric Badges & Meta -->
+<div class="grid grid-cols-3 gap-space-sm py-space-sm border-t border-b border-border-hairline">
+<div>
+<span class="font-label-sm text-label-sm text-text-muted block uppercase">Resolution</span>
+<span class="font-label-lg text-label-lg text-primary tabular-nums">Sub-Micromolar</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-text-muted block uppercase">Target Pk Engine</span>
+<span class="font-label-lg text-label-lg text-primary">In Silico + PBPK</span>
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-text-muted block uppercase">Validation Cohort</span>
+<span class="font-label-lg text-label-lg text-primary tabular-nums">N = 84,210</span>
+</div>
+</div>
+<!-- CTAs -->
+<div class="flex flex-wrap items-center gap-space-md pt-space-xs">
+<a class="inline-flex items-center gap-space-xs bg-primary-container hover:bg-tertiary-container text-on-primary px-6 py-3 rounded-DEFAULT font-label-lg text-label-lg transition-colors shadow-sm" data-path="analysis-workspace" href="#">
+<span>Launch Analysis Workspace</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</a>
+<a class="inline-flex items-center gap-space-xs border border-border-hairline bg-surface-container hover:bg-surface-subtle text-primary px-5 py-3 rounded-DEFAULT font-label-lg text-label-lg transition-colors" data-path="methodology" href="#">
+<span class="material-symbols-outlined text-[18px] text-text-muted">menu_book</span>
+<span>Read Methodology Whitepaper (v3.4)</span>
+</a>
+</div>
+</div>
+<!-- Right Column (5 Columns): Lab Instrumentation Telemetry & Monograph Visual -->
+<div class="lg:col-span-5 flex flex-col gap-space-md bg-surface-container border border-border-hairline p-space-md shadow-sm">
+<div class="flex items-center justify-between border-b border-border-hairline pb-space-sm">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-text-muted">Hepatic CYP450 Phenotyping Suite</span>
+<span class="font-headline-sm text-headline-sm text-primary">Instrument Protocol 88-MS</span>
+</div>
+<span class="font-label-sm text-label-sm uppercase px-2 py-0.5 bg-surface-subtle border border-border-hairline text-secondary font-semibold">Active Run</span>
+</div>
+<!-- High-Resolution Clinical Lab Photo Callout -->
+<div class="relative w-full h-56 overflow-hidden bg-surface-subtle border border-border-hairline group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Modern ultra-high performance liquid chromatography and tandem mass spectrometry analytical laboratory instrumentation in a sterile clinical pharmacology research center. Clean stainless steel surfaces, illuminated sample vials, subtle blue and warm white lighting reflecting off analytical glass columns, editorial scientific photography style inspired by academic research institute monographs." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnrs6vSNjr08VHuIilNHZnIdgPZpEQQJwLM4MRqD4EaoNVhKYtfysxWgxHYdDzaYglDpBEL6p9JydvFBBKoeaGjhzrhxjY-6y_5QlvF6AF4z0UChx_mXGdJlv-ltydtdQPmqwpZ6uIZwzG4kSTlXdWwEiw41EQNMlLQuzKlObpU6qHMvsCNz0NdXFzZCGdA5BayxHhuTtaCQngvL330JSGXyRmjjundnHl8nm-la_XhUZc-7PqqcMonQ"/>
+<div class="absolute bottom-2 left-2 right-2 bg-surface-container/90 backdrop-blur-sm px-2.5 py-1.5 border border-border-hairline flex items-center justify-between text-on-surface">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-medium">LC-MS/MS System 04 • Tandem Quad</span>
+<span class="font-label-sm text-label-sm text-text-muted tabular-nums">m/z 100-1200</span>
+</div>
+</div>
+<!-- Real-time Buffer Assay Telemetry Grid -->
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs font-body-sm text-body-sm">
+<div class="p-space-sm bg-surface-warm border border-border-hairline flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-text-muted uppercase">Buffer Assay pH</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-headline-sm text-headline-sm text-primary tabular-nums">7.42</span>
+<span class="font-label-sm text-label-sm text-severity-mild">± 0.02 Δ</span>
+</div>
+</div>
+<div class="p-space-sm bg-surface-warm border border-border-hairline flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-text-muted uppercase">Incubation Temp</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-headline-sm text-headline-sm text-primary tabular-nums">37.0°C</span>
+<span class="font-label-sm text-label-sm text-text-muted">Isothermal</span>
+</div>
+</div>
+<div class="p-space-sm bg-surface-warm border border-border-hairline flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-text-muted uppercase">Microsomal Protein</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-headline-sm text-headline-sm text-primary tabular-nums">0.5 mg/mL</span>
+<span class="font-label-sm text-label-sm text-secondary font-medium">Calibrated</span>
+</div>
+</div>
+<div class="p-space-sm bg-surface-warm border border-border-hairline flex flex-col justify-between">
+<span class="font-label-sm text-label-sm text-text-muted uppercase">NADPH Regeneration</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-headline-sm text-headline-sm text-primary tabular-nums">99.8%</span>
+<span class="font-label-sm text-label-sm text-severity-mild">Saturated</span>
+</div>
+</div>
+</div>
+<!-- Run Trace Footnote -->
+<div class="border-t border-border-hairline pt-space-xs flex items-center justify-between text-text-muted">
+<span class="font-label-sm text-label-sm uppercase tracking-wider">Calibration Hash: 0x9B1C...F44</span>
+<span class="font-label-sm text-label-sm tabular-nums">Cycle 412/500</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 2: POLYPHARMACY CASCADE (Editorial Impact Metrics & Scholarly Quote) -->
+<section class="w-full bg-surface-subtle border-y border-border-hairline py-space-xl">
+<div class="w-full px-gutter max-w-7xl mx-auto flex flex-col gap-space-xl">
+<!-- Metrics Strip -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter items-stretch">
+<!-- Stat 1 -->
+<div class="flex flex-col justify-between p-space-md bg-surface-container border border-border-hairline">
+<div>
+<span class="font-label-sm text-label-sm text-secondary uppercase font-semibold">Population Metric</span>
+<div class="font-headline-lg text-headline-lg text-primary tabular-nums tracking-tight mt-space-xs">42.8%</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-space-md leading-relaxed border-t border-border-hairline pt-space-sm">
+            of geriatric regimens involve 5+ concurrent therapeutics with completely untracked metabolic enzyme competition.
+          </p>
+</div>
+<!-- Stat 2 -->
+<div class="flex flex-col justify-between p-space-md bg-surface-container border border-border-hairline">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-severity-severe uppercase font-semibold">Annual Impact</span>
+<span class="w-2 h-2 rounded-full bg-severity-severe"></span>
+</div>
+<div class="font-headline-lg text-headline-lg text-primary tabular-nums tracking-tight mt-space-xs">3.2M</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-space-md leading-relaxed border-t border-border-hairline pt-space-sm">
+            adverse drug events documented worldwide directly attributed to predictable CYP450 enzyme exhaustion cascades.
+          </p>
+</div>
+<!-- Stat 3 -->
+<div class="flex flex-col justify-between p-space-md bg-surface-container border border-border-hairline">
+<div>
+<span class="font-label-sm text-label-sm text-secondary uppercase font-semibold">Empirical Corpus</span>
+<div class="font-headline-lg text-headline-lg text-primary tabular-nums tracking-tight mt-space-xs">18,400+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-space-md leading-relaxed border-t border-border-hairline pt-space-sm">
+            curated small-molecule and biologic monographs cataloged with verified thermodynamic binding kinetics.
+          </p>
+</div>
+<!-- Stat 4: Scholarly Quotation -->
+<div class="flex flex-col justify-between p-space-md bg-primary text-on-primary">
+<div class="flex flex-col">
+<span class="font-display-lg text-display-lg text-on-primary-container leading-none opacity-40 select-none">“</span>
+<p class="font-body-lg text-body-lg text-on-primary italic -mt-4 leading-snug">
+              Contemporary healthcare relies on static pairwise lookup tables. Real-world medicine is a simultaneous multi-substrate network problem.
+            </p>
+</div>
+<div class="border-t border-primary-container/80 pt-space-sm mt-space-sm">
+<span class="font-label-sm text-label-sm uppercase tracking-wider block text-on-primary font-semibold">Dr. Alistair Vance</span>
+<span class="font-label-sm text-label-sm text-on-primary-container block">Head of Computational Toxicology</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: FEATURED MOLECULAR NETWORK VISUALIZATION & DEMONSTRATION -->
+<section class="w-full px-gutter max-w-7xl mx-auto py-space-xl">
+<div class="flex flex-col gap-space-lg">
+<!-- Section Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-space-md border-b border-border-hairline pb-space-md">
+<div class="flex flex-col max-w-2xl">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-semibold">Clinical Triad Case Study</span>
+<h2 class="font-headline-lg text-headline-lg text-primary tracking-tight mt-space-xs">
+            The Hepatic CYP2C9 Bottleneck
+          </h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-space-xs">
+            Deterministic modeling of competitive substrate displacement and allosteric inhibition within the (S)-Warfarin, Amiodarone, and Fluconazole pharmacokinetic interaction nexus.
+          </p>
+</div>
+<!-- Interactive Mode Tabs -->
+<div class="inline-flex p-1 bg-surface-subtle border border-border-hairline rounded-DEFAULT self-start md:self-auto" id="triad-tabs">
+<button class="tab-btn active px-3 py-1.5 font-label-md text-label-md uppercase bg-surface-container text-primary shadow-xs transition-colors" data-target="path" type="button">Path Triangulation</button>
+<button class="tab-btn px-3 py-1.5 font-label-md text-label-md uppercase text-text-muted hover:text-primary transition-colors" data-target="saturation" type="button">CYP450 Saturation</button>
+<button class="tab-btn px-3 py-1.5 font-label-md text-label-md uppercase text-text-muted hover:text-primary transition-colors" data-target="transporters" type="button">Transporter Kinetics</button>
+</div>
+</div>
+<!-- Main Workbench Layout: 8-Column Schematic + 4-Column Clinical Rail -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left: SVG Molecular Clearance Diagram (8 Cols) -->
+<div class="lg:col-span-8 bg-surface-container border border-border-hairline p-space-lg flex flex-col justify-between relative min-h-[520px]">
+<div class="flex items-center justify-between border-b border-border-hairline pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-severity-severe"></span>
+<span class="font-label-md text-label-md uppercase tracking-wider text-primary font-semibold">Interaction Topology: 3-Compound Competitive Convergence</span>
+</div>
+<span class="font-label-sm text-label-sm text-text-muted tabular-nums">Simulation Node: CYP2C9-HEPATIC-01</span>
+</div>
+<!-- Dynamic SVG Vector Diagram -->
+<div class="w-full flex-1 flex items-center justify-center py-space-md">
+<svg class="w-full max-w-2xl h-auto" fill="none" viewbox="0 0 740 380" xmlns="http://www.w3.org/2000/svg">
+<!-- Grid Backdrop lines -->
+<line stroke="#E2E4E1" stroke-dasharray="4 4" stroke-width="1" x1="40" x2="700" y1="70" y2="70"></line>
+<line stroke="#E2E4E1" stroke-dasharray="4 4" stroke-width="1" x1="40" x2="700" y1="190" y2="190"></line>
+<line stroke="#E2E4E1" stroke-dasharray="4 4" stroke-width="1" x1="40" x2="700" y1="310" y2="310"></line>
+<!-- Substrate Node 1: (S)-Warfarin -->
+<g transform="translate(60, 50)">
+<rect fill="#F7F7F5" height="66" rx="2" stroke="#E2E4E1" stroke-width="1" width="180"></rect>
+<text fill="#022448" font-family="Work Sans" font-size="12" font-weight="600" letter-spacing="0.04em" x="16" y="24">WARFARIN (S-ENANTIOMER)</text>
+<text fill="#5A6578" font-family="Work Sans" font-size="11" x="16" y="42">Primary Substrate (Narrow TI)</text>
+<text fill="#006A65" font-family="Work Sans" font-size="10" font-weight="600" x="16" y="56">Km = 4.2 µM • Phase I</text>
+</g>
+<!-- Inhibitor Node 2: Fluconazole -->
+<g transform="translate(60, 160)">
+<rect fill="#FFF5F5" height="66" rx="2" stroke="#C93B2B" stroke-width="1" width="180"></rect>
+<text fill="#C93B2B" font-family="Work Sans" font-size="12" font-weight="600" letter-spacing="0.04em" x="16" y="24">FLUCONAZOLE</text>
+<text fill="#5A6578" font-family="Work Sans" font-size="11" x="16" y="42">Potent Competitive Inhibitor</text>
+<text fill="#C93B2B" font-family="Work Sans" font-size="10" font-weight="600" x="16" y="56">Ki = 0.55 µM (Direct Block)</text>
+</g>
+<!-- Modulator Node 3: Amiodarone -->
+<g transform="translate(60, 270)">
+<rect fill="#FFFBEB" height="66" rx="2" stroke="#D97706" stroke-width="1" width="180"></rect>
+<text fill="#D97706" font-family="Work Sans" font-size="12" font-weight="600" letter-spacing="0.04em" x="16" y="24">AMIODARONE</text>
+<text fill="#5A6578" font-family="Work Sans" font-size="11" x="16" y="42">Time-Dependent Modulator</text>
+<text fill="#D97706" font-family="Work Sans" font-size="10" font-weight="600" x="16" y="56">Ki = 1.3 µM + P-gp Efflux</text>
+</g>
+<!-- Central Enzyme Hub: CYP2C9 -->
+<g transform="translate(470, 140)">
+<circle cx="90" cy="50" fill="#F8F9FF" r="68" stroke="#022448" stroke-width="2"></circle>
+<circle cx="90" cy="50" fill="none" r="54" stroke="#C93B2B" stroke-dasharray="6 3" stroke-width="1.5"></circle>
+<text fill="#022448" font-family="Newsreader" font-size="18" font-weight="500" text-anchor="middle" x="90" y="42">CYP2C9</text>
+<text fill="#5A6578" font-family="Work Sans" font-size="10" font-weight="600" text-anchor="middle" x="90" y="58">HEPATIC CLEARING</text>
+<text fill="#C93B2B" font-family="Work Sans" font-size="10" font-weight="600" text-anchor="middle" x="90" y="72">86% OCCUPIED</text>
+</g>
+<!-- Connecting Vectors / Inhibition Trajectories -->
+<!-- Warfarin to Hub -->
+<path d="M 240 83 C 340 83, 380 155, 470 170" stroke="#006A65" stroke-linecap="round" stroke-width="2"></path>
+<circle cx="360" cy="120" fill="#006A65" r="3"></circle>
+<!-- Fluconazole to Hub (Strong direct inhibitory red vector) -->
+<path d="M 240 193 L 470 190" stroke="#C93B2B" stroke-linecap="round" stroke-width="3"></path>
+<!-- Marker block symbol -->
+<line stroke="#C93B2B" stroke-width="3" x1="455" x2="455" y1="182" y2="198"></line>
+<!-- Amiodarone to Hub -->
+<path d="M 240 303 C 340 303, 380 220, 470 210" stroke="#D97706" stroke-linecap="round" stroke-width="2"></path>
+<!-- Marker block symbol -->
+<line stroke="#D97706" stroke-width="2" x1="455" x2="455" y1="202" y2="218"></line>
+<!-- Downstream Outflow Path (Blocked Excretion) -->
+<path d="M 628 190 L 690 190" stroke="#74777F" stroke-dasharray="4 4" stroke-width="2"></path>
+<polygon fill="#74777F" points="695,190 685,185 685,195"></polygon>
+<text fill="#C93B2B" font-family="Work Sans" font-size="10" font-weight="600" text-anchor="middle" x="660" y="175">AUC +380%</text>
+<text fill="#5A6578" font-family="Work Sans" font-size="9" text-anchor="middle" x="660" y="215">Clearance Failure</text>
+</svg>
+</div>
+<!-- Topology Legend & Annotation -->
+<div class="border-t border-border-hairline pt-space-sm flex flex-wrap items-center justify-between gap-space-sm">
+<div class="flex items-center gap-space-md flex-wrap text-text-muted font-label-sm text-label-sm">
+<span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-secondary"></span> Substrate Turnover</span>
+<span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-severity-severe"></span> Competitive Inhibitor (Ki &lt; 1 µM)</span>
+<span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-severity-moderate"></span> Allosteric Modulator</span>
+</div>
+<div class="font-label-sm text-label-sm text-primary font-semibold">
+              Calculated ΔAUC: +380% Warfarin Exposure
+            </div>
+</div>
+</div>
+<!-- Right: Analytical Pharmacokinetic Rail (4 Cols) -->
+<div class="lg:col-span-4 flex flex-col gap-space-md">
+<!-- Critical Hazard Panel -->
+<div class="p-space-md bg-surface-container border border-border-hairline flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-text-muted">Pharmacodynamic Risk</span>
+<span class="font-label-sm text-label-sm uppercase px-2 py-0.5 border border-severity-severe text-severity-severe bg-error-container/30 font-semibold">Critical Grade 4</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Severe Hemorrhagic Risk</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Dual-inhibitor metabolic shutdown of CYP2C9 halts (S)-warfarin 7-hydroxylation. Unbound active fraction escalates rapidly within 48–72 hours of co-initiation.
+            </p>
+<div class="space-y-space-xs pt-space-xs border-t border-border-hairline text-body-sm">
+<div class="flex justify-between py-1">
+<span class="text-text-muted">International Normalized Ratio (INR):</span>
+<span class="font-semibold text-severity-severe tabular-nums">&gt; 5.5 Projected</span>
+</div>
+<div class="flex justify-between py-1 border-t border-surface-subtle">
+<span class="text-text-muted">Bleeding Hazard Elevation:</span>
+<span class="font-semibold text-severity-severe tabular-nums">4.8-fold [3.9 - 5.9]</span>
+</div>
+<div class="flex justify-between py-1 border-t border-surface-subtle">
+<span class="text-text-muted">Time-to-Clearance Recovery:</span>
+<span class="font-semibold text-primary tabular-nums">14 - 21 Days</span>
+</div>
+</div>
+</div>
+<!-- Clinical Intervention Dossier -->
+<div class="p-space-md bg-surface-subtle border border-border-hairline flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-primary font-semibold">Consensus Action Guidance</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              1. Reduce baseline Warfarin dosing by 50% prior to first dose of Fluconazole.<br/>
+              2. Alternate with an echinocandin (e.g., Anidulafungin) without CYP2C9 pathway reliance.<br/>
+              3. Implement 24-hour prothrombin time trajectory audits.
+            </p>
+<div class="pt-space-sm mt-space-xs border-t border-border-hairline flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-text-muted">CPIC Guideline Rev. 2024</span>
+<a class="font-label-sm text-label-sm uppercase text-secondary font-semibold hover:underline" href="#">View Dosing Monograph →</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 4: ALGORITHMIC PIPELINE & ARCHITECTURE OF INFERENCE (3-Column Editorial Grid) -->
+<section class="w-full bg-surface-container border-y border-border-hairline py-space-xl">
+<div class="w-full px-gutter max-w-7xl mx-auto flex flex-col gap-space-lg">
+<div class="flex flex-col max-w-2xl">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-semibold">Methodological Rigor</span>
+<h2 class="font-headline-lg text-headline-lg text-primary tracking-tight mt-space-xs">
+          The Architecture of Deterministic Inference
+        </h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-space-xs">
+          Moving beyond empirical trial observation alone. How Pharma Sentinel constructs holistic mathematical approximations of human metabolic bottlenecks.
+        </p>
+</div>
+<!-- 3-Column Architecture Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter pt-space-sm">
+<!-- Phase 01 -->
+<div class="flex flex-col justify-between p-space-lg bg-surface-warm border border-border-hairline hover:border-primary transition-colors group">
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between border-b border-border-hairline pb-space-sm">
+<span class="font-label-lg text-label-lg text-primary">PHASE 01</span>
+<span class="font-label-sm text-label-sm text-text-muted uppercase">Ingestion</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Multi-Compound Structure Ingestion</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Canonical SMILES representation parsing, InChIKey hashing, and structural descriptor projection. Automatic reconciliation against WHO ATC classification codes and chemical lipophilicity (LogP, pKa) gradients.
+            </p>
+</div>
+<div class="pt-space-md border-t border-border-hairline mt-space-md flex flex-col gap-1 font-label-sm text-label-sm text-text-muted">
+<span class="text-primary font-medium">Pipeline Components:</span>
+<span>• RDKit Molecular Standardization</span>
+<span>• SMILES Canonicalization Loop</span>
+<span>• Ionization State Partitioning</span>
+</div>
+</div>
+<!-- Phase 02 -->
+<div class="flex flex-col justify-between p-space-lg bg-surface-warm border border-border-hairline hover:border-primary transition-colors group">
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between border-b border-border-hairline pb-space-sm">
+<span class="font-label-lg text-label-lg text-secondary">PHASE 02</span>
+<span class="font-label-sm text-label-sm text-text-muted uppercase">Triangulation</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Pathway &amp; Substrate Triangulation</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Simultaneous mapping across Phase I/II hepatic enzymes (CYP3A4, 2D6, 2C19, UGT1A1), P-glycoprotein efflux transport, and hERG potassium channel affinity to predict metabolic rate-limiting barriers.
+            </p>
+</div>
+<div class="pt-space-md border-t border-border-hairline mt-space-md flex flex-col gap-1 font-label-sm text-label-sm text-text-muted">
+<span class="text-primary font-medium">Pipeline Components:</span>
+<span>• Multi-Substrate Michaelis-Menten Engine</span>
+<span>• Non-Linear Fractional Clearance (fm)</span>
+<span>• Renal Filtration GFR Scaling</span>
+</div>
+</div>
+<!-- Phase 03 -->
+<div class="flex flex-col justify-between p-space-lg bg-surface-warm border border-border-hairline hover:border-primary transition-colors group">
+<div class="flex flex-col gap-space-md">
+<div class="flex items-center justify-between border-b border-border-hairline pb-space-sm">
+<span class="font-label-lg text-label-lg text-primary">PHASE 03</span>
+<span class="font-label-sm text-label-sm text-text-muted uppercase">Disambiguation</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-primary">Tri-Tier Evidence Disambiguation</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Rigorous classification of every predicted clash into Tier I (Empirical Human Clinical Trial), Tier II (In-Silico Physiologically-Based PBPK Model), or Tier III (Empirical Research Void / Theoretical Clash).
+            </p>
+</div>
+<div class="pt-space-md border-t border-border-hairline mt-space-md flex flex-col gap-1 font-label-sm text-label-sm text-text-muted">
+<span class="text-primary font-medium">Pipeline Components:</span>
+<span>• Evidence Grade Weighing (GRADE System)</span>
+<span>• Confidence-Interval Bounds</span>
+<span>• Unbiased Epistemic Uncertainty Flag</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 5: CURATED CLINICAL PROVENANCE & INSTITUTIONAL NOTICE -->
+<section class="w-full px-gutter max-w-7xl mx-auto py-space-xl">
+<div class="flex flex-col gap-space-lg">
+<!-- Section Top -->
+<div class="flex flex-col max-w-2xl">
+<span class="font-label-sm text-label-sm uppercase tracking-widest text-secondary font-semibold">Institutional Provenance</span>
+<h2 class="font-headline-lg text-headline-lg text-primary tracking-tight mt-space-xs">
+          Transparent Data Lineage
+        </h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-space-xs">
+          Pharma Sentinel does not generate ungrounded statistical hallucinations. Every clearance rate, inhibition constant (Ki), and toxicological threshold ties to verifiable, auditable sources.
+        </p>
+</div>
+<!-- Provenance Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Source 1 -->
+<div class="p-space-md bg-surface-container border border-border-hairline flex flex-col justify-between">
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm text-text-muted uppercase">Structured Product Labels</span>
+<h4 class="font-headline-sm text-headline-sm text-primary">DailyMed SPLs</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mt-space-xs">
+              52,400+ indexed FDA prescription labels parsed for clinical contraindications, black-box warnings, and dose modifications.
+            </p>
+</div>
+<div class="pt-space-sm border-t border-border-hairline mt-space-sm flex justify-between items-center text-text-muted">
+<span class="font-label-sm text-label-sm">NIH / NLM Mirror</span>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">Sync: Daily</span>
+</div>
+</div>
+<!-- Source 2 -->
+<div class="p-space-md bg-surface-container border border-border-hairline flex flex-col justify-between">
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm text-text-muted uppercase">Adverse Event Signal</span>
+<h4 class="font-headline-sm text-headline-sm text-primary">EudraVigilance</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mt-space-xs">
+              Continuous retrospective epidemiological reconciliation against the European Medicines Agency safety database.
+            </p>
+</div>
+<div class="pt-space-sm border-t border-border-hairline mt-space-sm flex justify-between items-center text-text-muted">
+<span class="font-label-sm text-label-sm">EMA Direct Access</span>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">v2024.Q4</span>
+</div>
+</div>
+<!-- Source 3 -->
+<div class="p-space-md bg-surface-container border border-border-hairline flex flex-col justify-between">
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm text-text-muted uppercase">Peer-Reviewed Literature</span>
+<h4 class="font-headline-sm text-headline-sm text-primary">PubMed PMC</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mt-space-xs">
+              Prospective pharmacokinetics clinical trials, micro-dosing cohort studies, and in-vivo interaction literature with DOI cross-links.
+            </p>
+</div>
+<div class="pt-space-sm border-t border-border-hairline mt-space-sm flex justify-between items-center text-text-muted">
+<span class="font-label-sm text-label-sm">Semantic Mesh</span>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">2.8M Citations</span>
+</div>
+</div>
+<!-- Source 4 -->
+<div class="p-space-md bg-surface-container border border-border-hairline flex flex-col justify-between">
+<div class="flex flex-col gap-space-xs">
+<span class="font-label-sm text-label-sm text-text-muted uppercase">Bioactivity Assays</span>
+<h4 class="font-headline-sm text-headline-sm text-primary">ChEMBL v33</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed mt-space-xs">
+              Quantitative binding affinities, Kd, IC50, and kinetic constants derived from European Bioinformatics Institute databases.
+            </p>
+</div>
+<div class="pt-space-sm border-t border-border-hairline mt-space-sm flex justify-between items-center text-text-muted">
+<span class="font-label-sm text-label-sm">EMBL-EBI Pipeline</span>
+<span class="font-label-sm text-label-sm text-secondary font-semibold">Strict Ki &lt; 10µM</span>
+</div>
+</div>
+</div>
+<!-- Institutional Notice / Audit Banner -->
+<div class="p-space-md bg-surface-subtle border border-border-hairline flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+<div class="flex items-center gap-space-md">
+<span class="material-symbols-outlined text-[24px] text-primary">gavel</span>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-primary font-semibold uppercase">Investigational Methodology &amp; Clinical Oversight</span>
+<p class="font-body-sm text-body-sm text-text-muted">
+              Pharma Sentinel provides mathematical decision support for credentialed clinical pharmacologists. Not intended as sole autonomous diagnostic directive.
+            </p>
+</div>
+</div>
+<div class="flex items-center gap-space-md font-label-sm text-label-sm text-text-muted tabular-nums whitespace-nowrap">
+<span>Protocol ID: <strong class="text-primary font-mono">PS-2025-CLIN-09</strong></span>
+<span class="hidden sm:inline">|</span>
+<span class="hidden sm:inline">Audit Trace: <strong class="text-primary font-mono">SHA256:7e08b1a</strong></span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<script>
+  // Simple interactive tab handler for Molecular Network demonstration
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('#triad-tabs .tab-btn');
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        tabButtons.forEach(btn => {
+          btn.classList.remove('active', 'bg-surface-container', 'text-primary', 'shadow-xs');
+          btn.classList.add('text-text-muted');
+        });
+        button.classList.add('active', 'bg-surface-container', 'text-primary', 'shadow-xs');
+        button.classList.remove('text-text-muted');
+      });
+    });
+  });
+</script></main><footer class="w-full bg-surface-subtle py-space-xl"><div class="w-full px-gutter max-w-7xl mx-auto flex flex-col gap-space-lg"><div class="grid grid-cols-1 md:grid-cols-4 gap-gutter"><div class="flex flex-col gap-space-xs md:col-span-1"><span class="font-headline-sm text-headline-sm text-primary uppercase">Pharma Sentinel</span><p class="font-body-sm text-body-sm text-text-muted mt-space-xs">Center for Translational Clinical Pharmacology and High-Dimensional Pharmacokinetics Intelligence.</p><div class="mt-space-sm"><span class="inline-block px-2 py-0.5 bg-surface-container text-text-muted font-label-sm text-label-sm uppercase rounded-DEFAULT">ISO-14155 Clinical Audit</span></div></div><div class="flex flex-col gap-space-xs"><span class="font-label-md text-label-md uppercase text-primary tracking-wider">Research Cohorts</span><p class="font-body-sm text-body-sm text-text-muted">Cohort Alpha: Oncology Phase I/II Substrates</p><p class="font-body-sm text-body-sm text-text-muted">Cohort Beta: Multi-CYP Enzyme Modulators</p><p class="font-body-sm text-body-sm text-text-muted">Cohort Gamma: Renal Impairment Titrations</p></div><div class="flex flex-col gap-space-xs"><span class="font-label-md text-label-md uppercase text-primary tracking-wider">Institutional Index &amp; DOIs</span><a class="font-body-sm text-body-sm text-text-muted hover:text-primary transition-colors" href="#">DOI: 10.1038/s41587-024-00129-x</a><a class="font-body-sm text-body-sm text-text-muted hover:text-primary transition-colors" href="#">DOI: 10.1016/j.cpt.2024.08.019</a><a class="font-body-sm text-body-sm text-text-muted hover:text-primary transition-colors" href="#">Wyss-BioRxiv Identifier: WP-8994-P</a></div><div class="flex flex-col gap-space-xs"><span class="font-label-md text-label-md uppercase text-primary tracking-wider">Governance &amp; Licensing</span><p class="font-body-sm text-body-sm text-text-muted">Under Academic Research License 7.2b. Strictly validated against FDA 21 CFR Part 11 and ICH-GCP specifications.</p><div class="flex items-center gap-space-xs mt-space-sm text-text-muted font-label-sm text-label-sm"><span class="material-symbols-outlined text-[16px]">verified</span><span>Cryptographically Attested Build</span></div></div></div><div class="pt-space-md flex flex-col md:flex-row items-center justify-between gap-space-sm text-text-muted font-label-sm text-label-sm"><p>© 2024–2025 Institutional Clinical Pharmacology Consortium. All rights reserved.</p><div class="flex items-center gap-space-md"><a class="hover:text-primary transition-colors" href="#">Methodological Disclosures</a><a class="hover:text-primary transition-colors" href="#">Safety Committee Terms</a><a class="hover:text-primary transition-colors" href="#">Audit Logs</a></div></div></div></footer></body></html>

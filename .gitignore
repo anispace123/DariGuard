@@ -7,5 +7,14 @@ venv/
 .DS_Store
 .matplotlib/
 .backup_baseline/
+.backup_pre_redesign/
+*.dmg
+*.mp4
+*.mov
+Lesson 10_for A1 students.pdf
+реф*
+доп реф*
+еще один реф*
 *.tmp
 *.log
+.streamlit/secrets.toml
