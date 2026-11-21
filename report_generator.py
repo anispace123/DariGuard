@@ -1,4 +1,4 @@
-"""PHARMA SENTINEL — Clinical Audit Protocol Report Generator.
+"""DARIGUARD — Clinical Audit Protocol Report Generator.
 
 Generates a structured, publication-grade, printable HTML/CSS clinical protocol
 for polypharmacy reviews, pharmacovigilance records, and clinical decision support.
@@ -145,7 +145,7 @@ def generate_clinical_protocol_report(
 <html lang="{lang}">
 <head>
     <meta charset="utf-8">
-    <title>Pharma Sentinel · Clinical Protocol</title>
+    <title>DariGuard · Clinical Protocol</title>
     <style>
         @page {{
             size: A4;
@@ -319,7 +319,7 @@ def generate_clinical_protocol_report(
         </div>
         <div class="header">
             <div>
-                <div class="brand-title">Pharma Sentinel · Clinical Protocol</div>
+                <div class="brand-title">DariGuard · Clinical Protocol</div>
                 <div class="brand-sub">Clinical Pharmacoinformatics & Patient Safety System</div>
             </div>
             <div class="meta-block">
@@ -385,7 +385,7 @@ def generate_clinical_protocol_report(
         </div>
 
         <div class="disclaimer-box">
-            <b>{t("report_disclaimer_title", default="Правовой и доказательный статус протокола")}:</b> Настоящий протокол сгенерирован алгоритмическим комплексом Pharma Sentinel в качестве инструмента поддержки принятия врачебных решений (Clinical Decision Support). Протокол не заменяет врачебное суждение и требует сопоставления с индивидуальным анамнезом, функциями печени (Child-Pugh) и почек (CKD-EPI) пациента. Отсутствие данных в справочных базах не гарантирует абсолютной безопасности фармакотерапии.
+            <b>{t("report_disclaimer_title", default="Правовой и доказательный статус протокола")}:</b> Настоящий протокол сгенерирован алгоритмическим комплексом DariGuard в качестве инструмента поддержки принятия врачебных решений (Clinical Decision Support). Протокол не заменяет врачебное суждение и требует сопоставления с индивидуальным анамнезом, функциями печени (Child-Pugh) и почек (CKD-EPI) пациента. Отсутствие данных в справочных базах не гарантирует абсолютной безопасности фармакотерапии.
         </div>
     </div>
 </body>

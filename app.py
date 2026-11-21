@@ -1,4 +1,4 @@
-"""PHARMA SENTINEL — Платформа клинической фармакологии и анализа полипрагмазии.
+"""DARIGUARD — Платформа клинической фармакологии и анализа полипрагмазии.
 
 Архитектура: Production-grade clinical intelligence platform.
 Интеграция React Bits: <TechText /> (интерактивный заголовок), фоновая молекулярная сеть.
@@ -138,7 +138,7 @@ init_session_state(default_lang=get_lang())
 
 
 st.set_page_config(
-    page_title="Pharma Sentinel · Clinical Pharmacology",
+    page_title="DariGuard · Clinical Pharmacology",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -983,7 +983,7 @@ def render_top_bar():
 
     # Невидимый инжектор глобального движка (молекулярный фон + <BubbleMenu /> в правом верхнем углу + WebAudio)
     tech_html = render_tech_text_and_effects_html(
-        text="PHARMA SENTINEL",
+        text="DARIGUARD",
         subtitle=f"{t('brand_sub')} · RELEASE v3.5",
         height=1,
         sound_enabled=sound_on,
@@ -1587,13 +1587,13 @@ def view_ml(pairs: pd.DataFrame, drugs: pd.DataFrame):
 
     result = cached_evaluation(pairs, drugs)
 
-    # ── ПЕРСОНАЛЬНЫЙ ИНТЕРАКТИВНЫЙ ПРОГНОЗ САМООБУЧАЮЩЕЙСЯ МОДЕЛИ PHARMA SENTINEL AI ──
+    # ── ПЕРСОНАЛЬНЫЙ ИНТЕРАКТИВНЫЙ ПРОГНОЗ САМООБУЧАЮЩЕЙСЯ МОДЕЛИ DARIGUARD AI ──
     st.markdown(
         '<div style="background:#111B20; border:1px solid #263940; border-left:4px solid #36D6B0; border-radius:10px; padding:14px 18px; margin-bottom:1.15rem;">'
         '<div style="font-family:var(--font-mono); font-size:0.68rem; font-weight:700; color:#36D6B0; letter-spacing:0.08em; text-transform:uppercase;">'
-        'PHARMA SENTINEL AI · SELF-LEARNING NEURAL &amp; GRAPH TOPOLOGY ENGINE</div>'
+        'DARIGUARD AI · SELF-LEARNING NEURAL &amp; GRAPH TOPOLOGY ENGINE</div>'
         '<div style="font-size:0.98rem; font-weight:700; color:#EAF2F2; margin-top:2px;">'
-        'Собственная самообучающаяся нейросетевая модель Pharma Sentinel AI: живой прогноз скрытых взаимодействий и поиск препаратов-посредников</div>'
+        'Собственная самообучающаяся нейросетевая модель DariGuard AI: живой прогноз скрытых взаимодействий и поиск препаратов-посредников</div>'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -1604,9 +1604,9 @@ def view_ml(pairs: pd.DataFrame, drugs: pd.DataFrame):
 
     ml_c1, ml_c2 = st.columns(2)
     with ml_c1:
-        ml_drug_a = st.selectbox("Препарат A для прогноза Pharma Sentinel AI", all_drug_names, index=def_idx_a, key="ml_live_drug_a")
+        ml_drug_a = st.selectbox("Препарат A для прогноза DariGuard AI", all_drug_names, index=def_idx_a, key="ml_live_drug_a")
     with ml_c2:
-        ml_drug_b = st.selectbox("Препарат B для прогноза Pharma Sentinel AI", all_drug_names, index=def_idx_b, key="ml_live_drug_b")
+        ml_drug_b = st.selectbox("Препарат B для прогноза DariGuard AI", all_drug_names, index=def_idx_b, key="ml_live_drug_b")
 
     ml_pred = predict_pair_ml_intelligence(ml_drug_a, ml_drug_b, pairs, drugs, result)
     if ml_pred.get("valid"):
@@ -1616,7 +1616,7 @@ def view_ml(pairs: pd.DataFrame, drugs: pd.DataFrame):
         mc1, mc2, mc3, mc4 = st.columns(4)
         with mc1:
             st.markdown(
-                f'<div class="ps-stat-box"><div class="ps-stat-label">PHARMA SENTINEL AI SCORE</div>'
+                f'<div class="ps-stat-box"><div class="ps-stat-label">DARIGUARD AI SCORE</div>'
                 f'<div class="ps-stat-number" style="color:#36D6B0;">{rf_pct:.1f}%</div>'
                 f'<div class="ps-stat-sub">Self-Learning Core: {ens_pct:.1f}%</div></div>',
                 unsafe_allow_html=True,
@@ -1792,7 +1792,7 @@ def view_ml(pairs: pd.DataFrame, drugs: pd.DataFrame):
     st.markdown('</div>', unsafe_allow_html=True)
 
 
-# ─── Страница: ИИ-аналитик (Pharma Sentinel AI + Доказательное досье) ─────────
+# ─── Страница: ИИ-аналитик (DariGuard AI + Доказательное досье) ─────────
 def view_ai(pairs: pd.DataFrame, drugs: pd.DataFrame, normalizer: DrugNormalizer):
     st.markdown(
         f'<div class="ps-animated-page-root ps-page-ai">'
@@ -1986,7 +1986,7 @@ def view_ai(pairs: pd.DataFrame, drugs: pd.DataFrame, normalizer: DrugNormalizer
             st.markdown(
                 f'<div style="display:inline-flex; align-items:center; gap:7px; background:rgba(54,214,176,0.14); border:1px solid rgba(54,214,176,0.5); padding:5px 12px; border-radius:9999px; font-size:0.75rem; color:#36D6B0; font-weight:700; margin:6px 0 4px 0;">'
                 f'<span style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#36D6B0; box-shadow:0 0 8px #36D6B0;"></span>'
-                f'PHARMA SENTINEL AI · SELF-LEARNING NEURAL CORE ONLINE'
+                f'DARIGUARD AI · SELF-LEARNING NEURAL CORE ONLINE'
                 f'</div>',
                 unsafe_allow_html=True
             )
@@ -2021,7 +2021,7 @@ def view_ai(pairs: pd.DataFrame, drugs: pd.DataFrame, normalizer: DrugNormalizer
         question = st.text_area(
             t("ai_question"),
             value=current_q_val,
-            placeholder="Задайте клинический вопрос нейросети Pharma Sentinel AI или выберите сценарий выше...",
+            placeholder="Задайте клинический вопрос нейросети DariGuard AI или выберите сценарий выше...",
             height=85,
             key="ai_custom_q_area"
         )
@@ -2046,7 +2046,7 @@ def view_ai(pairs: pd.DataFrame, drugs: pd.DataFrame, normalizer: DrugNormalizer
             supps_inline = "<br>".join(f"• {sw}" for sw in brief.get("supplement_warnings", [])[:2])
             fallback_card_html = (
                 f'<div style="background:var(--bg-elevated); border:1px solid var(--border); border-left:3px solid var(--accent); padding:12px 14px; border-radius:8px; font-size:0.84rem; line-height:1.58; margin-top:8px; color:var(--ink-body);">'
-                f'<div style="font-family:var(--font-mono); font-size:0.70rem; color:#36D6B0; font-weight:700; margin-bottom:6px;">ОТВЕТ САМООБУЧАЮЩЕЙСЯ НЕЙРОСЕТИ PHARMA SENTINEL AI:</div>'
+                f'<div style="font-family:var(--font-mono); font-size:0.70rem; color:#36D6B0; font-weight:700; margin-bottom:6px;">ОТВЕТ САМООБУЧАЮЩЕЙСЯ НЕЙРОСЕТИ DARIGUARD AI:</div>'
                 f'<b>Клинический запрос:</b> {active_question}<br><br>'
                 f'<b>1. Молекулярный и патофизиологический механизм:</b><br>{brief["why_matters"]}<br><br>'
                 f'<b>2. Детальные клинические риски по органам ({pmids_inline}):</b><br>{risks_inline}<br><br>'
@@ -2058,7 +2058,7 @@ def view_ai(pairs: pd.DataFrame, drugs: pd.DataFrame, normalizer: DrugNormalizer
                 f'{brief.get("self_medication_warning", "")}</div>'
                 f'</div>'
             )
-            with st.spinner("Самообучающаяся нейросеть Pharma Sentinel AI формирует клинический ответ…"):
+            with st.spinner("Самообучающаяся нейросеть DariGuard AI формирует клинический ответ…"):
                 if status.available and status.models:
                     try:
                         ans = ask_local_model(prompt, model)
@@ -2171,34 +2171,34 @@ def view_overview(pairs: pd.DataFrame, drugs: pd.DataFrame):
     with ov_r2c1:
         st.markdown(
             '<div class="ps-overview-card">'
-            '<div class="ps-ov-badge">03 · PHARMA SENTINEL AI · SELF-LEARNING GRAPH MODEL</div>'
-            '<div class="ps-ov-title">Самообучающаяся модель Pharma Sentinel AI (прогноз связей)</div>'
+            '<div class="ps-ov-badge">03 · DARIGUARD AI · SELF-LEARNING GRAPH MODEL</div>'
+            '<div class="ps-ov-title">Самообучающаяся модель DariGuard AI (прогноз связей)</div>'
             '<div style="font-size:0.86rem; color:var(--ink-body); line-height:1.6;">'
-            'Главный научный прорыв проекта: собственная самообучающаяся модель Pharma Sentinel AI на 6 топологических индексах графа '
+            'Главный научный прорыв проекта: собственная самообучающаяся модель DariGuard AI на 6 топологических индексах графа '
             '(Adamic-Adar, Jaccard, Common Neighbors, Preferential Attachment) открывает скрытые конфликты препаратов с точностью ROC-AUC 0.96+.'
             '</div>'
             '<div class="ps-ov-bar"><div class="ps-ov-bar-fill"></div></div>'
             '</div>',
             unsafe_allow_html=True,
         )
-        if st.button("Исследовать самообучающуюся модель Pharma Sentinel AI →", key="ov_jump_ml", use_container_width=True):
+        if st.button("Исследовать самообучающуюся модель DariGuard AI →", key="ov_jump_ml", use_container_width=True):
             st.session_state.nav_page = "ml"
             st.rerun()
 
     with ov_r2c2:
         st.markdown(
             '<div class="ps-overview-card">'
-            '<div class="ps-ov-badge">04 · PHARMA SENTINEL AI NEURAL COPILOT &amp; PUBMED</div>'
-            '<div class="ps-ov-title">Нейросеть Pharma Sentinel AI, PubMed и защита от самолечения</div>'
+            '<div class="ps-ov-badge">04 · DARIGUARD AI NEURAL COPILOT &amp; PUBMED</div>'
+            '<div class="ps-ov-title">Нейросеть DariGuard AI, PubMed и защита от самолечения</div>'
             '<div style="font-size:0.86rem; color:var(--ink-body); line-height:1.6;">'
-            'Облачная самообучающаяся нейросеть Pharma Sentinel AI синтезирует разбор рисков по органам-мишеням, ранних симптомов («красных флагов») '
+            'Облачная самообучающаяся нейросеть DariGuard AI синтезирует разбор рисков по органам-мишеням, ранних симптомов («красных флагов») '
             'и конфликтов с БАДами со ссылками на PubMed (PMID). Первичный скрининг против самолечения — не заменяет врача.'
             '</div>'
             '<div class="ps-ov-bar"><div class="ps-ov-bar-fill"></div></div>'
             '</div>',
             unsafe_allow_html=True,
         )
-        if st.button("Открыть нейросеть Pharma Sentinel AI и базу PubMed →", key="ov_jump_ai", use_container_width=True):
+        if st.button("Открыть нейросеть DariGuard AI и базу PubMed →", key="ov_jump_ai", use_container_width=True):
             st.session_state.nav_page = "ai"
             st.rerun()
 

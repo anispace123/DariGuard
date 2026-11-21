@@ -1,4 +1,4 @@
-"""PHARMA SENTINEL — Molecular Intelligence Lab (Futuristic Scientific Intelligence).
+"""DARIGUARD — Molecular Intelligence Lab (Futuristic Scientific Intelligence).
 
 Научный модуль молекулярного моделирования и биохимической фармакодинамики:
 1. Единый надежный селектор препаратов (Drug A, Drug B, Swap ⇄, Reset ↺, выпадающий список эталонных пар).
@@ -429,7 +429,7 @@ def view_molecular_lab(
     with col_copilot:
         status = get_local_ai_status()
         engine_badge = (
-            f'<span style="color:#36D6B0;">● PHARMA SENTINEL AI · ONLINE</span>'
+            f'<span style="color:#36D6B0;">● DARIGUARD AI · ONLINE</span>'
             if status.available
             else '<span style="color:#67B7D1;">● DETERMINISTIC EVIDENCE ENGINE</span>'
         )
@@ -462,7 +462,7 @@ def view_molecular_lab(
                     model = status.models[0]
                     try:
                         ans = ask_local_model(prompt, model)
-                        st.markdown(f"**Ответ Pharma Sentinel AI:**\n\n{ans}")
+                        st.markdown(f"**Ответ DariGuard AI:**\n\n{ans}")
                     except Exception:
                         st.markdown(f"**Детерминированная справка:**\n\n{brief['why_matters']}\n\n**Мониторинг:** {brief['monitoring']}")
                 else:

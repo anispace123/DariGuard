@@ -1,5 +1,5 @@
 {
-  "description": "Справочник нормализации: синонимы МНН, торговые наименования и комбинированные препараты для Pharma Sentinel",
+  "description": "Справочник нормализации: синонимы МНН, торговые наименования и комбинированные препараты для DariGuard",
   "version": "1.1",
   "synonyms": {
     "парацетамол": {"canonical": "acetaminophen", "type": "inn_translation", "ru": "Парацетамол", "en_inn": "Paracetamol / Acetaminophen"},

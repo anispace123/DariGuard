@@ -2,7 +2,7 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "▶️ Запустить Pharma Sentinel (Графический запуск)",
+      "name": "▶️ Запустить DariGuard (Графический запуск)",
       "type": "debugpy",
       "request": "launch",
       "module": "streamlit",

@@ -1,4 +1,4 @@
-"""Модуль визуальных эффектов Pharma Sentinel — Clinical Sage.
+"""Модуль визуальных эффектов DariGuard — Clinical Sage.
 
 Компоненты:
 1. <TechText /> — интерактивный заголовок в эстетике Clinical Sage (темный текст #26332D, медицинский зелёный акцент #315E50).
@@ -14,7 +14,7 @@
 
 
 def render_tech_text_and_effects_html(
-    text: str = "PHARMA SENTINEL",
+    text: str = "DARIGUARD",
     subtitle: str = "КЛИНИЧЕСКАЯ ФАРМАКОЛОГИЯ · DDINTER v2024.11",
     height: int = 8,
     sound_enabled: bool = False,
@@ -38,13 +38,13 @@ def render_tech_text_and_effects_html(
 <body>
 <script>
 /* ==========================================================================
-   1. Глобальный движок сайта PHARMA SENTINEL V6:
+   1. Глобальный движок сайта DARIGUARD V6:
       - Интерактивный молекулярный фон со сборкой молекул вокруг курсора (#ps-molecular-canvas)
       - Навигационное <BubbleMenu /> (React Bits + GSAP) в правом верхнем углу (#ps-reactbits-bubble-dock)
       - Полное скрытие старой горизонтальной радио-полосы навигации
       - Тактильное WebAudio-сопровождение ховеров, карточек и кликов BubbleMenu
    ========================================================================== */
-function initPharmaSentinelPersistentEngine() {{
+function initDariGuardPersistentEngine() {{
   if (window.__PS_PERSISTENT_ENGINE_V7__) return;
   window.__PS_PERSISTENT_ENGINE_V7__ = true;
   window.__PS_PERSISTENT_ENGINE_V6__ = true;
@@ -822,11 +822,11 @@ function initPharmaSentinelPersistentEngine() {{
   const bubbleDock = doc.createElement('nav');
   bubbleDock.id = 'ps-reactbits-bubble-dock';
   bubbleDock.className = 'bubble-menu fixed';
-  bubbleDock.setAttribute('aria-label', 'Навигация по разделам PHARMA SENTINEL');
+  bubbleDock.setAttribute('aria-label', 'Навигация по разделам DARIGUARD');
   bubbleDock.innerHTML = `
     <div class="bubble logo-bubble" id="ps-rb-logo-bubble" title="Активный раздел · Нажмите, чтобы открыть или свернуть меню">
       <span class="ps-rb-dot"></span>
-      <span class="logo-content" id="ps-rb-active-label">PHARMA SENTINEL</span>
+      <span class="logo-content" id="ps-rb-active-label">DARIGUARD</span>
     </div>
     <button type="button" class="bubble toggle-bubble menu-btn" id="ps-rb-toggle-btn" aria-label="Открыть разделы сайта" aria-pressed="false">
       <span class="menu-line first"></span>
@@ -1245,7 +1245,7 @@ function initPharmaSentinelPersistentEngine() {{
 
   const engineScript = parentDoc.createElement('script');
   engineScript.id = 'ps-persistent-engine-script';
-  engineScript.textContent = '(' + initPharmaSentinelPersistentEngine.toString() + ')();';
+  engineScript.textContent = '(' + initDariGuardPersistentEngine.toString() + ')();';
   parentDoc.head.appendChild(engineScript);
 }})();
 </script>
@@ -1310,7 +1310,7 @@ def render_albus_fingent_hero_3d_html(
         eyebrow = "01 — БІЗДІҢ ҒЫЛЫМ · AI IS REDEFINING DRUG SAFETY"
         headline = "Деректерге негізделген ЖИ арқылы дәрілік қауіпсіздікті трансформациялау."
         subtext = (
-            "PHARMA SENTINEL — өзін-өзі емдеудің (самолечение) және полипрагмазияның қауіпті салдарын алдын ала "
+            "DARIGUARD — өзін-өзі емдеудің (самолечение) және полипрагмазияның қауіпті салдарын алдын ала "
             "болдырмауға арналған бастапқы клиникалық-фармакологиялық скрининг моделі (DDInter + PubMed + ML). "
             "Емдеуші дәрігерді немесе клиникалық фармакологты алмастырмайды."
         )
@@ -1324,7 +1324,7 @@ def render_albus_fingent_hero_3d_html(
         eyebrow = "01 — OUR SCIENCE · AI IS REDEFINING DRUG DISCOVERY & SAFETY"
         headline = "Transforming Drug Safety with Data-Driven AI."
         subtext = (
-            "PHARMA SENTINEL is a primary clinical pharmacology screening model combining DDInter, PubMed clinical studies, "
+            "DARIGUARD is a primary clinical pharmacology screening model combining DDInter, PubMed clinical studies, "
             "and topological ML to prevent hazardous self-medication. It never replaces an attending physician or clinical pharmacist."
         )
         btn_cap = "01 · 3D Capsule"
@@ -1337,7 +1337,7 @@ def render_albus_fingent_hero_3d_html(
         eyebrow = "01 — НАУЧНАЯ АРХИТЕКТУРА · AI IS REDEFINING DRUG SAFETY"
         headline = "Интеллектуальный 3D-аудит лекарств и защита от самолечения."
         subtext = (
-            "PHARMA SENTINEL объединяет верифицированную матрицу DDInter (160 230 пар), клинические исследования PubMed "
+            "DARIGUARD объединяет верифицированную матрицу DDInter (160 230 пар), клинические исследования PubMed "
             "и графовый ML-анализ. Первичная скрининговая модель для предотвращения опасного самолечения — не заменяет врача или клинического фармаколога."
         )
         btn_cap = "01 · 3D Пилюля"

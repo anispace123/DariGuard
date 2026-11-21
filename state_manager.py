@@ -1,4 +1,4 @@
-"""PHARMA SENTINEL — Unified State Management Architecture.
+"""DARIGUARD — Unified State Management Architecture.
 
 Provides single-source-of-truth state management across all platform views:
 - Command Center (Workspace / Анализ назначений)

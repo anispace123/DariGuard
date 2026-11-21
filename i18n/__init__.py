@@ -1,4 +1,4 @@
-"""PHARMA SENTINEL — Internationalization (i18n) Engine.
+"""DARIGUARD — Internationalization (i18n) Engine.
 
 Supports:
 - Kazakh (kk) — Default and primary platform language

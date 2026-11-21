@@ -1,4 +1,4 @@
-# Pharma Sentinel
+# DariGuard
 
 Учебное Streamlit-приложение для интерактивного изучения записей о лекарственных взаимодействиях из DDInter и честной проверки моделей предсказания связей.
 
@@ -53,7 +53,7 @@ ollama pull qwen2.5:3b
 ## Структура проекта
 
 ```text
-pharma_sentinel/
+dariguard/
 ├── app.py                  # Главный веб-интерфейс, страницы и Clinical Sage дизайн-система
 ├── i18n/                   # Движок интернационализации (kk — дефолт, ru, en)
 │   ├── __init__.py         # Функции t(), get_lang(), set_lang(), strict mode
@@ -104,7 +104,7 @@ pharma_sentinel/
 Для запуска нужны Python 3.10+ и восемь исходных CSV в `data/`. Выполните пять команд из папки проекта:
 
 ```bash
-cd /путь/к/pharma_sentinel
+cd /путь/к/dariguard
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt

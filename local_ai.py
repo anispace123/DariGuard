@@ -1,4 +1,4 @@
-"""Pharma Sentinel AI — облачный языковой движок (Groq API) с безопасной деградацией.
+"""DariGuard AI — облачный языковой движок (Groq API) с безопасной деградацией.
 
 Генеративный слой работает через облачный OpenAI-совместимый API Groq
 (базовая LLM: Llama 3.3 70B). Ответы строго заземляются (RAG) на доказательное
@@ -31,8 +31,8 @@ __all__ = [
 ]
 
 DEFAULT_BASE_URL = "https://api.groq.com/openai/v1"
-AI_BRAND_NAME = "Pharma Sentinel AI"
-AI_ENGINE_MODEL = "Pharma Sentinel AI v4.0 (Self-Learning Neural Core)"
+AI_BRAND_NAME = "DariGuard AI"
+AI_ENGINE_MODEL = "DariGuard AI v4.0 (Self-Learning Neural Core)"
 # Каскад облачных нейросетевых ядер: при перегрузке или сбое одного ядра
 # система мгновенно переключается на следующее доступное ядро.
 # Ядро qwen/qwen3.8-27b обеспечивает максимальную глубину клинических ответов без задержек рассуждений.
@@ -134,7 +134,7 @@ def _auth_headers() -> dict[str, str]:
 
 @dataclass
 class LocalAIStatus:
-    """Статус доступности собственного самообучающегося движка Pharma Sentinel AI."""
+    """Статус доступности собственного самообучающегося движка DariGuard AI."""
     available: bool
     models: list[str]
     status_code: str  # 'ready', 'no_models', 'unreachable', 'disabled'
@@ -143,13 +143,13 @@ class LocalAIStatus:
 
 
 def get_local_ai_status(base_url: str = DEFAULT_BASE_URL, timeout: float = 4.0) -> LocalAIStatus:
-    """Безопасно проверяет доступность самообучающегося движка Pharma Sentinel AI без выбрасывания исключений."""
+    """Безопасно проверяет доступность самообучающегося движка DariGuard AI без выбрасывания исключений."""
     cache_key = base_url.rstrip("/")
     cached = _STATUS_CACHE.get(cache_key)
     if cached and (time.time() - cached[0]) < _STATUS_TTL_SECONDS:
         return cached[1]
 
-    # Для стандартного облачного адреса Pharma Sentinel AI при наличии ключа сразу возвращаем готовность
+    # Для стандартного облачного адреса DariGuard AI при наличии ключа сразу возвращаем готовность
     if base_url == DEFAULT_BASE_URL:
         if not _read_api_key():
             status = LocalAIStatus(
@@ -164,7 +164,7 @@ def get_local_ai_status(base_url: str = DEFAULT_BASE_URL, timeout: float = 4.0) 
                 available=True,
                 models=[AI_ENGINE_MODEL],
                 status_code="ready",
-                message="Собственная самообучающаяся нейросеть Pharma Sentinel AI активна.",
+                message="Собственная самообучающаяся нейросеть DariGuard AI активна.",
                 details="Self-Learning Neural & Graph Topology Engine · DDInter + PubMed RAG",
             )
         _STATUS_CACHE[cache_key] = (time.time(), status)
@@ -218,11 +218,11 @@ def list_local_models(base_url: str = DEFAULT_BASE_URL) -> list[str]:
 
 
 _SYSTEM_PROMPT = (
-    "Ты — Pharma Sentinel AI, собственная самообучающаяся клинико-фармакологическая нейросеть проекта "
-    "PHARMA SENTINEL для первичного скрининга лекарственных взаимодействий и защиты от самолечения. "
+    "Ты — DariGuard AI, собственная самообучающаяся клинико-фармакологическая нейросеть проекта "
+    "DARIGUARD для первичного скрининга лекарственных взаимодействий и защиты от самолечения. "
     "Отвечай строго на основе переданного доказательного досье (DDInter, PubMed, графовая ML-модель). "
     "Не выдумывай несуществующие факты или PMID. В начале или конце ответа кратко подчеркивай, что вывод "
-    "сформирован самообучающейся нейросетью Pharma Sentinel AI и не заменяет очную консультацию врача. "
+    "сформирован самообучающейся нейросетью DariGuard AI и не заменяет очную консультацию врача. "
     "Отвечай на языке вопроса пользователя (қазақша, русский или English), профессионально, четко и структурированно."
 )
 
@@ -237,7 +237,7 @@ def _clean_neural_output(raw_text: str) -> str:
 
 
 def ask_local_model(prompt: str, model: str = AI_ENGINE_MODEL, base_url: str = DEFAULT_BASE_URL, timeout: int = 45) -> str:
-    """Запрашивает самообучающуюся нейросеть Pharma Sentinel AI с автоматическим каскадным переключением ядер."""
+    """Запрашивает самообучающуюся нейросеть DariGuard AI с автоматическим каскадным переключением ядер."""
     detected_url, active_key, preferred_candidates = _detect_provider_config()
     target_base_url = detected_url if base_url == DEFAULT_BASE_URL else base_url
 
@@ -659,14 +659,14 @@ def fetch_pubmed_evidence(drug_a: str, drug_b: str, lang: str = "ru", max_result
         try:
             q_term = quote_plus(f'("{norm_a}"[Title/Abstract]) AND ("{norm_b}"[Title/Abstract]) AND (interaction[Title/Abstract])')
             esearch_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&retmax=2&term={q_term}"
-            with _secure_urlopen(Request(esearch_url, headers={"User-Agent": "PharmaSentinel/3.5"}), timeout=1.2) as resp:
+            with _secure_urlopen(Request(esearch_url, headers={"User-Agent": "DariGuard/3.5"}), timeout=1.2) as resp:
                 search_data = json.loads(resp.read().decode("utf-8"))
             id_list = search_data.get("esearchresult", {}).get("idlist", [])
             live_items: list[dict[str, str]] = []
             if id_list:
                 ids_str = ",".join(id_list)
                 esum_url = f"https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&retmode=json&id={ids_str}"
-                with _secure_urlopen(Request(esum_url, headers={"User-Agent": "PharmaSentinel/3.5"}), timeout=1.2) as resp2:
+                with _secure_urlopen(Request(esum_url, headers={"User-Agent": "DariGuard/3.5"}), timeout=1.2) as resp2:
                     sum_data = json.loads(resp2.read().decode("utf-8")).get("result", {})
                 for pid in id_list:
                     doc = sum_data.get(str(pid), {})
@@ -790,19 +790,19 @@ def _enrich_brief_with_pubmed_and_organs(
 
     if lang == "kk":
         self_med_warning = (
-            "МАҢЫЗДЫ ЕСКЕРТУ: PHARMA SENTINEL — өзін-өзі емдеудің (самолечение) және полипрагмазияның қауіпті асқынуларын "
+            "МАҢЫЗДЫ ЕСКЕРТУ: DARIGUARD — өзін-өзі емдеудің (самолечение) және полипрагмазияның қауіпті асқынуларын "
             "алдын ала анықтауға арналған бастапқы ғылыми-скринингтік модель. Ол емдеуші дәрігердің немесе клиникалық фармакологтың "
             "жеке кеңесін алмастырмайды. Дәрігердің рұқсатынсыз препараттарды өз бетінше тағайындауға немесе тоқтатуға болмайды."
         )
     elif lang == "en":
         self_med_warning = (
-            "PRIMARY SCREENING MANDATE: PHARMA SENTINEL is a primary pharmacological screening model designed to prevent hazardous "
+            "PRIMARY SCREENING MANDATE: DARIGUARD is a primary pharmacological screening model designed to prevent hazardous "
             "self-medication and polypharmacy complications. It does NOT replace an attending physician or clinical pharmacist. "
             "Never initiate, alter, or abruptly discontinue prescribed medications without professional medical supervision."
         )
     else:
         self_med_warning = (
-            "ВАЖНОЕ КЛИНИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ: PHARMA SENTINEL — это первичная скрининговая и образовательная модель, созданная "
+            "ВАЖНОЕ КЛИНИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ: DARIGUARD — это первичная скрининговая и образовательная модель, созданная "
             "для предотвращения опасного самолечения и неконтролируемой полипрагмазии. Система НЕ заменяет консультацию лечащего врача "
             "или клинического фармаколога. Никогда не назначайте и не отменяйте рецептурные препараты самостоятельно."
         )

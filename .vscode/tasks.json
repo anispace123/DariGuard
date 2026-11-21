@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Запуск Pharma Sentinel",
+      "label": "Запуск DariGuard",
       "type": "shell",
       "command": "${workspaceFolder}/.venv/bin/streamlit run app.py",
       "isBackground": true,
