@@ -84,6 +84,17 @@ def _detect_provider_config() -> tuple[str, str, tuple[str, ...]]:
         except Exception:
             pass
 
+    # Также читаем st.secrets (для Streamlit Community Cloud)
+    try:
+        import streamlit as st
+        if hasattr(st, "secrets"):
+            for k in ("GEMINI_API_KEY", "GOOGLE_API_KEY", "OPENROUTER_API_KEY", "GROQ_API_KEY"):
+                val = st.secrets.get(k)
+                if val and k not in secrets:
+                    secrets[k] = str(val).strip()
+    except Exception:
+        pass
+
     # 1. Приоритет: Google Gemini API (через Google AI Studio: 1 000 000 TPM бесплатно!)
     gemini_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or str(secrets.get("GEMINI_API_KEY", "")).strip() or str(secrets.get("GOOGLE_API_KEY", "")).strip()
     if gemini_key and (gemini_key.startswith("AIzaSy") or len(gemini_key) > 30):
