@@ -242,12 +242,12 @@ def list_local_models(base_url: str = DEFAULT_BASE_URL) -> list[str]:
 
 
 _SYSTEM_PROMPT = (
-    "Ты — DariGuard AI, собственная самообучающаяся клинико-фармакологическая нейросеть проекта "
-    "DARIGUARD для первичного скрининга лекарственных взаимодействий и защиты от самолечения. "
-    "Отвечай строго на основе переданного доказательного досье (DDInter, PubMed, графовая ML-модель). "
-    "Не выдумывай несуществующие факты или PMID. В начале или конце ответа кратко подчеркивай, что вывод "
-    "сформирован самообучающейся нейросетью DariGuard AI и не заменяет очную консультацию врача. "
-    "Отвечай на языке вопроса пользователя (қазақша, русский или English), профессионально, четко и структурированно."
+    "Ты — DariGuard AI, понятный и дружелюбный ассистент по безопасности лекарств на базе DDInter и PubMed. "
+    "Отвечай КОРОТКО, ПРОСТО и ПРЯМО на конкретный вопрос пользователя (4–7 предложений или 3–4 коротких пункта). "
+    "Пиши человеческим языком, чтобы понял и обычный человек, и врач. "
+    "НЕ используй шаблонные заголовки вроде «1. Молекулярный и патофизиологический механизм» или длинные академические лекции — отвечай именно на то, что спросили. "
+    "Опирайся на переданные факты, не выдумывай PMID, не советуй резко отменять назначенные лекарства и в конце одной короткой фразой напомни обсудить схему с врачом. "
+    "Отвечай на языке вопроса пользователя (қазақша, русский или English)."
 )
 
 
@@ -289,20 +289,20 @@ def ask_local_model(prompt: str, model: str = AI_ENGINE_MODEL, base_url: str = D
             headers["Authorization"] = f"Bearer {active_key}"
 
         for engine_model in candidate_models:
-            max_tokens = 1500
+            max_tokens = 700
             req_payload: dict[str, Any] = {
                 "model": engine_model,
                 "messages": [
                     {"role": "system", "content": _SYSTEM_PROMPT},
                     {"role": "user", "content": prompt},
                 ],
-                "temperature": 0.2,
+                "temperature": 0.3,
             }
             if engine_model.startswith("openai/gpt-oss"):
                 req_payload["reasoning_effort"] = "low"
-                max_tokens = 2200
+                max_tokens = 900
             elif "gemini" in engine_model:
-                max_tokens = 2000
+                max_tokens = 800
             req_payload["max_tokens"] = max_tokens
 
             body = json.dumps(req_payload).encode("utf-8")
@@ -405,19 +405,18 @@ def make_evidence_prompt(
 
 ПАЙДАЛАНУШЫНЫҢ СҰРАҒЫ: {question}
 
-ЖАУАП ҚҰРЫЛЫМЫ:
-Нақты сұраққа толық жауап бер: 1) Патофизиологиялық механизм мен ағзаларға әсері, 2) Нақты клиникалық тәуекелдер мен алғашқы қауіпті белгілер (PubMed PMID сілтемелерімен), 3) ББҚ/қоспалармен ықтимал қақтығыстар және зертханалық бақылау, 4) Өзін-өзі емдеуге жол бермеу және дәрігермен кеңесу туралы ескерту."""
+ЖАУАП ЕРЕЖЕСІ:
+Пайдаланушының нақты сұрағына қысқа, қарапайым және түсінікті тілмен жауап бер (4–7 сөйлем). Ұзақ шаблонды тақырыптарды қолданба. Қажет болса 1–2 негізгі қауіпті, бақылау талдауын және дәрігермен кеңесу қажеттігін қысқаша атап өт."""
 
     elif lang_normalized == "en":
-        return f"""You are an expert clinical pharmacology decision-support assistant analyzing the DDInter database and PubMed clinical evidence.
-Answer the user's inquiry in English with comprehensive clinical risk detail, pathophysiological mechanisms, and PubMed PMID citations.
+        return f"""You are a clear, helpful medication safety assistant using the DDInter database and PubMed clinical evidence.
+Answer the user's specific question directly in plain, everyday English so both patients and clinicians can understand it immediately.
 
-CRITICAL SAFETY DIRECTIVES (ANTI-SELF-MEDICATION MANDATE):
-1. Base your answer strictly on the provided structured clinical & PubMed evidence.
-2. Explicitly state that this model is a primary screening tool to prevent hazardous self-medication and does NOT replace an attending physician or clinical pharmacist.
-3. Never advise abrupt self-discontinuation of prescribed pharmacotherapy.
+SAFETY RULES:
+1. Stay grounded in the provided DDInter & PubMed facts (do not invent PMIDs).
+2. Never advise abruptly stopping prescribed medication; remind the user in one brief sentence to confirm changes with their doctor.
 
-STRUCTURED PHARMACOLOGICAL & PUBMED EVIDENCE:
+REFERENCE FACTS:
 - Evaluated Medications: {drug_a} + {drug_b}
 - DDInter Finding: {finding}
 - Drug A Mechanism: {moa_a}
@@ -438,45 +437,40 @@ STRUCTURED PHARMACOLOGICAL & PUBMED EVIDENCE:
 
 USER INQUIRY: {question}
 
-RESPONSE REQUIREMENTS:
-Provide a thorough, structured clinical response covering: (1) exact enzymatic/receptor mechanism, (2) specific organ risks & red-flag symptoms with PubMed PMIDs, (3) dietary supplement interactions & laboratory monitoring, and (4) why self-medication is dangerous and physician oversight is required."""
+RESPONSE RULES:
+Answer the exact question above in 4–7 clear, concise sentences (or a brief 3-bullet list). Do NOT dump a rigid 4-section textbook template. Explain any medical terms in simple words."""
 
     # Default Russian
-    return f"""Ты — экспертный ИИ-ассистент по клинической фармакологии, анализирующий базу DDInter и клинические публикации PubMed.
-Дай полный, глубокий и практически полезный клинический ответ по-русски.
+    return f"""Ты — понятный ассистент по безопасности лекарств на базе DDInter и PubMed.
+Ответь на конкретный вопрос пользователя по-русски: коротко, живо и простым человеческим языком, чтобы понял любой человек, а не только врач.
 
-КРИТИЧЕСКИЕ ПРАВИЛА БЕЗОПАСНОСТИ (ПРЕДОТВРАЩЕНИЕ САМОЛЕЧЕНИЯ):
-1. Опирайся на переданный клинический профиль и исследования PubMed (указывай PMID). Не ограничивайся общими фразами — подробно раскрой все конкретные риски для органов и систем.
-2. Обязательно подчеркни, что данная модель является первичным скрининговым инструментом для предотвращения опасного самолечения и полипрагмазии и НЕ заменяет консультацию лечащего врача или клинического фармаколога.
-3. Категорически запрещено рекомендовать пациенту самостоятельно отменять назначенную врачом терапию.
+ПРАВИЛА БЕЗОПАСНОСТИ:
+1. Опирайся только на переданные факты DDInter и PubMed (не выдумывай PMID).
+2. Не советуй резко отменять назначенные лекарства и в конце одной короткой фразой напомни обсудить схему с врачом.
 
-СТРУКТУРИРОВАННЫЕ КЛИНИЧЕСКИЕ И PUBMED ДАННЫЕ:
-- Анализируемые препараты: {drug_a} + {drug_b}
+СПРАВОЧНЫЕ ДАННЫЕ ПО ПАРЕ:
+- Препараты: {drug_a} + {drug_b}
 - Статус в базе DDInter: {finding}
-- Механизм действия препарата A: {moa_a}
-- Механизм действия препарата B: {moa_b}
-- Биологический смысл взаимодействия: {why_matters}
+- Механизм A: {moa_a}
+- Механизм B: {moa_b}
+- Суть взаимодействия: {why_matters}
 - Клинические последствия: {clinical_consequence}
-- Детальная матрица рисков по органам-мишеням:
+- Риски по органам:
 {detailed_risks}
-- Временное окно развития эффекта (Time-to-Onset): {time_to_onset}
-- Симптомы-предвестники («Красные флаги»): {red_flags}
-- Регламент лабораторного мониторинга: {monitoring}
-- Клинические данные PubMed:
+- Временное окно: {time_to_onset}
+- Симптомы тревоги: {red_flags}
+- Мониторинг: {monitoring}
+- Данные PubMed:
 {pubmed_block}
-- Риски при сопутствующем приеме БАДов и фитопрепаратов (PubMed):
+- БАДы и добавки:
 {supp_block}
-- Научные источники: {sources}
-- Предупреждение о самолечении: {self_med_warning}
+- Источники: {sources}
+- Предупреждение: {self_med_warning}
 
 ВОПРОС ПОЛЬЗОВАТЕЛЯ: {question}
 
 ТРЕБОВАНИЯ К ОТВЕТУ:
-Дай развернутый, конкретный ответ в 3–4 структурированных блоках:
-1) Точный молекулярный и патофизиологический механизм конфликта;
-2) Полный перечень клинических рисков по органам, временное окно и ранние симптомы («красные флаги») со ссылками на PubMed (PMID);
-3) Риски наложения БАДов/добавок и точный регламент анализов (МНО, креатинин, КФК, калий, ЭКГ);
-4) Напоминание о недопустимости самолечения и необходимости согласования терапии с врачом."""
+Отвечай прямо на вопрос пользователя: коротко, ясно и по-человечески (4–7 предложений или 3 коротких пункта). НЕ пиши длинную шаблонную лекцию с заголовками «1. Молекулярный механизм...». Если упоминаешь медицинский термин или анализ — сразу поясняй простыми словами."""
 
 
 
