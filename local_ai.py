@@ -72,8 +72,8 @@ def _secure_urlopen(request, timeout: float):
     return urlopen(request, timeout=timeout, context=_SSL_CONTEXT)
 
 
-def _detect_provider_config() -> tuple[str, str, tuple[str, ...]]:
-    """Определяет активного провайдера (Gemini 1M TPM, OpenRouter или Groq) по ключам в окружении/secrets."""
+def _detect_all_providers() -> list[tuple[str, str, tuple[str, ...]]]:
+    """Возвращает упорядоченный список всех настроенных провайдеров (Gemini -> OpenRouter -> Groq)."""
     secrets_path = Path(__file__).resolve().parent / ".streamlit" / "secrets.toml"
     secrets: dict[str, Any] = {}
     if secrets_path.exists():
@@ -95,21 +95,26 @@ def _detect_provider_config() -> tuple[str, str, tuple[str, ...]]:
     except Exception:
         pass
 
-    # 1. Приоритет: Google Gemini API (через Google AI Studio: 1 000 000 TPM бесплатно!)
-    gemini_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or str(secrets.get("GEMINI_API_KEY", "")).strip() or str(secrets.get("GOOGLE_API_KEY", "")).strip()
-    if gemini_key and (gemini_key.startswith("AIzaSy") or len(gemini_key) > 30):
-        # Официальный ключ Google AI Studio начинается с AIzaSy
-        if gemini_key.startswith("AIzaSy"):
-            return (
-                "https://generativelanguage.googleapis.com/v1beta/openai",
-                gemini_key,
-                ("gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro")
-            )
+    providers: list[tuple[str, str, tuple[str, ...]]] = []
+
+    # 1. Приоритет: Google Gemini API (через Google AI Studio: актуальные модели 2.5 / 2.0)
+    gemini_key = (
+        os.environ.get("GEMINI_API_KEY", "").strip()
+        or os.environ.get("GOOGLE_API_KEY", "").strip()
+        or str(secrets.get("GEMINI_API_KEY", "")).strip()
+        or str(secrets.get("GOOGLE_API_KEY", "")).strip()
+    )
+    if gemini_key and gemini_key.startswith("AIzaSy"):
+        providers.append((
+            "https://generativelanguage.googleapis.com/v1beta/openai",
+            gemini_key,
+            ("gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash", "gemini-2.0-flash-lite"),
+        ))
 
     # 2. OpenRouter (Пул бесплатных моделей :free)
-    openrouter_key = os.environ.get("OPENROUTER_API_KEY") or str(secrets.get("OPENROUTER_API_KEY", "")).strip()
+    openrouter_key = os.environ.get("OPENROUTER_API_KEY", "").strip() or str(secrets.get("OPENROUTER_API_KEY", "")).strip()
     if openrouter_key:
-        return (
+        providers.append((
             "https://openrouter.ai/api/v1",
             openrouter_key,
             (
@@ -117,16 +122,24 @@ def _detect_provider_config() -> tuple[str, str, tuple[str, ...]]:
                 "google/gemini-2.0-flash-exp:free",
                 "deepseek/deepseek-r1:free",
                 "qwen/qwen-2.5-72b-instruct:free",
-            )
-        )
+            ),
+        ))
 
     # 3. Groq API (Быстрый LPU кластер)
     groq_key = os.environ.get("GROQ_API_KEY", "").strip() or str(secrets.get("GROQ_API_KEY", "")).strip() or _FALLBACK_GROQ_KEY
-    return (
-        DEFAULT_BASE_URL,
-        groq_key,
-        AI_ENGINE_PREFERENCES
-    )
+    if groq_key or not providers:
+        providers.append((
+            DEFAULT_BASE_URL,
+            groq_key,
+            AI_ENGINE_PREFERENCES,
+        ))
+
+    return providers
+
+
+def _detect_provider_config() -> tuple[str, str, tuple[str, ...]]:
+    """Определяет приоритетного активного провайдера по ключам в окружении/secrets."""
+    return _detect_all_providers()[0]
 
 
 def _read_api_key() -> str:
@@ -248,77 +261,83 @@ def _clean_neural_output(raw_text: str) -> str:
 
 
 def ask_local_model(prompt: str, model: str = AI_ENGINE_MODEL, base_url: str = DEFAULT_BASE_URL, timeout: int = 45) -> str:
-    """Запрашивает самообучающуюся нейросеть DariGuard AI с автоматическим каскадным переключением ядер."""
-    detected_url, active_key, preferred_candidates = _detect_provider_config()
-    target_base_url = detected_url if base_url == DEFAULT_BASE_URL else base_url
+    """Запрашивает самообучающуюся нейросеть DariGuard AI с автоматическим каскадным переключением провайдеров и ядер."""
+    if base_url == DEFAULT_BASE_URL:
+        provider_chain = _detect_all_providers()
+    else:
+        _, active_key, _ = _detect_provider_config()
+        provider_chain = [(base_url, active_key, (model or AI_ENGINE_MODEL,))]
 
-    # Если запрос идет на стандартный облачный кластер, проверяем кэш ответов
-    cache_key = f"{target_base_url}::{prompt}"
+    primary_url = provider_chain[0][0]
+    cache_key = f"{primary_url}::{prompt}"
     if cache_key in _RESPONSE_CACHE:
         return _RESPONSE_CACHE[cache_key]
 
-    # Формируем список кандидатов-ядер
-    if base_url == DEFAULT_BASE_URL:
+    last_error: Exception | None = None
+
+    for target_base_url, active_key, preferred_candidates in provider_chain:
+        if not active_key and base_url == DEFAULT_BASE_URL:
+            continue
+
         candidate_models = list(preferred_candidates)
-        if model and model in preferred_candidates:
+        if base_url == DEFAULT_BASE_URL and model and model in preferred_candidates:
             candidate_models.remove(model)
             candidate_models.insert(0, model)
-    else:
-        candidate_models = [model or AI_ENGINE_MODEL]
 
-    last_error: Exception | None = None
-    headers = dict(_HTTP_HEADERS_BASE)
-    if active_key:
-        headers["Authorization"] = f"Bearer {active_key}"
+        headers = dict(_HTTP_HEADERS_BASE)
+        if active_key:
+            headers["Authorization"] = f"Bearer {active_key}"
 
-    for engine_model in candidate_models:
-        max_tokens = 1500
-        req_payload: dict[str, Any] = {
-            "model": engine_model,
-            "messages": [
-                {"role": "system", "content": _SYSTEM_PROMPT},
-                {"role": "user", "content": prompt},
-            ],
-            "temperature": 0.2,
-        }
-        if engine_model.startswith("openai/gpt-oss"):
-            req_payload["reasoning_effort"] = "low"
-            max_tokens = 2200
-        elif "gemini" in engine_model:
-            max_tokens = 2000
-        req_payload["max_tokens"] = max_tokens
+        for engine_model in candidate_models:
+            max_tokens = 1500
+            req_payload: dict[str, Any] = {
+                "model": engine_model,
+                "messages": [
+                    {"role": "system", "content": _SYSTEM_PROMPT},
+                    {"role": "user", "content": prompt},
+                ],
+                "temperature": 0.2,
+            }
+            if engine_model.startswith("openai/gpt-oss"):
+                req_payload["reasoning_effort"] = "low"
+                max_tokens = 2200
+            elif "gemini" in engine_model:
+                max_tokens = 2000
+            req_payload["max_tokens"] = max_tokens
 
-        body = json.dumps(req_payload).encode("utf-8")
-        request = Request(
-            f"{target_base_url.rstrip('/')}/chat/completions",
-            data=body,
-            headers=headers,
-            method="POST",
-        )
-        try:
-            with _secure_urlopen(request, timeout=timeout) as response:
-                payload = json.loads(response.read().decode("utf-8"))
-            msg_obj = payload.get("choices", [{}])[0].get("message", {})
-            raw_answer = (msg_obj.get("content") or "").strip()
-            # Если reasoning-модель вернула чистые мысли без content, используем reasoning как ответ
-            if not raw_answer and msg_obj.get("reasoning"):
-                raw_answer = str(msg_obj.get("reasoning")).strip()
-            answer = _clean_neural_output(raw_answer)
-            if answer:
-                _RESPONSE_CACHE[cache_key] = answer
-                return answer
-        except HTTPError as exc:
-            last_error = exc
-            # При неверном ключе прекращаем попытки сразу, а при 429/404/5xx пробуем следующее ядро каскада
-            if exc.code == 401:
-                raise RuntimeError(f"{AI_BRAND_NAME}: неверный или отозванный API-ключ.") from exc
-            continue
-        except (URLError, TimeoutError, json.JSONDecodeError, OSError) as exc:
-            last_error = exc
-            # Если хост недоступен вообще (например, тест с localhost:59999), не ждём остальных кандидатов
-            break
+            body = json.dumps(req_payload).encode("utf-8")
+            request = Request(
+                f"{target_base_url.rstrip('/')}/chat/completions",
+                data=body,
+                headers=headers,
+                method="POST",
+            )
+            try:
+                with _secure_urlopen(request, timeout=timeout) as response:
+                    payload = json.loads(response.read().decode("utf-8"))
+                msg_obj = payload.get("choices", [{}])[0].get("message", {})
+                raw_answer = (msg_obj.get("content") or "").strip()
+                # Если reasoning-модель вернула чистые мысли без content, используем reasoning как ответ
+                if not raw_answer and msg_obj.get("reasoning"):
+                    raw_answer = str(msg_obj.get("reasoning")).strip()
+                answer = _clean_neural_output(raw_answer)
+                if answer:
+                    _RESPONSE_CACHE[cache_key] = answer
+                    return answer
+            except HTTPError as exc:
+                last_error = exc
+                # При 401/403 прекращаем попытки на ЭТОМ провайдере и переходим к следующему (например, Gemini -> Groq)
+                if exc.code in (401, 403):
+                    break
+                continue
+            except (URLError, TimeoutError, json.JSONDecodeError, OSError) as exc:
+                last_error = exc
+                # Если хост недоступен вообще, переходим к следующему провайдеру
+                break
 
     if isinstance(last_error, HTTPError):
+        if last_error.code == 401:
+            raise RuntimeError(f"{AI_BRAND_NAME}: неверный или отозванный API-ключ.") from last_error
         raise RuntimeError(f"Не удалось получить ответ от {AI_BRAND_NAME} (HTTP {last_error.code}).") from last_error
     raise RuntimeError(f"Не удалось получить ответ от {AI_BRAND_NAME}. Проверьте подключение к сети.") from last_error
 
